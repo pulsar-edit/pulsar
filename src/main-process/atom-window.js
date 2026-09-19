@@ -16,7 +16,7 @@ const { EventEmitter } = require('events');
 const StartupTime = require('../startup-time');
 
 let ICON_PATH = path.resolve(process.resourcesPath, 'pulsar.png');
-if(!fs.existsSync(ICON_PATH)) {
+if (!fs.existsSync(ICON_PATH)) {
   ICON_PATH = path.resolve(__dirname, '..', '..', 'resources', 'pulsar.png');
 }
 
@@ -130,11 +130,12 @@ module.exports = class AtomWindow extends EventEmitter {
 
     StartupTime.addMarker('main-process:atom-window:end');
 
-    // Expose the startup markers to the renderer process, so we can have unified
-    // measures about startup time between the main process and the renderer process.
+    // Expose the startup markers to the renderer process, so we can have
+    // unified measures about startup time between the main process and the
+    // renderer process.
     Object.defineProperty(this.browserWindow, 'startupMarkers', {
       get: () => {
-        // We only want to make the main process startup data available once,
+        // We want to make the main process startup data available only once —
         // so if the window is refreshed or a new window is opened, the
         // renderer process won't use it again.
         const timingData = StartupTime.exportData();
@@ -183,6 +184,18 @@ module.exports = class AtomWindow extends EventEmitter {
     this.browserWindow.showSaveDialog = this.showSaveDialog.bind(this);
 
     if (this.isSpec) this.browserWindow.focusOnWebView();
+
+    if (this.isSpec && process.env.CI) {
+      // A hidden window in a headless CI environment will trigger throttling
+      // of `requestAnimationFrame` on Windows. This happens on other
+      // platforms, too, but they have other strategies for working around it.
+      //
+      // For Windows we'll use the same technique that VS Code uses: show the
+      // window but keep it unfocused. This makes the unwanted throttling
+      // impossible and prevents Windows editor tests from being ~4-6x slower
+      // than the same tests on macOS and Linux.
+      this.browserWindow.showInactive();
+    }
 
     const hasPathToOpen = !(
       locationsToOpen.length === 1 && locationsToOpen[0].pathToOpen == null
@@ -253,9 +266,17 @@ module.exports = class AtomWindow extends EventEmitter {
       if (result.response === 0) this.browserWindow.destroy();
     });
 
-    this.browserWindow.webContents.on('render-process-gone', async () => {
+    this.browserWindow.webContents.on('render-process-gone', async (_event, details) => {
+      // `details.reason` is the only thing that distinguishes a renderer
+      // killed for memory (`oom`) from one that hit a native fault
+      // (`crashed`). Without it, a headless CI run reports nothing but
+      // "crashed" no matter what actually happened… which is also a lie when
+      // the reason is `clean-exit` or `killed`.
       if (this.headless) {
-        console.log('Renderer process crashed, exiting');
+        const reason = details?.reason ?? 'unknown';
+        console.log(
+          `Renderer process gone (reason: ${reason}, exit code: ${details?.exitCode}); exiting`
+        );
         this.atomApplication.exit(100);
         return;
       }
@@ -287,7 +308,7 @@ module.exports = class AtomWindow extends EventEmitter {
 
     this.setupContextMenu();
 
-    // Spec window's web view should always have focus
+    // Spec window's web view should always have focus.
     if (this.isSpec)
       this.browserWindow.on('blur', () => this.browserWindow.focusOnWebView());
   }

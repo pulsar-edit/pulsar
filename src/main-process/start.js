@@ -42,6 +42,18 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
+  // Disable Chromium's Windows-only feature for native window occlusion
+  // tracking. It stops compositing once it believes a window is covered; this
+  // in turn slows or stops `requestAnimationFrame` callbacks. Defensible for a
+  // web site, but not the right call for a desktop application.
+  //
+  // VS Code also disables this flag unconditionally.
+  const featuresToDisable = [
+    'CalculateNativeWinOcclusion',
+    app.commandLine.getSwitchValue('disable-features')
+  ].filter(Boolean).join(',');
+  app.commandLine.appendSwitch('disable-features', featuresToDisable);
+
   const releaseChannel = getReleaseChannel(app.getVersion());
   process.env.ATOM_CHANNEL ??= releaseChannel;
   atomPaths.setAtomHome(app.getPath('home'));
@@ -67,7 +79,16 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     crashReporter.start({
       productName: 'Pulsar',
       companyName: 'Pulsar-Edit',
-      submitURL: '',
+      // Nothing is ever uploaded; `uploadToServer` is false below.
+      //
+      // This was an empty string until we went looking for the crash dumps
+      // that Windows CI never produced, on the theory that some Electron
+      // versions refuse to start the Crashpad handler without a
+      // syntactically valid URL. That theory did not hold: with this in
+      // place the handler still created no dump directory and wrote no
+      // dumps. It is kept only because a valid placeholder is easier to
+      // defend than an empty string — not because it fixed anything.
+      submitURL: 'https://localhost/',
       uploadToServer: false,
       ignoreSystemCrashHandler: false,
       compress: false

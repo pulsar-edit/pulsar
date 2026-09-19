@@ -6,6 +6,11 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ATOM_JASMINE_REPORTER: list
+  # TEMPORARY (troubleshooting): ask Electron to print a stack trace to
+  # stderr when a process crashes, so a fault shows up in the job log even
+  # if no dump is written anywhere. Remove with the rest of the crash
+  # investigation scaffolding.
+  ELECTRON_ENABLE_STACK_DUMPING: "1"
 
 jobs:
   tests:
@@ -16,7 +21,7 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-20.04, macos-13, windows-2019]
-        os: [ubuntu-latest, macos-14]
+        os: [ubuntu-latest, macos-14, windows-2022]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -46,6 +51,92 @@ jobs:
     - name: Build Dependencies
       run: yarn build
 
+    # Windows Defender scans every file this suite touches, and it touches a
+    # great many: temp directories per spec, the compile cache, node_modules,
+    # and a fresh Electron process tree. Excluding those paths and the test
+    # binary is standard practice for Windows CI (pytorch, pipenv and others
+    # do the same).
+    - name: Exclude test paths from Windows Defender
+      if: runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        try {
+          Add-MpPreference -ExclusionPath "$env:GITHUB_WORKSPACE"
+          Add-MpPreference -ExclusionPath "$env:USERPROFILE\.pulsar"
+          Add-MpPreference -ExclusionPath "$env:TEMP"
+          Add-MpPreference -ExclusionProcess "electron.exe"
+          Write-Host "Defender exclusions added."
+        } catch {
+          Write-Host "Could not add Defender exclusions: $_"
+        }
+    # TEMPORARY (troubleshooting): attach ProcDump to every Electron process.
+    # A debugger is notified of first-chance exceptions BEFORE any in-process
+    # handler runs, so it catches faults that Crashpad never reports — which
+    # is exactly the situation we are in. Filtered to C0000005 so ordinary
+    # first-chance exceptions are ignored.
+    - name: Arm ProcDump
+      if: runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        $tools = "$env:GITHUB_WORKSPACE\crash-tools"
+        $dumps = "$env:GITHUB_WORKSPACE\procdump-dumps"
+        New-Item -ItemType Directory -Force -Path $tools, $dumps | Out-Null
+        try {
+          Invoke-WebRequest -Uri 'https://download.sysinternals.com/files/Procdump.zip' -OutFile "$tools\Procdump.zip"
+          Expand-Archive -Path "$tools\Procdump.zip" -DestinationPath $tools -Force
+        } catch {
+          Write-Host "Could not fetch ProcDump: $_"
+          exit 0
+        }
+        $procdump = "$tools\procdump.exe"
+        if (-not (Test-Path $procdump)) { Write-Host "procdump.exe missing after extract"; exit 0 }
+
+        # The watcher goes in its own file: a single-quoted here-string keeps
+        # PowerShell from interpolating it here, and the two paths are
+        # substituted in afterwards.
+        $watcherPath = "$tools\watch.ps1"
+        @'
+        $seen = @{}
+        while ($true) {
+          Get-Process electron -ErrorAction SilentlyContinue | ForEach-Object {
+            if (-not $seen.ContainsKey($_.Id)) {
+              $seen[$_.Id] = $true
+              Add-Content -Path 'DUMPS_PATH\attach.log' -Value ((Get-Date).ToString('s') + ' attaching to pid ' + $_.Id)
+              Start-Process -FilePath 'PROCDUMP_PATH' -ArgumentList '-accepteula','-ma','-e','1','-f','C0000005','-p',$_.Id,'DUMPS_PATH' -WindowStyle Hidden -ErrorAction SilentlyContinue
+            }
+          }
+          Start-Sleep -Milliseconds 500
+        }
+        '@ -replace 'PROCDUMP_PATH', $procdump -replace 'DUMPS_PATH', $dumps | Set-Content -Path $watcherPath
+
+        Start-Process powershell -ArgumentList '-NoProfile','-WindowStyle','Hidden','-File',$watcherPath -WindowStyle Hidden
+        Write-Host "ProcDump watcher started; dumps -> $dumps"
+    # TEMPORARY (troubleshooting): crash a renderer on purpose and report
+    # immediately whether anything captured it. Without this control an empty
+    # dump artifact cannot be told apart from a capture path that has never
+    # worked. Runs before the suite so it reports regardless of how the suite
+    # ends, and cannot fail the job.
+    - name: Crash control
+      if: runner.os == 'Windows'
+      continue-on-error: true
+      shell: bash
+      run: |
+        # Crash a renderer on purpose so that every run proves the dump
+        # pipeline still works. Without this, an empty artifact cannot be
+        # told apart from a capture path that has stopped working.
+        yarn start --test spec-crash-control || true
+        mkdir -p crash-control
+        if [ -d "$HOME/.pulsar/crashdumps" ]; then
+          cp -R "$HOME/.pulsar/crashdumps/." crash-control/ 2>/dev/null || true
+          # Clear the source so the suite's own collection later cannot pick
+          # these up and mislabel them as coming from the suite.
+          rm -rf "$HOME/.pulsar/crashdumps" || true
+        fi
+        echo "--- captured by the control crash:"
+        ls -laR crash-control || true
+
     - name: Run Tests
       if: runner.os != 'Linux'
       run: yarn start --test spec
@@ -53,3 +144,158 @@ jobs:
     - name: Run Tests with xvfb-run (Linux)
       if: runner.os == 'Linux'
       run: xvfb-run --auto-servernum yarn start --test spec
+
+    # The renderer can die without producing any JS-level output, so we should
+    # grab a crashdump whenever that happens.
+    # TEMPORARY (troubleshooting): Windows logs an Application Error event
+    # naming the faulting module and offset even when no dump is written, so
+    # this can identify the culprit on its own.
+    - name: Crash diagnostics
+      if: always() && runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        Write-Host "=== Application Error / Windows Error Reporting / Application Hang ==="
+        try {
+          Get-WinEvent -FilterHashtable @{ LogName='Application'; ProviderName='Application Error','Windows Error Reporting','Application Hang' } -MaxEvents 20 -ErrorAction Stop |
+            ForEach-Object {
+              Write-Host ("[{0}] Id={1}" -f $_.TimeCreated, $_.Id)
+              Write-Host $_.Message
+              Write-Host ""
+            }
+        } catch {
+          Write-Host "No matching events found: $_"
+        }
+        Write-Host "=== any recent Application event mentioning electron ==="
+        try {
+          Get-WinEvent -LogName Application -MaxEvents 300 -ErrorAction Stop |
+            Where-Object { $_.Message -match 'electron' } |
+            ForEach-Object {
+              Write-Host ("[{0}] {1} Id={2}" -f $_.TimeCreated, $_.ProviderName, $_.Id)
+              Write-Host $_.Message
+              Write-Host ""
+            }
+        } catch {
+          Write-Host "Could not scan the Application log: $_"
+        }
+        Write-Host "=== ProcDump attach log ==="
+        Get-Content "$env:GITHUB_WORKSPACE\procdump-dumps\attach.log" -ErrorAction SilentlyContinue | Write-Host
+        Write-Host "=== ProcDump dumps ==="
+        Get-ChildItem "$env:GITHUB_WORKSPACE\procdump-dumps" -ErrorAction SilentlyContinue |
+          Format-Table Name, Length, LastWriteTime | Out-String | Write-Host
+    - name: Collect crash dumps
+      # TEMPORARY: always(), not failure(), so the deliberate crash control
+      # above is collected even on a run where the suite itself passes.
+      if: always() && runner.os == 'Windows'
+      shell: bash
+      run: |
+        mkdir -p crash-dumps
+        DUMPS="${ATOM_HOME:-$HOME/.pulsar}/crashdumps"
+        echo "HOME=$HOME ATOM_HOME=${ATOM_HOME:-<unset>}"
+        echo "Looking for crash dumps in $DUMPS"
+        if [ -d "$DUMPS" ]; then
+          echo "Source directory exists; contents:"
+          ls -laR "$DUMPS" || true
+          cp -R "$DUMPS/." crash-dumps/ || true
+        else
+          echo "Source directory does NOT exist; listing its parent:"
+          ls -la "$(dirname "$DUMPS")" || echo "parent does not exist either"
+        fi
+        # Spec runs relocate userData to a temp directory (start.js), and
+        # Electron derives its default dump path from userData — so sweep the
+        # temp tree too, in case the dumps are landing there rather than in
+        # ATOM_HOME.
+        # Do NOT trust $TEMP here: Git Bash sets it to its own /tmp, not the
+        # Windows temp directory that Node's `temp` package actually uses.
+        # Search every plausible root instead.
+        mkdir -p crash-dumps/stray
+        for root in "$HOME/AppData" "$HOME/.pulsar" /tmp /c/Windows/Temp .; do
+          [ -d "$root" ] || continue
+          echo "--- searching $root"
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" -print 2>/dev/null | head -50 || true
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -type d \( -iname "Crashpad" -o -iname "crashdumps" \) -print 2>/dev/null | head -20 || true
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" 2>/dev/null | while read -r dmp; do
+            cp "$dmp" crash-dumps/stray/ || true
+          done || true
+        done
+        if [ -d procdump-dumps ]; then
+          mkdir -p crash-dumps/procdump
+          cp -R procdump-dumps/. crash-dumps/procdump/ || true
+        fi
+        if [ -d crash-control ]; then
+          mkdir -p crash-dumps/control
+          cp -R crash-control/. crash-dumps/control/ || true
+        fi
+        # Native symbols, so a dump can still be symbolized long after the
+        # runner has been destroyed.
+        mkdir -p crash-dumps/pdb
+        find node_modules -maxdepth 6 -path "*/build/Release/*.pdb" 2>/dev/null | while read -r pdb; do
+          cp "$pdb" crash-dumps/pdb/ || true
+        done || true
+        echo "Staged for upload:"
+        ls -laR crash-dumps || true
+
+    # TEMPORARY (troubleshooting): resolve dump addresses to functions while
+    # the binaries and PDBs are still on the machine. Only local symbol paths
+    # are used — pulling electron.exe symbols from Microsoft would cost
+    # gigabytes and we only need the native module frames named.
+    - name: Symbolize crash dumps
+      if: always() && runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        # Debugging Tools for Windows is an optional SDK feature and may not be
+        # on the image, so search rather than assume a path, then fall back to
+        # installing it. Chocolatey is preinstalled on GitHub runners.
+        $roots = @('C:\Program Files (x86)\Windows Kits', 'C:\Program Files\Windows Kits', 'C:\Program Files\WindowsApps')
+        function Find-Cdb {
+          foreach ($r in $roots) {
+            if (-not (Test-Path $r)) { continue }
+            $hit = Get-ChildItem $r -Recurse -Filter cdb.exe -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match 'x64' } | Select-Object -First 1
+            if ($hit) { return $hit }
+          }
+          return $null
+        }
+        $cdb = Find-Cdb
+        if (-not $cdb) {
+          Write-Host "cdb.exe not present; attempting to install Debugging Tools..."
+          try {
+            choco install windbg -y --no-progress | Out-String | Write-Host
+            $cdb = Find-Cdb
+          } catch {
+            Write-Host "Install failed: $_"
+          }
+        }
+        if (-not $cdb) {
+          Write-Host "STILL no cdb.exe. The dump and its matching PDBs are both in the artifact;"
+          Write-Host "symbolize offline with WinDbg, or llvm-symbolizer which can read PDBs."
+          exit 0
+        }
+        Write-Host "Using $($cdb.FullName)"
+        $dumps = Get-ChildItem "$env:GITHUB_WORKSPACE\crash-dumps" -Recurse -Filter *.dmp -ErrorAction SilentlyContinue
+        if (-not $dumps) { Write-Host "No dumps to symbolize."; exit 0 }
+        $symDirs = Get-ChildItem "$env:GITHUB_WORKSPACE\node_modules" -Recurse -Depth 6 -Filter *.pdb -ErrorAction SilentlyContinue |
+          Select-Object -ExpandProperty DirectoryName -Unique
+        $symPath = ($symDirs -join ';')
+        Write-Host "PDBs found: $($symDirs.Count) directories"
+        Write-Host "Symbol path: $symPath"
+        if (-not $symDirs) { Write-Host "WARNING: no PDBs found — native frames will not resolve." }
+        foreach ($d in $dumps) {
+          Write-Host ""
+          Write-Host "=============================================================="
+          Write-Host "=== $($d.FullName)"
+          Write-Host "=============================================================="
+          & $cdb.FullName -z $d.FullName -y $symPath -c '.reload; !analyze -v; k 40; lm; q' 2>&1 |
+            Out-String | Write-Host
+        }
+    - name: Upload crash dumps
+      # TEMPORARY: always(), not failure(), so the deliberate crash control
+      # above is collected even on a run where the suite itself passes.
+      if: always() && runner.os == 'Windows'
+      uses: actions/upload-artifact@v7
+      with:
+        name: Crash dumps (${{ matrix.os }})
+        path: ./crash-dumps/*
+        if-no-files-found: ignore
+        retention-days: 7
