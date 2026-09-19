@@ -42,6 +42,26 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
+  if (args.test) {
+    // The spec window is never shown (see `AtomWindow`), and Chromium treats
+    // an unshown window as backgrounded: it throttles timers and drops
+    // `requestAnimationFrame` from 60Hz to roughly 1Hz. Since virtually every
+    // editor update is scheduled through a frame callback, that turns a ~16ms
+    // wait into a ~1s one, thousands of times over. On Windows CI the spec
+    // suite takes ~60 minutes against ~11 on Linux, and the per-spec timings
+    // cluster at one- and two-second boundaries — exactly one and two dropped
+    // frames.
+    //
+    // `backgroundThrottling: false` in the window's `webPreferences` governs
+    // the renderer's own timers; these govern Chromium's occlusion tracking,
+    // which is the part that starves the frames. Restricted to spec runs:
+    // these have real power-consumption costs for an editor people leave open
+    // all day.
+    app.commandLine.appendSwitch('disable-background-timer-throttling');
+    app.commandLine.appendSwitch('disable-renderer-backgrounding');
+    app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
+  }
+
   const releaseChannel = getReleaseChannel(app.getVersion());
   process.env.ATOM_CHANNEL ??= releaseChannel;
   atomPaths.setAtomHome(app.getPath('home'));
