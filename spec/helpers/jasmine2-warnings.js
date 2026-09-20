@@ -40,36 +40,36 @@ exports.register = (jasmineEnv) => {
   jasmineEnv.afterEach(async (done) => {
     let t;
 
-    t = Date.now();
+    t = performance.now();
     ensureNoDeprecatedFunctionCalls();
-    const depFns = Date.now() - t;
+    const depFns = performance.now() - t;
 
-    t = Date.now();
+    t = performance.now();
     ensureNoDeprecatedStylesheets();
-    const depStyles = Date.now() - t;
+    const depStyles = performance.now() - t;
 
-    t = Date.now();
+    t = performance.now();
     await atom.reset();
-    const atomReset = Date.now() - t;
+    const atomReset = performance.now() - t;
 
-    t = Date.now();
+    t = performance.now();
     if (!window.debugContent) {
       document.getElementById('jasmine-content').innerHTML = '';
     }
-    const clearContent = Date.now() - t;
+    const clearContent = performance.now() - t;
 
-    t = Date.now();
+    t = performance.now();
     warnIfLeakingPathSubscriptions();
-    const leakCheck = Date.now() - t;
+    const leakCheck = performance.now() - t;
 
     specCount += 1;
     appendTiming(
       specCount +
-        ' depFns=' + depFns +
-        ' depStyles=' + depStyles +
-        ' atomReset=' + atomReset +
-        ' clearContent=' + clearContent +
-        ' leakCheck=' + leakCheck
+        ' depFns=' + depFns.toFixed(1) +
+        ' depStyles=' + depStyles.toFixed(1) +
+        ' atomReset=' + atomReset.toFixed(1) +
+        ' clearContent=' + clearContent.toFixed(1) +
+        ' leakCheck=' + leakCheck.toFixed(1)
     );
 
     done();

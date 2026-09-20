@@ -101,7 +101,7 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   ['it', 'fit', 'xit'].forEach((key) => {
     window[key] = (name, originalFn) => {
       jasmineEnv[key](name, async (done) => {
-        const startedAt = Date.now();
+        const startedAt = performance.now();
         let recorded = false;
         const finish = () => {
           if (recorded) return;
@@ -133,7 +133,7 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   ['beforeEach', 'afterEach'].forEach((key) => {
     window[key] = (originalFn) => {
       jasmineEnv[key](async (done) => {
-        const startedAt = Date.now();
+        const startedAt = performance.now();
         let recorded = false;
         const finish = () => {
           if (recorded) return;
@@ -215,10 +215,10 @@ const appendPhase = (phase, ms) => {
 };
 
 const recordPhase = (phase, startedAt) => {
-  const elapsed = Date.now() - startedAt;
+  const elapsed = performance.now() - startedAt;
   PHASE[phase].ms += elapsed;
   PHASE[phase].n += 1;
-  appendPhase(phase, elapsed);
+  appendPhase(phase, elapsed.toFixed(1));
   // Report periodically rather than only at the end: a jasmineDone reporter
   // that implements just one method does not appear to be dispatched here, and
   // more importantly the Windows suite crashes often enough that an end-of-run
@@ -245,13 +245,13 @@ const probeFrameRate = () => {
   return new Promise(resolve => {
     let frames = 0;
     let timers = 0;
-    const started = Date.now();
+    const started = performance.now();
     const onFrame = () => { frames++; requestAnimationFrame(onFrame); };
     const onTimer = () => { timers++; setTimeout(onTimer, 0); };
     requestAnimationFrame(onFrame);
     setTimeout(onTimer, 0);
     setTimeout(() => {
-      const elapsed = Date.now() - started;
+      const elapsed = performance.now() - started;
       console.log(
         `[frame-probe] platform=${process.platform} ` +
           `rAF=${frames} callbacks in ${elapsed}ms (${(frames / (elapsed / 1000)).toFixed(1)}/s) ` +

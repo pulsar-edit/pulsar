@@ -59,9 +59,9 @@ exports.register = (jasmineEnv) => {
     // Do not clobber recent project history
     spyOn(Object.getPrototypeOf(atom.history), 'saveState').and.returnValue(Promise.resolve());
 
-    const setPathsStartedAt = Date.now();
+    const setPathsStartedAt = performance.now();
     atom.project.setPaths([specProjectPath]);
-    appendSetPathsTiming(Date.now() - setPathsStartedAt);
+    appendSetPathsTiming((performance.now() - setPathsStartedAt).toFixed(1));
 
     atom.packages._originalResolvePackagePath = atom.packages.resolvePackagePath;
     const spy = spyOn(atom.packages, 'resolvePackagePath')
