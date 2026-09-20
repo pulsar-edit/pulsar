@@ -147,6 +147,29 @@ jobs:
 
     # The renderer can die without producing any JS-level output, so we should
     # grab a crashdump whenever that happens.
+    # TEMPORARY (troubleshooting): per-spec teardown timings, written to a file
+    # by the global afterEach because console output from inside that hook has
+    # repeatedly failed to reach the job log.
+    - name: Teardown timings
+      if: always()
+      continue-on-error: true
+      shell: bash
+      run: |
+        f="$GITHUB_WORKSPACE/teardown-timing.log"
+        if [ ! -f "$f" ]; then echo "no teardown-timing.log produced"; exit 0; fi
+        echo "lines: $(wc -l < "$f")"
+        echo "--- first 5 ---"; head -5 "$f"
+        echo "--- last 5 ---";  tail -5 "$f"
+        echo "--- totals (seconds) ---"
+        awk '{
+          for (i = 2; i <= NF; i++) { split($i, kv, "="); tot[kv[1]] += kv[2] }
+          n++
+        } END {
+          printf "specs=%d\n", n
+          for (k in tot) printf "  %-14s %8.1fs\n", k, tot[k] / 1000
+        }' "$f"
+        echo "--- 10 slowest specs by atomReset ---"
+        sort -t= -k4 -rn "$f" 2>/dev/null | head -10 || true
     # TEMPORARY (troubleshooting): Windows logs an Application Error event
     # naming the faulting module and offset even when no dump is written, so
     # this can identify the culprit on its own.

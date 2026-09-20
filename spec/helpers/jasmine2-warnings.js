@@ -5,39 +5,36 @@ const {
 } = require('./warnings')
 
 // TEMPORARY (troubleshooting): the Windows suite runs ~5x slower than Linux and
-// macOS, and this hook runs after every one of the ~2365 specs. Time each part
-// so we know whether it is `atom.reset()`, the leak check, or neither.
+// macOS. This hook runs after every one of the ~2365 specs, so teardown is the
+// leading suspect. Time each part.
 //
-// Deliberately dumb straight-line code: no helper wrappers and no extra `await`
-// points, so the control flow is identical to what it replaced. This is
-// throwaway instrumentation; the only thing that matters is that it runs and
-// prints.
-const TEARDOWN = {
-  deprecatedFunctions: 0,
-  deprecatedStylesheets: 0,
-  atomReset: 0,
-  clearContent: 0,
-  leakCheck: 0,
-  specs: 0
-};
-
-function reportTeardown() {
+// Results go to a FILE, one line per spec. Console output from inside this hook
+// has gone missing more than once for reasons I could not pin down; a file
+// cannot be swallowed, survives a crash mid-run, and gives per-spec figures
+// instead of running totals.
+const TIMING_LOG = (() => {
   try {
-    console.log(
-      '[teardown-timing] platform=' + process.platform +
-      ' specs=' + TEARDOWN.specs +
-      ' deprecatedFunctions=' + (TEARDOWN.deprecatedFunctions / 1000).toFixed(1) + 's' +
-      ' deprecatedStylesheets=' + (TEARDOWN.deprecatedStylesheets / 1000).toFixed(1) + 's' +
-      ' atomReset=' + (TEARDOWN.atomReset / 1000).toFixed(1) + 's' +
-      ' clearContent=' + (TEARDOWN.clearContent / 1000).toFixed(1) + 's' +
-      ' leakCheck=' + (TEARDOWN.leakCheck / 1000).toFixed(1) + 's'
-    );
+    const os = require('os');
+    const path = require('path');
+    return path.join(process.env.GITHUB_WORKSPACE || os.tmpdir(), 'teardown-timing.log');
+  } catch (e) {
+    return null;
+  }
+})();
+
+let specCount = 0;
+
+function appendTiming(line) {
+  if (!TIMING_LOG) return;
+  try {
+    require('fs').appendFileSync(TIMING_LOG, line + '\n');
   } catch (e) {
     // Never let instrumentation break a run.
   }
 }
 
-console.log('[teardown-timing] instrumentation loaded');
+appendTiming('--- teardown timing start, platform=' + process.platform);
+console.log('[teardown-timing] writing to ' + TIMING_LOG);
 
 exports.register = (jasmineEnv) => {
   jasmineEnv.afterEach(async (done) => {
@@ -45,30 +42,35 @@ exports.register = (jasmineEnv) => {
 
     t = Date.now();
     ensureNoDeprecatedFunctionCalls();
-    TEARDOWN.deprecatedFunctions += Date.now() - t;
+    const depFns = Date.now() - t;
 
     t = Date.now();
     ensureNoDeprecatedStylesheets();
-    TEARDOWN.deprecatedStylesheets += Date.now() - t;
+    const depStyles = Date.now() - t;
 
     t = Date.now();
     await atom.reset();
-    TEARDOWN.atomReset += Date.now() - t;
+    const atomReset = Date.now() - t;
 
     t = Date.now();
     if (!window.debugContent) {
       document.getElementById('jasmine-content').innerHTML = '';
     }
-    TEARDOWN.clearContent += Date.now() - t;
+    const clearContent = Date.now() - t;
 
     t = Date.now();
     warnIfLeakingPathSubscriptions();
-    TEARDOWN.leakCheck += Date.now() - t;
+    const leakCheck = Date.now() - t;
 
-    TEARDOWN.specs += 1;
-    // Loud on the first few, so a run tells us immediately whether this hook
-    // runs at all, rather than after an hour of silence.
-    if (TEARDOWN.specs <= 3 || TEARDOWN.specs % 100 === 0) reportTeardown();
+    specCount += 1;
+    appendTiming(
+      specCount +
+        ' depFns=' + depFns +
+        ' depStyles=' + depStyles +
+        ' atomReset=' + atomReset +
+        ' clearContent=' + clearContent +
+        ' leakCheck=' + leakCheck
+    );
 
     done();
   });
