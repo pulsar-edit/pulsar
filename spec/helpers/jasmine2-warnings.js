@@ -66,7 +66,9 @@ exports.register = (jasmineEnv) => {
     TEARDOWN.leakCheck += Date.now() - t;
 
     TEARDOWN.specs += 1;
-    if (TEARDOWN.specs % 100 === 0) reportTeardown();
+    // Loud on the first few, so a run tells us immediately whether this hook
+    // runs at all, rather than after an hour of silence.
+    if (TEARDOWN.specs <= 3 || TEARDOWN.specs % 100 === 0) reportTeardown();
 
     done();
   });

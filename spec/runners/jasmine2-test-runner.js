@@ -198,7 +198,7 @@ const recordPhase = (phase, startedAt) => {
   // that implements just one method does not appear to be dispatched here, and
   // more importantly the Windows suite crashes often enough that an end-of-run
   // summary is lost exactly when it is most wanted.
-  if (phase === 'it' && PHASE.it.n % 250 === 0) reportPhases();
+  if (phase === 'it' && (PHASE.it.n <= 3 || PHASE.it.n % 100 === 0)) reportPhases();
 };
 const reportPhases = () => {
   const part = p =>
