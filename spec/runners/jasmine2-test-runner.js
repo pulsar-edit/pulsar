@@ -191,9 +191,34 @@ const wrapDone = (done, finish) => {
   return wrapped;
 };
 
+// TEMPORARY (troubleshooting): same file sink the teardown and setPaths timings
+// use. Console output from inside these wrappers has gone missing repeatedly; a
+// file has not.
+const PHASE_LOG = (() => {
+  try {
+    const os = require("os");
+    const p = require("path");
+    return p.join(process.env.GITHUB_WORKSPACE || os.tmpdir(), "teardown-timing.log");
+  } catch (e) {
+    return null;
+  }
+})();
+let phaseSeq = 0;
+const appendPhase = (phase, ms) => {
+  if (!PHASE_LOG) return;
+  try {
+    if (phase === "it") phaseSeq += 1;
+    require("fs").appendFileSync(PHASE_LOG, "PH " + phaseSeq + " " + phase + "=" + ms + "\n");
+  } catch (e) {
+    // Never let instrumentation break a run.
+  }
+};
+
 const recordPhase = (phase, startedAt) => {
-  PHASE[phase].ms += Date.now() - startedAt;
+  const elapsed = Date.now() - startedAt;
+  PHASE[phase].ms += elapsed;
   PHASE[phase].n += 1;
+  appendPhase(phase, elapsed);
   // Report periodically rather than only at the end: a jasmineDone reporter
   // that implements just one method does not appear to be dispatched here, and
   // more importantly the Windows suite crashes often enough that an end-of-run

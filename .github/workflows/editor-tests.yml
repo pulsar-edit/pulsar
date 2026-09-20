@@ -161,15 +161,25 @@ jobs:
         echo "--- first 5 ---"; head -5 "$f"
         echo "--- last 5 ---";  tail -5 "$f"
         echo "--- totals (seconds) ---"
-        awk '{
-          for (i = 2; i <= NF; i++) { split($i, kv, "="); tot[kv[1]] += kv[2] }
-          n++
-        } END {
-          printf "specs=%d\n", n
-          for (k in tot) printf "  %-14s %8.1fs\n", k, tot[k] / 1000
-        }' "$f"
-        echo "--- 10 slowest specs by atomReset ---"
-        sort -t= -k4 -rn "$f" 2>/dev/null | head -10 || true
+        awk '
+          /^---/ { next }                      # skip the header line
+          {
+            for (i = 1; i <= NF; i++) {
+              if (index($i, "=") == 0) continue
+              split($i, kv, "=")
+              tot[kv[1]] += kv[2]
+              cnt[kv[1]]++
+            }
+          }
+          END {
+            for (k in tot) printf "  %-14s %8.1fs over %d\n", k, tot[k] / 1000, cnt[k]
+          }' "$f"
+        echo "--- 10 slowest by atomReset ---"
+        grep depFns "$f" | sort -t= -k4 -rn | head -10 || true
+        echo "--- 10 slowest specs by it-phase ---"
+        grep ' it=' "$f" | sort -t= -k2 -rn | head -10 || true
+        echo "--- 10 slowest by setPaths ---"
+        grep setPaths "$f" | sort -t= -k2 -rn | head -10 || true
     # TEMPORARY (troubleshooting): Windows logs an Application Error event
     # naming the faulting module and offset even when no dump is written, so
     # this can identify the culprit on its own.
