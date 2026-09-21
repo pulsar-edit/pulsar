@@ -77,12 +77,8 @@ window.advanceClock = function(delta) {
   })();
 };
 
-const timingSink = require("./timing-sink");
-let timeHookCount = 0;
-
 exports.register = (jasmineEnv) => {
   jasmineEnv.beforeEach(() => {
-    const hookStartedAt = performance.now();
     resetTimeouts();
     spyOn(_._, "now").and.callFake(() => now);
     spyOn(Date, 'now').and.callFake(() => now);
@@ -91,7 +87,5 @@ exports.register = (jasmineEnv) => {
     spyOn(window, 'setInterval').and.callFake(fakeSetInterval);
     spyOn(window, 'clearInterval').and.callFake(fakeClearInterval);
     spyOn(_, "debounce").and.callFake(mockDebounce);
-    timeHookCount += 1;
-    timingSink.append("GH " + timeHookCount + " timeHook=" + (performance.now() - hookStartedAt).toFixed(1));
   })
 }

@@ -2,16 +2,8 @@ const _ = require("underscore-plus");
 const fs = require("fs-plus");
 const path = require("path");
 
-const timingSink = require("./timing-sink");
-let matchersHookCount = 0;
-
 exports.register = (jasmineEnv) => {
   jasmineEnv.beforeEach(function () {
-    const hookStartedAt = performance.now();
-    matchersHookCount += 1;
-    const recordMatchersHook = () =>
-      timingSink.append("GH " + matchersHookCount + " matchersHook=" + (performance.now() - hookStartedAt).toFixed(1));
-    try {
     jasmineEnv.addCustomEqualityTester(function (a, b) {
       // Match jasmine.any's equality matching logic
       if ((a != null ? a.jasmineMatches : undefined) != null) {
@@ -171,8 +163,5 @@ exports.register = (jasmineEnv) => {
         }
       }
     });
-    } finally {
-      recordMatchersHook();
-    }
   });
 }

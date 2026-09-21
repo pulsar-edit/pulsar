@@ -101,23 +101,14 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   ['it', 'fit', 'xit'].forEach((key) => {
     window[key] = (name, originalFn) => {
       jasmineEnv[key](name, async (done) => {
-        const startedAt = performance.now();
-        let recorded = false;
-        const finish = () => {
-          if (recorded) return;
-          recorded = true;
-          recordPhase('it', startedAt);
-        };
         try {
           if (originalFn.length === 0) {
             await originalFn();
-            finish();
             done();
           } else {
-            originalFn(wrapDone(done, finish));
+            originalFn(done);
           }
         } catch (err) {
-          finish();
           if (typeof err === 'string' && err.includes('Pending')) {
             // A test marked itself as pending. Swallow the exception and
             // proceed.
@@ -133,19 +124,11 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   ['beforeEach', 'afterEach'].forEach((key) => {
     window[key] = (originalFn) => {
       jasmineEnv[key](async (done) => {
-        const startedAt = performance.now();
-        let recorded = false;
-        const finish = () => {
-          if (recorded) return;
-          recorded = true;
-          recordPhase(key, startedAt);
-        };
         if (originalFn.length === 0) {
           await originalFn()
-          finish();
           done();
         } else {
-          originalFn(wrapDone(done, finish));
+          originalFn(done);
         }
       })
     }
@@ -161,118 +144,6 @@ function disableFocusMethods() {
     }
   }
 }
-
-// TEMPORARY (troubleshooting): where does the wall-clock actually go? The
-// Windows suite runs ~5x slower than Linux and macOS, and knowing whether
-// that is setup, the spec bodies, or teardown narrows the search far more
-// than any single theory. Teardown is the one to watch: Windows cannot
-// delete a file while a handle is open, so per-spec temp cleanup racing the
-// file watchers would retry with backoff.
-const PHASE = {
-  beforeEach: { ms: 0, n: 0 },
-  it: { ms: 0, n: 0 },
-  afterEach: { ms: 0, n: 0 }
-};
-// Jasmine hands hooks a `done` callback that carries extra properties (notably
-// `done.fail`). Replacing it with a bare arrow function would silently drop
-// those, so copy them across.
-const wrapDone = (done, finish) => {
-  const wrapped = (...args) => {
-    finish();
-    return done(...args);
-  };
-  for (const key of Object.keys(done)) wrapped[key] = done[key];
-  if (typeof done.fail === "function") {
-    wrapped.fail = (...args) => {
-      finish();
-      return done.fail(...args);
-    };
-  }
-  return wrapped;
-};
-
-// TEMPORARY (troubleshooting): same file sink the teardown and setPaths timings
-// use. Console output from inside these wrappers has gone missing repeatedly; a
-// file has not.
-const PHASE_LOG = (() => {
-  try {
-    const os = require("os");
-    const p = require("path");
-    return p.join(process.env.GITHUB_WORKSPACE || os.tmpdir(), "teardown-timing.log");
-  } catch (e) {
-    return null;
-  }
-})();
-let phaseSeq = 0;
-const appendPhase = (phase, ms) => {
-  if (!PHASE_LOG) return;
-  try {
-    if (phase === "it") phaseSeq += 1;
-    require("fs").appendFileSync(PHASE_LOG, "PH " + phaseSeq + " " + phase + "=" + ms + "\n");
-  } catch (e) {
-    // Never let instrumentation break a run.
-  }
-};
-
-appendPhase.mark = (label) => {
-  if (!PHASE_LOG) return;
-  try {
-    require("fs").appendFileSync(
-      PHASE_LOG,
-      "=== " + label + " wall=" + performance.now().toFixed(0) + "\n"
-    );
-  } catch (e) {
-    // Never let instrumentation break a run.
-  }
-};
-
-const recordPhase = (phase, startedAt) => {
-  const elapsed = performance.now() - startedAt;
-  PHASE[phase].ms += elapsed;
-  PHASE[phase].n += 1;
-  appendPhase(phase, elapsed.toFixed(1));
-  // Report periodically rather than only at the end: a jasmineDone reporter
-  // that implements just one method does not appear to be dispatched here, and
-  // more importantly the Windows suite crashes often enough that an end-of-run
-  // summary is lost exactly when it is most wanted.
-  if (phase === 'it' && (PHASE.it.n <= 3 || PHASE.it.n % 100 === 0)) reportPhases();
-};
-const reportPhases = () => {
-  const part = p =>
-    `${p} ${(PHASE[p].ms / 1000).toFixed(1)}s over ${PHASE[p].n}`;
-  console.log(
-    `[phase-timing] platform=${process.platform} ` +
-      [part('beforeEach'), part('it'), part('afterEach')].join('  ')
-  );
-};
-
-// TEMPORARY (troubleshooting): measure how fast frames and timers actually
-// tick in this window. The Windows CI suite runs ~5x slower than Linux and
-// macOS with per-spec times clustering at one- and two-second boundaries,
-// which looks like starved `requestAnimationFrame` — but that has been
-// inferred from timings rather than measured. This measures it directly:
-// count callbacks over a fixed 2s window, so the probe costs the same
-// wall-clock time no matter what the answer is.
-const probeFrameRate = () => {
-  return new Promise(resolve => {
-    let frames = 0;
-    let timers = 0;
-    const started = performance.now();
-    const onFrame = () => { frames++; requestAnimationFrame(onFrame); };
-    const onTimer = () => { timers++; setTimeout(onTimer, 0); };
-    requestAnimationFrame(onFrame);
-    setTimeout(onTimer, 0);
-    setTimeout(() => {
-      const elapsed = performance.now() - started;
-      console.log(
-        `[frame-probe] platform=${process.platform} ` +
-          `rAF=${frames} callbacks in ${elapsed}ms (${(frames / (elapsed / 1000)).toFixed(1)}/s) ` +
-          `setTimeout0=${timers} (${(timers / (elapsed / 1000)).toFixed(1)}/s)`
-      );
-      resolve();
-    }, 2000);
-  });
-};
 
 const loadSpecsAndRunThem = (logFile, headless, testPaths) => {
   return new Promise((resolve) => {
@@ -290,18 +161,10 @@ const loadSpecsAndRunThem = (logFile, headless, testPaths) => {
 
     // Add the reporter and register the promise resolve as a callback
     jasmineEnv.addReporter(buildReporter({logFile, headless}));
-    // Before the retry reporter: that one resolves the run promise, and a
-    // reporter added after it can be cut off before it reports.
-    jasmineEnv.addReporter({ jasmineDone: reportPhases });
     jasmineEnv.addReporter(buildRetryReporter(resolve));
 
-    // And finally execute the tests, after the frame-rate probe above has
-    // reported. TEMPORARY: remove with the rest of the slowness diagnosis.
-    // Each call of this function is one pass (the suite, then the retry of
-    // failures). They share a process and a log file, so mark the boundary or
-    // the totals silently blend passes together.
-    appendPhase.mark("PASS start");
-    probeFrameRate().then(() => jasmineEnv.execute());
+    // And finally execute the tests
+    jasmineEnv.execute();
   })
 }
 
@@ -371,7 +234,6 @@ const buildRetryReporter = (onCompleteCallback) => {
     },
 
     jasmineDone: () => {
-      appendPhase.mark("PASS end");
       onCompleteCallback({
         failedSpecs,
         hasDeprecations: Grim.getDeprecationsLength() > 0

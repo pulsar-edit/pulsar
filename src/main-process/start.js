@@ -79,16 +79,7 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
     crashReporter.start({
       productName: 'Pulsar',
       companyName: 'Pulsar-Edit',
-      // Nothing is ever uploaded; `uploadToServer` is false below.
-      //
-      // This was an empty string until we went looking for the crash dumps
-      // that Windows CI never produced, on the theory that some Electron
-      // versions refuse to start the Crashpad handler without a
-      // syntactically valid URL. That theory did not hold: with this in
-      // place the handler still created no dump directory and wrote no
-      // dumps. It is kept only because a valid placeholder is easier to
-      // defend than an empty string — not because it fixed anything.
-      submitURL: 'https://localhost/',
+      submitURL: '',
       uploadToServer: false,
       ignoreSystemCrashHandler: false,
       compress: false
