@@ -51,6 +51,42 @@ jobs:
     - name: Build Dependencies
       run: yarn build
 
+    # On Azure VMs, D: is the local ephemeral SSD and C: is the network-backed
+    # OS disk. GitHub puts the workspace on D:, but %TEMP% lives under the user
+    # profile on C: — so every temp directory these specs create lands on the
+    # slow disk. Benchmark both, then point TEMP/TMP at the fast one.
+    - name: Use the fast disk for temp files
+      if: runner.os == Windows
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        function Measure-SmallFileOps($dir) {
+          New-Item -ItemType Directory -Force -Path $dir | Out-Null
+          $sw = [System.Diagnostics.Stopwatch]::StartNew()
+          for ($i = 0; $i -lt 300; $i++) {
+            $p = Join-Path $dir "bench$i.tmp"
+            [System.IO.File]::WriteAllText($p, "x")
+            [System.IO.File]::GetLastWriteTime($p) | Out-Null
+            [System.IO.File]::Delete($p)
+          }
+          $sw.Stop()
+          return $sw.ElapsedMilliseconds
+        }
+        $cTemp = Join-Path $env:TEMP "disk-bench"
+        $dTemp = Join-Path $env:GITHUB_WORKSPACE "_temp\disk-bench"
+        $cMs = Measure-SmallFileOps $cTemp
+        $dMs = Measure-SmallFileOps $dTemp
+        Write-Host "300 create/stat/delete cycles:"
+        Write-Host ("  C: ({0}) {1} ms" -f $env:TEMP, $cMs)
+        Write-Host ("  D: ({0}) {1} ms" -f $dTemp, $dMs)
+        if ($dMs -gt 0) { Write-Host ("  C: is {0:N1}x the cost of D:" -f ($cMs / $dMs)) }
+        Remove-Item -Recurse -Force $cTemp, $dTemp -ErrorAction SilentlyContinue
+
+        $t = Join-Path $env:GITHUB_WORKSPACE "_temp"
+        New-Item -ItemType Directory -Force -Path $t | Out-Null
+        "TEMP=$t" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        "TMP=$t"  | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        Write-Host "TEMP and TMP now point at $t"
     # Windows Defender scans every file this suite touches, and it touches a
     # great many: temp directories per spec, the compile cache, node_modules,
     # and a fresh Electron process tree. Excluding those paths and the test
