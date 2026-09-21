@@ -73,7 +73,7 @@ jobs:
           return $sw.ElapsedMilliseconds
         }
         $cTemp = Join-Path $env:TEMP "disk-bench"
-        $dTemp = Join-Path $env:GITHUB_WORKSPACE "_temp\disk-bench"
+        $dTemp = Join-Path $env:RUNNER_TEMP "disk-bench"
         $cMs = Measure-SmallFileOps $cTemp
         $dMs = Measure-SmallFileOps $dTemp
         Write-Host "300 create/stat/delete cycles:"
@@ -82,11 +82,19 @@ jobs:
         if ($dMs -gt 0) { Write-Host ("  C: is {0:N1}x the cost of D:" -f ($cMs / $dMs)) }
         Remove-Item -Recurse -Force $cTemp, $dTemp -ErrorAction SilentlyContinue
 
-        $t = Join-Path $env:GITHUB_WORKSPACE "_temp"
+        $t = Join-Path $env:RUNNER_TEMP "spec-temp"
         New-Item -ItemType Directory -Force -Path $t | Out-Null
         "TEMP=$t" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
         "TMP=$t"  | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
         Write-Host "TEMP and TMP now point at $t"
+
+        # ATOM_HOME defaults to the user profile on C:, and it holds the compile
+        # cache that every `require` consults — far more small reads than the
+        # temp directories. Move it to the fast disk too.
+        $home2 = Join-Path $env:RUNNER_TEMP "atom-home"
+        New-Item -ItemType Directory -Force -Path $home2 | Out-Null
+        "ATOM_HOME=$home2" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        Write-Host "ATOM_HOME now points at $home2"
     # Windows Defender scans every file this suite touches, and it touches a
     # great many: temp directories per spec, the compile cache, node_modules,
     # and a fresh Electron process tree. Excluding those paths and the test
@@ -271,7 +279,9 @@ jobs:
       shell: bash
       run: |
         mkdir -p crash-dumps
-        DUMPS="${ATOM_HOME:-$HOME/.pulsar}/crashdumps"
+        # ATOM_HOME may now be a Windows path (D:\a\...), which bash cannot stat.
+        ATOM_HOME_UNIX=$(cygpath -u "$ATOM_HOME" 2>/dev/null || echo "$ATOM_HOME")
+        DUMPS="${ATOM_HOME_UNIX:-$HOME/.pulsar}/crashdumps"
         echo "HOME=$HOME ATOM_HOME=${ATOM_HOME:-<unset>}"
         echo "Looking for crash dumps in $DUMPS"
         if [ -d "$DUMPS" ]; then
