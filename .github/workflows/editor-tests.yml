@@ -160,19 +160,31 @@ jobs:
         echo "lines: $(wc -l < "$f")"
         echo "--- first 5 ---"; head -5 "$f"
         echo "--- last 5 ---";  tail -5 "$f"
-        echo "--- totals (seconds) ---"
+        echo "--- totals (seconds), split by pass ---"
         awk '
-          /^---/ { next }                      # skip the header line
+          /^=== PASS start/ { seg++; wstart[seg] = $NF; sub(/wall=/, "", wstart[seg]); next }
+          /^=== PASS end/   { wend[seg] = $NF; sub(/wall=/, "", wend[seg]); next }
+          /^---/ { next }
           {
             for (i = 1; i <= NF; i++) {
               if (index($i, "=") == 0) continue
               split($i, kv, "=")
-              tot[kv[1]] += kv[2]
-              cnt[kv[1]]++
+              tot[seg, kv[1]] += kv[2]; cnt[seg, kv[1]]++
+              keys[kv[1]] = 1
             }
           }
           END {
-            for (k in tot) printf "  %-14s %8.1fs over %d\n", k, tot[k] / 1000, cnt[k]
+            for (p = 1; p <= seg; p++) {
+              wall = (wend[p] - wstart[p]) / 1000
+              printf "\npass %d  wall %.1fs\n", p, wall
+              measured = 0
+              for (k in keys) {
+                if (cnt[p, k] == 0) continue
+                printf "    %-14s %8.1fs over %d\n", k, tot[p, k] / 1000, cnt[p, k]
+                if (k == "it" || k == "beforeEach" || k == "afterEach") measured += tot[p, k] / 1000
+              }
+              if (wall > 0) printf "    %-14s %8.1fs (%.0f%% of wall)\n", "UNMEASURED", wall - measured, 100 * (wall - measured) / wall
+            }
           }' "$f"
         echo "--- 10 slowest by atomReset ---"
         grep depFns "$f" | sort -t= -k4 -rn | head -10 || true

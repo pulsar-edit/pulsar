@@ -214,6 +214,18 @@ const appendPhase = (phase, ms) => {
   }
 };
 
+appendPhase.mark = (label) => {
+  if (!PHASE_LOG) return;
+  try {
+    require("fs").appendFileSync(
+      PHASE_LOG,
+      "=== " + label + " wall=" + performance.now().toFixed(0) + "\n"
+    );
+  } catch (e) {
+    // Never let instrumentation break a run.
+  }
+};
+
 const recordPhase = (phase, startedAt) => {
   const elapsed = performance.now() - startedAt;
   PHASE[phase].ms += elapsed;
@@ -285,6 +297,10 @@ const loadSpecsAndRunThem = (logFile, headless, testPaths) => {
 
     // And finally execute the tests, after the frame-rate probe above has
     // reported. TEMPORARY: remove with the rest of the slowness diagnosis.
+    // Each call of this function is one pass (the suite, then the retry of
+    // failures). They share a process and a log file, so mark the boundary or
+    // the totals silently blend passes together.
+    appendPhase.mark("PASS start");
     probeFrameRate().then(() => jasmineEnv.execute());
   })
 }
@@ -355,6 +371,7 @@ const buildRetryReporter = (onCompleteCallback) => {
     },
 
     jasmineDone: () => {
+      appendPhase.mark("PASS end");
       onCompleteCallback({
         failedSpecs,
         hasDeprecations: Grim.getDeprecationsLength() > 0

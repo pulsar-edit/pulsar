@@ -24,6 +24,18 @@ const SPIES_TIMING_LOG = (() => {
   }
 })();
 let setPathsCount = 0;
+function appendSetPathsTiming2(ms) {
+  if (!SPIES_TIMING_LOG) return;
+  try {
+    require("fs").appendFileSync(
+      SPIES_TIMING_LOG,
+      "GH " + spiesHookCount + " spiesHook=" + ms.toFixed(1) + "\n"
+    );
+  } catch (e) {
+    // Never let instrumentation break a run.
+  }
+}
+
 function appendSetPathsTiming(ms) {
   if (!SPIES_TIMING_LOG) return;
   try {
@@ -54,8 +66,12 @@ if (specDirectory) {
   specProjectPath = require('os').tmpdir();
 }
 
+let spiesHookCount = 0;
+
 exports.register = (jasmineEnv) => {
   jasmineEnv.beforeEach(function () {
+    const spiesHookStartedAt = performance.now();
+    spiesHookCount += 1;
     // Do not clobber recent project history
     spyOn(Object.getPrototypeOf(atom.history), 'saveState').and.returnValue(Promise.resolve());
 
@@ -126,6 +142,7 @@ exports.register = (jasmineEnv) => {
     let clipboardContent = 'initial clipboard content';
     spyOn(clipboard, 'writeText').and.callFake(text => clipboardContent = text);
     spyOn(clipboard, 'readText').and.callFake(() => clipboardContent);
+    appendSetPathsTiming2(performance.now() - spiesHookStartedAt);
   });
 }
 
