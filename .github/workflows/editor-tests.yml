@@ -15,7 +15,6 @@ jobs:
       !startsWith(github.event.pull_request.title, '[skip-editor-ci]')
     strategy:
       matrix:
-        # os: [ubuntu-20.04, macos-13, windows-2019]
         os: [ubuntu-latest, macos-14, windows-2022]
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -46,10 +45,11 @@ jobs:
     - name: Build Dependencies
       run: yarn build
 
-    # On Azure VMs, D: is the local ephemeral SSD and C: is the network-backed
-    # OS disk. GitHub puts the workspace on D:, but %TEMP% lives under the user
-    # profile on C: — so every temp directory these specs create lands on the
-    # slow disk. Benchmark both, then point TEMP/TMP at the fast one.
+    # On Azure VMs, D: is faster than C: for mysterious reasons. The specs
+    # touch `ATOM_HOME` quite a bit (because of config reading and the compile
+    # cache) and `TEMP` almot as much (any temporary folders created during the
+    # spec run), so make sure both point to locations on D:. This alone speeds
+    # up the test suite by 2-3x.
     - name: Use the fast disk for temp files
       if: runner.os == 'Windows'
       continue-on-error: true
@@ -61,9 +61,6 @@ jobs:
         "TMP=$t"  | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
         Write-Host "TEMP and TMP now point at $t"
 
-        # ATOM_HOME defaults to the user profile on C:, and it holds the compile
-        # cache that every `require` consults — far more small reads than the
-        # temp directories. Move it to the fast disk too.
         $home2 = Join-Path $env:RUNNER_TEMP "atom-home"
         New-Item -ItemType Directory -Force -Path $home2 | Out-Null
         "ATOM_HOME=$home2" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
@@ -122,18 +119,15 @@ jobs:
         echo "Staged for upload:"
         ls -laR crash-dumps || true
 
-    # TEMPORARY (troubleshooting): resolve dump addresses to functions while
-    # the binaries and PDBs are still on the machine. Only local symbol paths
-    # are used — pulling electron.exe symbols from Microsoft would cost
-    # gigabytes and we only need the native module frames named.
+    # Runs only when a Windows run fails. Resolves `minidump` frames to symbols
+    # so the stack can go into the CI output rather than just the artifact.
     - name: Symbolize crash dumps
       if: failure() && runner.os == 'Windows'
       continue-on-error: true
       shell: pwsh
       run: |
         # Debugging Tools for Windows is an optional SDK feature and may not be
-        # on the image, so search rather than assume a path, then fall back to
-        # installing it. Chocolatey is preinstalled on GitHub runners.
+        # on the image, so search rather than assume a path.
         $roots = @('C:\Program Files (x86)\Windows Kits', 'C:\Program Files\Windows Kits', 'C:\Program Files\WindowsApps')
         function Find-Cdb {
           foreach ($r in $roots) {
@@ -146,16 +140,7 @@ jobs:
         }
         $cdb = Find-Cdb
         if (-not $cdb) {
-          Write-Host "cdb.exe not present; attempting to install Debugging Tools..."
-          try {
-            choco install windbg -y --no-progress | Out-String | Write-Host
-            $cdb = Find-Cdb
-          } catch {
-            Write-Host "Install failed: $_"
-          }
-        }
-        if (-not $cdb) {
-          Write-Host "STILL no cdb.exe. The dump and its matching PDBs are both in the artifact;"
+          Write-Host "No cdb.exe. The dump and its matching PDBs are both in the artifact;"
           Write-Host "symbolize offline with WinDbg, or llvm-symbolizer which can read PDBs."
           exit 0
         }
