@@ -2029,6 +2029,11 @@ class NullLanguageModeHighlightIterator {
 }
 
 class NullLayerHighlightIterator {
+  constructor(languageLayer) {
+    this.languageLayer = languageLayer;
+    this.depth = languageLayer.depth;
+    this.coverShallowerScopes = false;
+  }
   seek() {
     return [false, new OpenScopeMap];
   }
@@ -3134,7 +3139,7 @@ class LanguageLayer {
     if (this.tree) {
       return new LayerHighlightIterator(this, this.tree);
     } else {
-      return new NullLayerHighlightIterator();
+      return new NullLayerHighlightIterator(this);
     }
   }
 
