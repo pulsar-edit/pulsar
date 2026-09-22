@@ -73,6 +73,23 @@ jobs:
       if: runner.os == 'Linux'
       run: xvfb-run --auto-servernum yarn start --test spec
 
+    # The probe specs write their readings to a file as well as to stderr, and
+    # the crash-dump collector below only runs on failure — so print the file
+    # here, where a green run can still show it.
+    - name: Environment probe readings
+      if: always() && runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        $root = if ($env:ATOM_HOME) { $env:ATOM_HOME } else { Join-Path $env:USERPROFILE ".pulsar" }
+        $log = Join-Path $root "environment-probe.log"
+        if (Test-Path $log) {
+          Write-Host "--- $log"
+          Get-Content $log | Write-Host
+        } else {
+          Write-Host "No probe log at $log"
+        }
+
     # The renderer can die without producing any JS-level output, so we should
     # grab a crashdump whenever that happens.
     - name: Collect crash dumps
