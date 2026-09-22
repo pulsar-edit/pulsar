@@ -28,24 +28,13 @@ const realRequestAnimationFrame = window.requestAnimationFrame.bind(window);
 const now = () => performance.now();
 
 const SLEEP_MS = 10000;
-const RAF_FRAMES = 60;
+const SAMPLE_MS = 2000;
 const MICROTASK_TURNS = 20000;
-const TIMER_TURNS = 100;
 const IO_TURNS = 200;
 const CPU_ITERATIONS = 5e6;
 
 // Keeps the CPU probe's loop from being optimized away.
 let sink = 0;
-
-// A probe that depends on the frame or timer callbacks firing could hang
-// forever if they never do — in a hidden window, say. Report that as a
-// non-answer instead of letting the spec time out with nothing to show.
-function withDeadline(promise, ms) {
-  return Promise.race([
-    promise,
-    new Promise(resolve => realSetTimeout(() => resolve(null), ms))
-  ]);
-}
 
 function timeCpu() {
   const started = now();
@@ -57,22 +46,6 @@ function timeCpu() {
   return now() - started;
 }
 
-function timeFrames() {
-  return new Promise(resolve => {
-    const started = now();
-    let remaining = RAF_FRAMES;
-    const tick = () => {
-      remaining -= 1;
-      if (remaining > 0) {
-        realRequestAnimationFrame(tick);
-      } else {
-        resolve(now() - started);
-      }
-    };
-    realRequestAnimationFrame(tick);
-  });
-}
-
 async function timeMicrotasks() {
   const started = now();
   for (let i = 0; i < MICROTASK_TURNS; i++) {
@@ -81,18 +54,55 @@ async function timeMicrotasks() {
   return now() - started;
 }
 
-function timeTimers() {
+// Frames and timer turns are sampled by counting how many arrive in a fixed
+// window, rather than by timing how long a fixed number takes. An earlier
+// version did the latter, and it could not tell a renderer ticking over at
+// 1fps — which is what Chromium does to a window it thinks is hidden — from
+// one that had stopped compositing altogether. Both simply failed to deliver
+// their quota before the deadline. A count distinguishes them: 2 and 0 are
+// different answers.
+function countFrames(ms) {
   return new Promise(resolve => {
     const started = now();
-    let remaining = TIMER_TURNS;
+    let frames = 0;
+    let finished = false;
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      resolve({ count: frames, elapsed: now() - started });
+    };
+
     const tick = () => {
-      remaining -= 1;
-      if (remaining > 0) {
-        realSetTimeout(tick, 0);
+      frames += 1;
+      if (now() - started < ms) {
+        realRequestAnimationFrame(tick);
       } else {
-        resolve(now() - started);
+        finish();
       }
     };
+
+    realRequestAnimationFrame(tick);
+    // The callback may never arrive at all, so close the sample on a real
+    // timer regardless. Zero frames is the interesting answer, not a hang.
+    realSetTimeout(finish, ms + 500);
+  });
+}
+
+function countTimerTurns(ms) {
+  return new Promise(resolve => {
+    const started = now();
+    let turns = 0;
+
+    const tick = () => {
+      turns += 1;
+      if (now() - started < ms) {
+        realSetTimeout(tick, 0);
+      } else {
+        resolve({ count: turns, elapsed: now() - started });
+      }
+    };
+
     realSetTimeout(tick, 0);
   });
 }
@@ -155,7 +165,15 @@ function report(line) {
 }
 
 function format(label, value) {
-  return value === null ? `${label}=none` : `${label}=${value.toFixed(1)}ms`;
+  return `${label}=${value.toFixed(1)}ms`;
+}
+
+// Turns per second, and the average gap between turns — the latter is what
+// makes timer clamping legible at a glance.
+function rate(label, sample) {
+  const perSecond = (1000 * sample.count) / sample.elapsed;
+  const gap = sample.count === 0 ? 0 : sample.elapsed / sample.count;
+  return `${label}=${sample.count} ${label}PerSec=${perSecond.toFixed(1)} ${label}Gap=${gap.toFixed(1)}ms`;
 }
 
 // Generous enough that a slow host cannot fail the spec, since a failure here
@@ -164,20 +182,17 @@ exports.TIMEOUT_MS = SLEEP_MS + 120000;
 
 exports.run = async label => {
   const cpu = timeCpu();
-  const frames = await withDeadline(timeFrames(), 30000);
+  const frames = await countFrames(SAMPLE_MS);
   const microtasks = await timeMicrotasks();
-  const timers = await withDeadline(timeTimers(), 30000);
+  const timers = await countTimerTurns(SAMPLE_MS);
   const io = timeFileSystem();
   const slept = await timeSleep();
 
   const fields = [
     format('cpu', cpu),
-    format(`raf${RAF_FRAMES}`, frames),
-    frames === null
-      ? 'rafFps=none'
-      : `rafFps=${((1000 * RAF_FRAMES) / frames).toFixed(1)}`,
+    rate('raf', frames),
+    rate('timer', timers),
     format(`microtasks${MICROTASK_TURNS}`, microtasks),
-    format(`timers${TIMER_TURNS}`, timers),
     format(`io${IO_TURNS}`, io),
     format(`sleep${SLEEP_MS}`, slept)
   ];
