@@ -188,8 +188,8 @@ jobs:
         if-no-files-found: ignore
         retention-days: 7
 
-  # A manual run of the Windows suite with full page heap turned on for
-  # superstring's allocations.
+  # A manual run of the Windows suite with full page heap turned on for the
+  # native addons.
   #
   # We get an intermittent 0xC0000005 whose stack is always the same: the
   # destructor of `MarkerIndex::node_position_cache` walking a corrupted list.
@@ -197,18 +197,36 @@ jobs:
   # that corrupted the list happened earlier, and the crash only materializes
   # when the garbage collector happens to finalize the wrapper afterwards.
   #
-  # Page heap puts a guard page immediately after every allocation made by
-  # `superstring.node`, so an overrun into one of its blocks faults at the
-  # instant of the write, with the guilty stack still live. It also removes the
-  # collector from the equation: the fault no longer depends on when anything
-  # finalizes, which is what made this crash intermittent in the first place.
+  # What page heap buys, in order of usefulness:
   #
-  # Scoped to one module on purpose. Full page heap across all of Electron
-  # would be far heavier, and the block we care about belongs to superstring.
+  # 1. Use-after-free detection. A freed block's pages become PAGE_NOACCESS and
+  #    stay reserved, so a write through a stale pointer faults at the instant
+  #    of the write with the guilty stack live. Every theory we have left is a
+  #    lifetime bug of this shape, so this is the reason to run it.
+  # 2. It takes the collector out of the equation. The fault no longer waits on
+  #    a finalizer, which is what made this crash intermittent — the corrupting
+  #    write is probably common and only its detection was a lottery.
+  # 3. Overrun detection, but only of a module's own allocations — see below.
   #
-  # Two things it cannot see: a wild write landing *inside* a still-valid
-  # superstring block, and anything Chromium allocates through PartitionAlloc,
-  # which bypasses the Windows heap. A clean run here is not an acquittal.
+  # Note what targeting does NOT do. Full page heap relocates each targeted
+  # allocation onto its own page flush against a trailing guard page, which
+  # destroys physical adjacency: once superstring's blocks sit on isolated
+  # pages, another module's block is no longer next to one, and a foreign
+  # overrun runs into its own neighbours in the ordinary heap instead. So this
+  # cannot catch "something else overran superstring". It catches a module
+  # overrunning itself, at its own guard page — which is why every addon is
+  # listed below rather than superstring alone. That way the perpetrator trips
+  # its own boundary no matter who the victim would have been.
+  #
+  # Still invisible: a wild write landing inside a still-valid block, and
+  # anything Chromium allocates through PartitionAlloc, which bypasses the
+  # Windows heap entirely. A clean run here is not an acquittal.
+  #
+  # Cost: every targeted allocation occupies at least one page. superstring
+  # allocates small objects prolifically — every `MarkerIndex::Node`, every
+  # patch node — so a ~100-byte object becoming 4KB+ is a large multiplier on
+  # the busiest structures in the process. If the job dies of memory rather
+  # than of the bug, narrow the `/dlls` list or add `/size` bounds.
   pageheap:
     name: Tests under PageHeap (Windows)
     if: github.event_name == 'workflow_dispatch'
@@ -249,7 +267,7 @@ jobs:
     # symbolize step finds `cdb.exe`. Page heap is keyed on the image name in
     # the registry, so enabling it here applies to the Electron the test step
     # launches.
-    - name: Enable page heap for superstring
+    - name: Enable page heap for the native addons
       shell: pwsh
       run: |
         $roots = @('C:\Program Files (x86)\Windows Kits', 'C:\Program Files\Windows Kits')
@@ -266,7 +284,23 @@ jobs:
         }
 
         Write-Host "Using $($gflags.FullName)"
-        & $gflags.FullName /p /enable electron.exe /full /dlls superstring.node | Write-Host
+        # Every native addon, not just superstring: an overrun is caught at the
+        # overrunning module's own guard page, so the suspect has to be listed
+        # for the trap to exist. `test_extension.node` is omitted — it is
+        # better-sqlite3's test fixture and is never loaded.
+        $dlls = @(
+          'superstring.node', 'build_libiconv.node', 'git.node',
+          'pathwatcher.node', 'nsfw.node', 'fs_admin.node',
+          'spellchecker.node', 'keytar.node', 'ctags.node',
+          'fuzzy-native.node', 'keyboard-layout-manager.node',
+          'get_scrollbar_style_native.node', 'better_sqlite3.node', 'pty.node'
+        )
+        Write-Host "Page heap for: $($dlls -join ', ')"
+        & $gflags.FullName /p /enable electron.exe /full /dlls @dlls | Write-Host
+
+        $memory = Get-CimInstance Win32_OperatingSystem
+        Write-Host ("Memory: {0:N0} MB total, {1:N0} MB free" -f `
+          ($memory.TotalVisibleMemorySize / 1KB), ($memory.FreePhysicalMemory / 1KB))
 
         Write-Host "--- images with page heap enabled ---"
         & $gflags.FullName /p | Write-Host
