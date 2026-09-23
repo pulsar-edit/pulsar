@@ -3,7 +3,6 @@ on:
   pull_request:
   push:
     branches: ['master']
-  workflow_dispatch:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ATOM_JASMINE_REPORTER: list
@@ -229,7 +228,9 @@ jobs:
   # than of the bug, narrow the `/dlls` list or add `/size` bounds.
   pageheap:
     name: Tests under PageHeap (Windows)
-    if: github.event_name == 'workflow_dispatch'
+    if: |
+      !startsWith(github.event.pull_request.title, '[skip-ci]') &&
+      !startsWith(github.event.pull_request.title, '[skip-editor-ci]')
     runs-on: windows-2022
     steps:
     - name: Checkout the latest code
