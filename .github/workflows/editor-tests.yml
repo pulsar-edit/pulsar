@@ -3,6 +3,7 @@ on:
   pull_request:
   push:
     branches: ['master']
+  workflow_dispatch:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ATOM_JASMINE_REPORTER: list
@@ -183,6 +184,197 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: Crash dumps (${{ matrix.os }})
+        path: ./crash-dumps/*
+        if-no-files-found: ignore
+        retention-days: 7
+
+  # A manual run of the Windows suite with full page heap turned on for
+  # superstring's allocations.
+  #
+  # We get an intermittent 0xC0000005 whose stack is always the same: the
+  # destructor of `MarkerIndex::node_position_cache` walking a corrupted list.
+  # That is where the damage is detected, not where it was caused — the write
+  # that corrupted the list happened earlier, and the crash only materializes
+  # when the garbage collector happens to finalize the wrapper afterwards.
+  #
+  # Page heap puts a guard page immediately after every allocation made by
+  # `superstring.node`, so an overrun into one of its blocks faults at the
+  # instant of the write, with the guilty stack still live. It also removes the
+  # collector from the equation: the fault no longer depends on when anything
+  # finalizes, which is what made this crash intermittent in the first place.
+  #
+  # Scoped to one module on purpose. Full page heap across all of Electron
+  # would be far heavier, and the block we care about belongs to superstring.
+  #
+  # Two things it cannot see: a wild write landing *inside* a still-valid
+  # superstring block, and anything Chromium allocates through PartitionAlloc,
+  # which bypasses the Windows heap. A clean run here is not an acquittal.
+  pageheap:
+    name: Tests under PageHeap (Windows)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: windows-2022
+    steps:
+    - name: Checkout the latest code
+      uses: actions/checkout@v6
+      with:
+        submodules: true
+    - name: Setup node
+      uses: actions/setup-node@v6
+      with:
+        node-version-file: '.nvmrc'
+    - name: Install Python setuptools
+      # This is needed for Python 3.12+, since many versions of node-gyp
+      # are incompatible with Python 3.12+, which no-longer ships 'distutils'
+      # out of the box. 'setuptools' package provides 'distutils'.
+      run: python3 -m pip install setuptools --break-system-packages
+    - name: Install Dependencies
+      run: yarn install --ignore-engines || yarn install --ignore-engines
+    - name: Build Dependencies
+      run: yarn build
+    - name: Use the fast disk for temp files
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        $t = Join-Path $env:RUNNER_TEMP "spec-temp"
+        New-Item -ItemType Directory -Force -Path $t | Out-Null
+        "TEMP=$t" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        "TMP=$t"  | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        Write-Host "TEMP and TMP now point at $t"
+
+        $home2 = Join-Path $env:RUNNER_TEMP "atom-home"
+        New-Item -ItemType Directory -Force -Path $home2 | Out-Null
+        "ATOM_HOME=$home2" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        Write-Host "ATOM_HOME now points at $home2"
+    # `gflags.exe` ships with Debugging Tools for Windows, in the same place the
+    # symbolize step finds `cdb.exe`. Page heap is keyed on the image name in
+    # the registry, so enabling it here applies to the Electron the test step
+    # launches.
+    - name: Enable page heap for superstring
+      shell: pwsh
+      run: |
+        $roots = @('C:\Program Files (x86)\Windows Kits', 'C:\Program Files\Windows Kits')
+        $gflags = $null
+        foreach ($r in $roots) {
+          if (-not (Test-Path $r)) { continue }
+          $gflags = Get-ChildItem $r -Recurse -Filter gflags.exe -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match 'x64' } | Select-Object -First 1
+          if ($gflags) { break }
+        }
+        if (-not $gflags) {
+          Write-Host "::error::gflags.exe not found; cannot enable page heap."
+          exit 1
+        }
+
+        Write-Host "Using $($gflags.FullName)"
+        & $gflags.FullName /p /enable electron.exe /full /dlls superstring.node | Write-Host
+
+        Write-Host "--- images with page heap enabled ---"
+        & $gflags.FullName /p | Write-Host
+
+    - name: Run Tests
+      run: yarn start --test spec
+
+    - name: Environment probe readings
+      if: always()
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        $root = if ($env:ATOM_HOME) { $env:ATOM_HOME } else { Join-Path $env:USERPROFILE ".pulsar" }
+        $log = Join-Path $root "environment-probe.log"
+        if (Test-Path $log) {
+          Write-Host "--- $log"
+          Get-Content $log | Write-Host
+        } else {
+          Write-Host "No probe log at $log"
+        }
+    - name: Collect crash dumps
+      if: failure()
+      shell: bash
+      run: |
+        mkdir -p crash-dumps
+        # ATOM_HOME may now be a Windows path (D:\a\...), which bash cannot stat.
+        ATOM_HOME_UNIX=$(cygpath -u "$ATOM_HOME" 2>/dev/null || echo "$ATOM_HOME")
+        DUMPS="${ATOM_HOME_UNIX:-$HOME/.pulsar}/crashdumps"
+        echo "HOME=$HOME ATOM_HOME=${ATOM_HOME:-<unset>}"
+        echo "Looking for crash dumps in $DUMPS"
+        if [ -d "$DUMPS" ]; then
+          echo "Source directory exists; contents:"
+          ls -laR "$DUMPS" || true
+          cp -R "$DUMPS/." crash-dumps/ || true
+        else
+          echo "Source directory does NOT exist; listing its parent:"
+          ls -la "$(dirname "$DUMPS")" || echo "parent does not exist either"
+        fi
+        # Spec runs relocate userData to a temp directory (start.js), and
+        # Electron derives its default dump path from userData — so sweep the
+        # temp tree too, in case the dumps are landing there rather than in
+        # ATOM_HOME.
+        # Do NOT trust $TEMP here: Git Bash sets it to its own /tmp, not the
+        # Windows temp directory that Node's `temp` package actually uses.
+        # Search every plausible root instead.
+        mkdir -p crash-dumps/stray
+        for root in "$HOME/AppData" "$HOME/.pulsar" /tmp /c/Windows/Temp .; do
+          [ -d "$root" ] || continue
+          echo "--- searching $root"
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" -print 2>/dev/null | head -50 || true
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -type d \( -iname "Crashpad" -o -iname "crashdumps" \) -print 2>/dev/null | head -20 || true
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" 2>/dev/null | while read -r dmp; do
+            cp "$dmp" crash-dumps/stray/ || true
+          done || true
+        done
+        # Native symbols, so a dump can still be symbolized long after the
+        # runner has been destroyed.
+        mkdir -p crash-dumps/pdb
+        find node_modules -maxdepth 6 -path "*/build/Release/*.pdb" 2>/dev/null | while read -r pdb; do
+          cp "$pdb" crash-dumps/pdb/ || true
+        done || true
+        echo "Staged for upload:"
+        ls -laR crash-dumps || true
+    - name: Symbolize crash dumps
+      if: failure()
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        # Debugging Tools for Windows is an optional SDK feature and may not be
+        # on the image, so search rather than assume a path.
+        $roots = @('C:\Program Files (x86)\Windows Kits', 'C:\Program Files\Windows Kits', 'C:\Program Files\WindowsApps')
+        function Find-Cdb {
+          foreach ($r in $roots) {
+            if (-not (Test-Path $r)) { continue }
+            $hit = Get-ChildItem $r -Recurse -Filter cdb.exe -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match 'x64' } | Select-Object -First 1
+            if ($hit) { return $hit }
+          }
+          return $null
+        }
+        $cdb = Find-Cdb
+        if (-not $cdb) {
+          Write-Host "No cdb.exe. The dump and its matching PDBs are both in the artifact;"
+          Write-Host "symbolize offline with WinDbg, or llvm-symbolizer which can read PDBs."
+          exit 0
+        }
+        Write-Host "Using $($cdb.FullName)"
+        $dumps = Get-ChildItem "$env:GITHUB_WORKSPACE\crash-dumps" -Recurse -Filter *.dmp -ErrorAction SilentlyContinue
+        if (-not $dumps) { Write-Host "No dumps to symbolize."; exit 0 }
+        $symDirs = Get-ChildItem "$env:GITHUB_WORKSPACE\node_modules" -Recurse -Depth 6 -Filter *.pdb -ErrorAction SilentlyContinue |
+          Select-Object -ExpandProperty DirectoryName -Unique
+        $symPath = ($symDirs -join ';')
+        Write-Host "PDBs found: $($symDirs.Count) directories"
+        Write-Host "Symbol path: $symPath"
+        if (-not $symDirs) { Write-Host "WARNING: no PDBs found — native frames will not resolve." }
+        foreach ($d in $dumps) {
+          Write-Host ""
+          Write-Host "=============================================================="
+          Write-Host "=== $($d.FullName)"
+          Write-Host "=============================================================="
+          & $cdb.FullName -z $d.FullName -y $symPath -c '.reload; !analyze -v; k 40; lm; q' 2>&1 |
+            Out-String | Write-Host
+        }
+    - name: Upload crash dumps
+      if: failure()
+      uses: actions/upload-artifact@v7
+      with:
+        name: Crash dumps (PageHeap)
         path: ./crash-dumps/*
         if-no-files-found: ignore
         retention-days: 7

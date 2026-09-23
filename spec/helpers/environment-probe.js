@@ -36,6 +36,25 @@ const CPU_ITERATIONS = 5e6;
 // Keeps the CPU probe's loop from being optimized away.
 let sink = 0;
 
+// Whether the renderer thinks it is on screen. Chromium throttles a hidden
+// window's frames to roughly 1fps, so if the frame count collapses later in
+// the run, this says whether that is the reason.
+function windowState() {
+  let focus;
+  try {
+    focus = document.hasFocus();
+  } catch (error) {
+    focus = 'unknown';
+  }
+
+  return [
+    `visibility=${document.visibilityState}`,
+    `hidden=${document.hidden}`,
+    `focus=${focus}`,
+    `size=${window.innerWidth}x${window.innerHeight}`
+  ].join(' ');
+}
+
 function timeCpu() {
   const started = now();
   let accumulator = 0;
@@ -182,13 +201,20 @@ exports.TIMEOUT_MS = SLEEP_MS + 120000;
 
 exports.run = async label => {
   const cpu = timeCpu();
+  // Read immediately before and after the frame sample: a window that goes
+  // hidden partway through would otherwise be invisible in the output.
+  const stateBeforeFrames = windowState();
   const frames = await countFrames(SAMPLE_MS);
+  const stateAfterFrames = windowState();
   const microtasks = await timeMicrotasks();
   const timers = await countTimerTurns(SAMPLE_MS);
   const io = timeFileSystem();
   const slept = await timeSleep();
 
   const fields = [
+    stateBeforeFrames === stateAfterFrames
+      ? stateBeforeFrames
+      : `${stateBeforeFrames} -> ${stateAfterFrames}`,
     format('cpu', cpu),
     rate('raf', frames),
     rate('timer', timers),
