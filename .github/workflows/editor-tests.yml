@@ -166,6 +166,15 @@ jobs:
         if (-not $dumps) { Write-Host "No dumps to symbolize."; exit 0 }
         $symDirs = Get-ChildItem "$env:GITHUB_WORKSPACE\node_modules" -Recurse -Depth 6 -Filter *.pdb -ErrorAction SilentlyContinue |
           Select-Object -ExpandProperty DirectoryName -Unique
+        # Microsoft's symbol server, so `ntdll` resolves. Without it every
+        # dump we have symbolized has landed in a `ntdll.wrong.symbols.dll`
+        # bucket, and `!analyze` cannot decode an Application Verifier stop —
+        # the stop code and the block's allocation and free stacks all live
+        # behind ntdll symbols. Downloads are cached in the directory below and
+        # cost a minute or two on the first dump.
+        $symbolCache = Join-Path $env:RUNNER_TEMP "symcache"
+        New-Item -ItemType Directory -Force -Path $symbolCache | Out-Null
+        $symDirs += "srv*$symbolCache*https://msdl.microsoft.com/download/symbols"
         $symPath = ($symDirs -join ';')
         Write-Host "PDBs found: $($symDirs.Count) directories"
         Write-Host "Symbol path: $symPath"
@@ -175,7 +184,11 @@ jobs:
           Write-Host "=============================================================="
           Write-Host "=== $($d.FullName)"
           Write-Host "=============================================================="
-          & $cdb.FullName -z $d.FullName -y $symPath -c '.reload; !analyze -v; k 40; lm; q' 2>&1 |
+          # `!avrf` first: on an Application Verifier stop it names the stop
+          # and prints the offending block's allocation and free stacks, which
+          # is the part that identifies the culprit. It prints nothing useful
+          # on an ordinary crash, which costs us nothing.
+          & $cdb.FullName -z $d.FullName -y $symPath -c '.reload; !avrf; !analyze -v; k 40; lm; q' 2>&1 |
             Out-String | Write-Host
         }
     - name: Upload crash dumps
@@ -393,6 +406,15 @@ jobs:
         if (-not $dumps) { Write-Host "No dumps to symbolize."; exit 0 }
         $symDirs = Get-ChildItem "$env:GITHUB_WORKSPACE\node_modules" -Recurse -Depth 6 -Filter *.pdb -ErrorAction SilentlyContinue |
           Select-Object -ExpandProperty DirectoryName -Unique
+        # Microsoft's symbol server, so `ntdll` resolves. Without it every
+        # dump we have symbolized has landed in a `ntdll.wrong.symbols.dll`
+        # bucket, and `!analyze` cannot decode an Application Verifier stop —
+        # the stop code and the block's allocation and free stacks all live
+        # behind ntdll symbols. Downloads are cached in the directory below and
+        # cost a minute or two on the first dump.
+        $symbolCache = Join-Path $env:RUNNER_TEMP "symcache"
+        New-Item -ItemType Directory -Force -Path $symbolCache | Out-Null
+        $symDirs += "srv*$symbolCache*https://msdl.microsoft.com/download/symbols"
         $symPath = ($symDirs -join ';')
         Write-Host "PDBs found: $($symDirs.Count) directories"
         Write-Host "Symbol path: $symPath"
@@ -402,7 +424,11 @@ jobs:
           Write-Host "=============================================================="
           Write-Host "=== $($d.FullName)"
           Write-Host "=============================================================="
-          & $cdb.FullName -z $d.FullName -y $symPath -c '.reload; !analyze -v; k 40; lm; q' 2>&1 |
+          # `!avrf` first: on an Application Verifier stop it names the stop
+          # and prints the offending block's allocation and free stacks, which
+          # is the part that identifies the culprit. It prints nothing useful
+          # on an ordinary crash, which costs us nothing.
+          & $cdb.FullName -z $d.FullName -y $symPath -c '.reload; !avrf; !analyze -v; k 40; lm; q' 2>&1 |
             Out-String | Write-Host
         }
     - name: Upload crash dumps
