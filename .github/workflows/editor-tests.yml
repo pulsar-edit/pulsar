@@ -184,12 +184,29 @@ jobs:
           Write-Host "=============================================================="
           Write-Host "=== $($d.FullName)"
           Write-Host "=============================================================="
-          # `!avrf` first: on an Application Verifier stop it names the stop
-          # and prints the offending block's allocation and free stacks, which
-          # is the part that identifies the culprit. It prints nothing useful
-          # on an ordinary crash, which costs us nothing.
-          & $cdb.FullName -z $d.FullName -y $symPath -c '.reload; !avrf; !analyze -v; k 40; lm; q' 2>&1 |
-            Out-String | Write-Host
+          # `!avrf` first: on an Application Verifier stop it names the stop.
+          # It prints nothing useful on an ordinary crash, which costs nothing.
+          $analysis = & $cdb.FullName -z $d.FullName -y $symPath `
+            -c '.reload; !avrf; !analyze -v; k 40; lm; q' 2>&1 | Out-String
+          Write-Host $analysis
+
+          # A verifier stop names the offending block as Arg2. The stack above
+          # it belongs to whoever called `free` and tripped the check — which
+          # is not necessarily whoever corrupted the block, since a freed block
+          # sits on a delay list and the bad write can come from anywhere that
+          # shares the heap. `!heap -p -a` asks page heap for that block's own
+          # allocation and free stacks, which is what says who owned it.
+          $block = [regex]::Match(
+            $analysis, 'Arg2:\s*([0-9a-fA-F]+),\s*Heap block being freed')
+          if ($block.Success) {
+            $address = "0x" + $block.Groups[1].Value
+            Write-Host ""
+            Write-Host "=== !heap -p -a $address"
+            & $cdb.FullName -z $d.FullName -y $symPath `
+              -c ".reload; !heap -p -a $address; q" 2>&1 | Out-String | Write-Host
+          } else {
+            Write-Host "No verifier stop block address in the analysis; skipping !heap."
+          }
         }
     - name: Upload crash dumps
       if: failure() && runner.os == 'Windows'
@@ -424,12 +441,29 @@ jobs:
           Write-Host "=============================================================="
           Write-Host "=== $($d.FullName)"
           Write-Host "=============================================================="
-          # `!avrf` first: on an Application Verifier stop it names the stop
-          # and prints the offending block's allocation and free stacks, which
-          # is the part that identifies the culprit. It prints nothing useful
-          # on an ordinary crash, which costs us nothing.
-          & $cdb.FullName -z $d.FullName -y $symPath -c '.reload; !avrf; !analyze -v; k 40; lm; q' 2>&1 |
-            Out-String | Write-Host
+          # `!avrf` first: on an Application Verifier stop it names the stop.
+          # It prints nothing useful on an ordinary crash, which costs nothing.
+          $analysis = & $cdb.FullName -z $d.FullName -y $symPath `
+            -c '.reload; !avrf; !analyze -v; k 40; lm; q' 2>&1 | Out-String
+          Write-Host $analysis
+
+          # A verifier stop names the offending block as Arg2. The stack above
+          # it belongs to whoever called `free` and tripped the check — which
+          # is not necessarily whoever corrupted the block, since a freed block
+          # sits on a delay list and the bad write can come from anywhere that
+          # shares the heap. `!heap -p -a` asks page heap for that block's own
+          # allocation and free stacks, which is what says who owned it.
+          $block = [regex]::Match(
+            $analysis, 'Arg2:\s*([0-9a-fA-F]+),\s*Heap block being freed')
+          if ($block.Success) {
+            $address = "0x" + $block.Groups[1].Value
+            Write-Host ""
+            Write-Host "=== !heap -p -a $address"
+            & $cdb.FullName -z $d.FullName -y $symPath `
+              -c ".reload; !heap -p -a $address; q" 2>&1 | Out-String | Write-Host
+          } else {
+            Write-Host "No verifier stop block address in the analysis; skipping !heap."
+          }
         }
     - name: Upload crash dumps
       if: failure()
