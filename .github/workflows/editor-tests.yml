@@ -217,8 +217,7 @@ jobs:
         if-no-files-found: ignore
         retention-days: 7
 
-  # A manual run of the Windows suite with full page heap turned on for the
-  # native addons.
+  # A manual run of the Windows suite under full page heap.
   #
   # We get an intermittent 0xC0000005 whose stack is always the same: the
   # destructor of `MarkerIndex::node_position_cache` walking a corrupted list.
@@ -237,15 +236,12 @@ jobs:
   #    write is probably common and only its detection was a lottery.
   # 3. Overrun detection, but only of a module's own allocations — see below.
   #
-  # Note what targeting does NOT do. Full page heap relocates each targeted
-  # allocation onto its own page flush against a trailing guard page, which
-  # destroys physical adjacency: once superstring's blocks sit on isolated
-  # pages, another module's block is no longer next to one, and a foreign
-  # overrun runs into its own neighbours in the ordinary heap instead. So this
-  # cannot catch "something else overran superstring". It catches a module
-  # overrunning itself, at its own guard page — which is why every addon is
-  # listed below rather than superstring alone. That way the perpetrator trips
-  # its own boundary no matter who the victim would have been.
+  # Page heap is enabled process-wide rather than for a list of modules. A
+  # targeted `/dlls` list relocates only those modules' allocations onto guarded
+  # pages, which destroys adjacency and means it can only catch a listed module
+  # overrunning *itself* — not somebody else corrupting its memory. Since we do
+  # not know who the offender is, restricting the trap to a guess about it is
+  # backwards.
   #
   # Still invisible: a wild write landing inside a still-valid block, and
   # anything Chromium allocates through PartitionAlloc, which bypasses the
@@ -298,7 +294,7 @@ jobs:
     # symbolize step finds `cdb.exe`. Page heap is keyed on the image name in
     # the registry, so enabling it here applies to the Electron the test step
     # launches.
-    - name: Enable page heap for the native addons
+    - name: Enable full page heap
       shell: pwsh
       run: |
         $roots = @('C:\Program Files (x86)\Windows Kits', 'C:\Program Files\Windows Kits')
@@ -315,19 +311,31 @@ jobs:
         }
 
         Write-Host "Using $($gflags.FullName)"
-        # Every native addon, not just superstring: an overrun is caught at the
-        # overrunning module's own guard page, so the suspect has to be listed
-        # for the trap to exist. `test_extension.node` is omitted — it is
-        # better-sqlite3's test fixture and is never loaded.
-        $dlls = @(
-          'superstring.node', 'build_libiconv.node', 'git.node',
-          'pathwatcher.node', 'nsfw.node', 'fs_admin.node',
-          'spellchecker.node', 'keytar.node', 'ctags.node',
-          'fuzzy-native.node', 'keyboard-layout-manager.node',
-          'get_scrollbar_style_native.node', 'better_sqlite3.node', 'pty.node'
-        )
-        Write-Host "Page heap for: $($dlls -join ', ')"
-        & $gflags.FullName /p /enable electron.exe /full /dlls @dlls | Write-Host
+        # Process-wide, with no `/dlls` restriction.
+        #
+        # We started by targeting the native addons, on the theory that an
+        # overrun is caught at the overrunning module's own guard page. Three
+        # runs in, every stop has been the same: CORRUPTED_FREED_HEAP_BLOCK,
+        # detected at whatever called `free` next — `attr_cache_lookup`,
+        # `p_realpath`, `filesystem_iterator_frame_push`. All in git.node, all
+        # different call sites, which is what a module that frees a lot looks
+        # like when somebody else's write corrupted the block. Identifying the
+        # actual writer needed `!heap -p -a`, which has returned nothing for us
+        # even from a full-memory dump, because `gflags /p` enables page heap
+        # without registering the verifier layer that owns those stack traces.
+        #
+        # Going process-wide sidesteps the archaeology. Under full page heap
+        # every freed block's pages are decommitted, so a write to freed memory
+        # access-violates at the instant of the write with the writer's stack
+        # live — no delay-free list, no detection-versus-offence gap, nothing to
+        # reconstruct afterwards.
+        #
+        # This is heavier. Chromium allocates mostly through PartitionAlloc and
+        # V8 through its own allocator, so the Windows heap traffic this
+        # inflates is smaller than the process size suggests — but watch the
+        # memory line below, and if the job dies of allocation failure rather
+        # than of the bug, fall back to `/dlls` with a narrow list.
+        & $gflags.FullName /p /enable electron.exe /full | Write-Host
 
         $memory = Get-CimInstance Win32_OperatingSystem
         Write-Host ("Memory: {0:N0} MB total, {1:N0} MB free" -f `
