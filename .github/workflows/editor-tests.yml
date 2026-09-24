@@ -336,6 +336,29 @@ jobs:
         Write-Host "--- images with page heap enabled ---"
         & $gflags.FullName /p | Write-Host
 
+    # Page heap keeps each block's allocation and free stacks in heap memory,
+    # and a minidump does not capture it — `!heap -p -a` came back empty on our
+    # first attempt for exactly that reason. Ask Windows Error Reporting for a
+    # full-memory dump instead. WER is already producing the dumps we collect
+    # (`electron.exe.<pid>.dmp`); this only changes their type.
+    #
+    # These are large — expect something on the order of gigabytes, versus tens
+    # of megabytes for a minidump — so `DumpCount` is 1 and they go on the fast
+    # disk. If the artifact upload becomes intolerable, symbolize in the job and
+    # stop uploading the dump rather than going back to minidumps, which cannot
+    # answer the question we are asking.
+    - name: Ask for full-memory crash dumps
+      shell: pwsh
+      run: |
+        $key = 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\electron.exe'
+        New-Item -Path $key -Force | Out-Null
+        $folder = Join-Path $env:RUNNER_TEMP "werdumps"
+        New-Item -ItemType Directory -Force -Path $folder | Out-Null
+        New-ItemProperty -Path $key -Name DumpType   -PropertyType DWord     -Value 2        -Force | Out-Null
+        New-ItemProperty -Path $key -Name DumpCount  -PropertyType DWord     -Value 1        -Force | Out-Null
+        New-ItemProperty -Path $key -Name DumpFolder -PropertyType ExpandString -Value $folder -Force | Out-Null
+        Get-ItemProperty -Path $key | Format-List DumpType, DumpCount, DumpFolder | Out-String | Write-Host
+
     - name: Run Tests
       run: yarn start --test spec
 
@@ -378,7 +401,7 @@ jobs:
         # Windows temp directory that Node's `temp` package actually uses.
         # Search every plausible root instead.
         mkdir -p crash-dumps/stray
-        for root in "$HOME/AppData" "$HOME/.pulsar" /tmp /c/Windows/Temp .; do
+        for root in "$HOME/AppData" "$HOME/.pulsar" /tmp /c/Windows/Temp "$(cygpath -u "$RUNNER_TEMP" 2>/dev/null)/werdumps" .; do
           [ -d "$root" ] || continue
           echo "--- searching $root"
           find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" -print 2>/dev/null | head -50 || true
