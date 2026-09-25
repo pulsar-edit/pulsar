@@ -257,12 +257,23 @@ jobs:
     # Reproduces in 15-35 minutes when it reproduces at all; anything much past
     # that means page heap has changed the timing rather than caught something.
     timeout-minutes: 150
-    # Necessity test: stubs `GitRepository#refreshStatus`, which is the only
-    # route to git-utils' three async workers. Every stop we have has been on a
-    # pool thread under `StatusWorker::Execute`. If the crash survives this, git
-    # is not involved at all and we have been looking at the wrong library.
-    env:
-      PULSAR_DISABLE_ASYNC_GIT: 1
+    # NEXT STEP, deliberately not enabled yet: setting
+    # `PULSAR_DISABLE_ASYNC_GIT: 1` here redirects git-utils' four async methods
+    # to their synchronous counterparts (see
+    # `spec/helpers/disable-async-git.js`), which moves libgit2's status work off
+    # the libuv pool threads where all seven of our symbolized crashes have run.
+    #
+    # It is off for now because this page-heap configuration is itself
+    # unvalidated: light page heap has never caught a stop — all six verifier
+    # stops came from `/full` configurations — so a clean run with the stub on
+    # would be unreadable. It could mean the stub worked, or that nothing was
+    # being detected in the first place.
+    #
+    # So: validate the trigger first. If a run in this configuration produces a
+    # verifier stop, set the variable and the necessity test becomes meaningful.
+    # If two or three runs stay clean, light page heap does not detect and the
+    # trigger should go back to `/full /dlls test_extension.node`, which is
+    # 1-for-1.
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-editor-ci]')

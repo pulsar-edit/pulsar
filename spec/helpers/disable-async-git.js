@@ -1,29 +1,67 @@
 // A necessity test for the Windows heap-corruption crash, switched on by
 // `PULSAR_DISABLE_ASYNC_GIT` and inert otherwise.
 //
-// Every symbolized stop we have collected — six of them, five distinct
-// detection points — runs on a libuv pool thread under
-// `StatusWorker::Execute`, inside libgit2's `git_diff__oid_for_entry`. That
-// makes "does the crash need async git work at all?" the sharpest single
-// question available, and this answers it without touching production code.
+// Every symbolized Windows crash we have — six page-heap verifier stops across
+// five distinct detection points, plus a natural `0xC0000005` in
+// `git!dowild` — runs on a libuv pool thread under `StatusWorker::Execute`,
+// inside libgit2's status scan. So the sharpest single question available is
+// whether the crash needs that pool-thread work at all.
 //
-// `refreshStatus` is where all three async workers are reached from
-// (`getStatusAsync`, `getHeadAsync`, `getAheadBehindCountAsync`), and it is
-// called from the `GitRepository` constructor and from
-// `GitRepositoryProvider#repositoryForGitDirectory`. Replacing it stops the
-// pool threads without preventing repositories from being opened, so sync
-// libgit2 work carries on as usual.
+// The four async methods on git-utils' `Repository` each have a synchronous
+// counterpart, so we redirect them rather than neutering them. Behaviour is
+// preserved — real branch, real statuses, real ahead/behind counts, and
+// `GitRepository#refreshStatus` still does its bookkeeping and emits
+// `did-change-statuses` — while the work moves from a pool thread to the main
+// thread.
 //
-// Specs that assert on refreshed status will fail with this on. That is fine:
-// the job that sets the variable only cares whether the renderer dies.
+// An earlier version of this stubbed `refreshStatus` itself to return a bare
+// resolved promise. That removed the pool-thread work but also stopped the
+// event ever firing, so every spec waiting on a status change sat there until
+// it timed out. Hence the redirection: it isolates the thread, and nothing
+// else.
 module.exports = function disableAsyncGit() {
   if (!process.env.PULSAR_DISABLE_ASYNC_GIT) return;
 
-  const GitRepository = require('../../src/git-repository');
-  GitRepository.prototype.refreshStatus = function () {
-    return Promise.resolve();
+  const GitUtils = require('@pulsar-edit/git-utils');
+
+  const patch = prototype => {
+    prototype.getHeadAsync = function () {
+      return Promise.resolve(this.getHead());
+    };
+    prototype.getStatusAsync = function () {
+      return Promise.resolve(this.getStatus());
+    };
+    prototype.getStatusForPathsAsync = function (paths) {
+      return Promise.resolve(this.getStatusForPaths(paths));
+    };
+    prototype.getAheadBehindCountAsync = function (branch = 'HEAD') {
+      return Promise.resolve(this.getAheadBehindCount(branch));
+    };
   };
 
-  // Logged so the run can be confirmed from CI output rather than assumed.
-  console.log('PULSAR_DISABLE_ASYNC_GIT is set: GitRepository#refreshStatus stubbed.');
+  // The module exports only `open`, so the prototype has to come from an
+  // instance. Opening the working directory is the cheap way to get one; if
+  // that is not a repository, fall back to patching on first open instead.
+  const sample = GitUtils.open(process.cwd());
+  if (sample) {
+    patch(Object.getPrototypeOf(sample));
+    console.log(
+      'PULSAR_DISABLE_ASYNC_GIT: async git redirected to sync (prototype patched eagerly).'
+    );
+    return;
+  }
+
+  const open = GitUtils.open;
+  let patched = false;
+  GitUtils.open = function (...args) {
+    const repository = open.apply(this, args);
+    if (repository && !patched) {
+      patched = true;
+      patch(Object.getPrototypeOf(repository));
+      console.log(
+        'PULSAR_DISABLE_ASYNC_GIT: async git redirected to sync (patched on first open).'
+      );
+    }
+    return repository;
+  };
 };
