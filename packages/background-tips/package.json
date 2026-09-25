@@ -23,11 +23,20 @@
       "description": "How long each tip is displayed, in seconds.",
       "order": 1
     },
+    "ignoredPackages": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "description": "Package names whose background tips should not be displayed.",
+      "order": 2
+    },
     "debug": {
       "type": "boolean",
       "default": false,
       "description": "Log debug information about tip collection and display to the console.",
-      "order": 2
+      "order": 3
     }
   },
   "dependencies": {

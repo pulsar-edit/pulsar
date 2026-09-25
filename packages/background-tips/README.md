@@ -4,9 +4,13 @@ Displays tips about Pulsar in the background when there are no open editors.
 
 ![Screen shot](https://f.cloud.github.com/assets/69169/1796267/c3de038c-6a60-11e3-8bf8-36f45684902c.png)
 
+### Ignoring package tips
+
+Tips contributed by disabled packages are ignored automatically. To hide the tips from a package without disabling the package itself, add its package name to the **Ignored Packages** setting (`background-tips.ignoredPackages`).
+
 ### Contributing tips
 
-Packages can contribute tips by adding a `backgroundTips` array to their `package.json`. Each entry is a string displayed as-is, with optional `{command}` placeholders that are replaced by the current keybinding for that command.
+Packages can contribute tips by adding a `backgroundTips` array to their `package.json`. Tips are read from the package metadata, so they are available even if the package uses deferred activation. Each entry is a string displayed as-is, with optional `{command}` placeholders that are replaced by the current keybinding for that command.
 
 ```json
 "backgroundTips": [

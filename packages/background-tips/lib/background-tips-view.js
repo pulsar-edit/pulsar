@@ -15,6 +15,7 @@ module.exports = class BackgroundTipsElement {
     this.fadeDuration = 300;
     this.tips = [];
     this.tipSources = [];
+    this.ignoredPackages = new Set();
     this.started = false;
     this.disposables = new CompositeDisposable();
     const visibilityCallback = () => this.updateVisibility();
@@ -24,6 +25,17 @@ module.exports = class BackgroundTipsElement {
       this.workspaceCenter.onDidChangeActivePaneItem(visibilityCallback),
       atom.config.observe('background-tips.displayDuration', (value) => {
         this.displayDuration = value * 1000;
+      }),
+      atom.config.observe('background-tips.ignoredPackages', (value) => {
+        this.ignoredPackages = new Set(Array.isArray(value) ? value : []);
+        if (!this.started) return;
+
+        const currentSource = this.tipSources[this.index];
+        if (this.interval == null) {
+          this.start();
+        } else if (this.shouldIgnorePackage(currentSource)) {
+          this.showNextTip();
+        }
       }),
     );
     this.startTimeout = setTimeout(() => { this.started = true; this.start(); }, this.startDelay);
@@ -67,8 +79,8 @@ module.exports = class BackgroundTipsElement {
     if (this.tips.length === 0) return;
     this.randomizeIndex();
     this.attach();
-    this.showNextTip();
     this.interval = setInterval(() => this.showNextTip(), this.displayDuration);
+    this.showNextTip();
   }
 
   stop() {
@@ -91,7 +103,7 @@ module.exports = class BackgroundTipsElement {
     let html = null;
     for (let i = 0; i < this.tips.length; i++) {
       this.index = (this.index + 1) % this.tips.length;
-      if (atom.packages.isPackageDisabled(this.tipSources[this.index])) continue;
+      if (this.shouldIgnorePackage(this.tipSources[this.index])) continue;
       html = this.renderTip(this.tips[this.index]);
       if (html !== null) break;
       this.log(`Skipping tip (missing keybinding): "${this.tips[this.index]}"`);
@@ -140,6 +152,13 @@ module.exports = class BackgroundTipsElement {
         this.index = Math.min(this.index, this.tips.length - 1);
       }
     }
+  }
+
+  shouldIgnorePackage(packageName) {
+    return (
+      atom.packages.isPackageDisabled(packageName) ||
+      this.ignoredPackages.has(packageName)
+    );
   }
 
   renderTip(str) {

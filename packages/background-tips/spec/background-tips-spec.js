@@ -112,4 +112,36 @@ describe("BackgroundTips", () => {
     });
   });
 
+  describe("ignored package tips", () => {
+    let backgroundTipsView;
+
+    beforeEach(async () => {
+      backgroundTipsView = await activatePackage();
+      backgroundTipsView.tips = ["Ignored tip"];
+      backgroundTipsView.tipSources = ["ignored-package"];
+      atom.config.set("background-tips.ignoredPackages", ["ignored-package"]);
+      advanceClock(backgroundTipsView.startDelay);
+    });
+
+    it("does not display tips from ignored packages", () => {
+      expect(backgroundTipsView.element.parentNode).toBeFalsy();
+    });
+
+    it("starts displaying tips when their package is no longer ignored", () => {
+      atom.config.set("background-tips.ignoredPackages", []);
+      advanceClock(backgroundTipsView.fadeDuration);
+
+      expect(backgroundTipsView.element.parentNode).toBeTruthy();
+      expect(backgroundTipsView.message.textContent).toBe("Ignored tip");
+    });
+
+    it("stops displaying a tip when its package becomes ignored", () => {
+      atom.config.set("background-tips.ignoredPackages", []);
+      advanceClock(backgroundTipsView.fadeDuration);
+      atom.config.set("background-tips.ignoredPackages", ["ignored-package"]);
+
+      expect(backgroundTipsView.element.parentNode).toBeFalsy();
+    });
+  });
+
 });
