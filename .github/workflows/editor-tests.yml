@@ -314,32 +314,34 @@ jobs:
         }
 
         Write-Host "Using $($gflags.FullName)"
-        # Targeted at the native addons rather than process-wide.
+        # Page heap on for the process, with `/full` aimed at a module that
+        # never loads.
         #
-        # Process-wide `/full` was tried and is not usable for the whole suite:
-        # it taxes everything about tenfold from the first spec, manufactures
-        # dozens of failures by pushing specs past the 120s timeout, and by the
-        # end of a run a real ten-second timer took twelve minutes. The run
-        # exceeded the six-hour job limit without crashing, which tells us
-        # nothing, because a process that distorted is not running the timing
-        # the bug needs.
+        # `test_extension.node` is better-sqlite3's test fixture: it exists on
+        # disk so gflags accepts it, and nothing in Pulsar ever requires it. So
+        # no live allocation gets full page heap, while page heap itself stays
+        # on — which is what installs the delay-free list and the fill-pattern
+        # checking that has caught every stop so far.
         #
-        # This list is the configuration that actually reproduces — four stops
-        # in four runs, inside fifteen to thirty-five minutes. It detects late
-        # (a freed block's fill pattern checked when it leaves the delay list)
-        # rather than at the offending write, so it names the next caller of
-        # `free` and not the culprit. That is a known limit, accepted here in
-        # exchange for a reproduction that fits in a job.
+        # This is an experiment, not a settled configuration. Every stop we have
+        # has come through `AVrfpDphCheckNormalFreeHeapBlock` — page heap's
+        # *normal* path, not its full path. Full treatment means guarded pages
+        # and decommit-on-free; the fill-pattern check only exists for blocks
+        # that don't get it. So the corrupted block was never under full page
+        # heap, and the fourteen-module list we used to pass here contributed
+        # nothing to catching it.
         #
-        # See the `pageheap-fast` job for process-wide coverage over a slice
-        # short enough that the tax never accumulates.
-        $dlls = @(
-          'superstring.node', 'build_libiconv.node', 'git.node',
-          'pathwatcher.node', 'nsfw.node', 'fs_admin.node',
-          'spellchecker.node', 'keytar.node', 'ctags.node',
-          'fuzzy-native.node', 'keyboard-layout-manager.node',
-          'get_scrollbar_style_native.node', 'better_sqlite3.node', 'pty.node'
-        )
+        # If this still reproduces — it did five times out of five with the real
+        # list — then the module list is noise, and the next thing to try is
+        # dropping `/full` altogether for plain light page heap, which would be
+        # far cheaper to run repeatedly. If it stops reproducing, that
+        # contradicts the evidence above and means full page heap on the addons
+        # is somehow perturbing layout into the state the bug needs.
+        #
+        # Either way: a crash here is conclusive from one run, a clean run is
+        # not. At five-for-five, one clean run happens by chance often enough
+        # to mean nothing; three would be needed.
+        $dlls = @('test_extension.node')
         Write-Host "Page heap for: $($dlls -join ', ')"
         & $gflags.FullName /p /enable electron.exe /full /dlls @dlls | Write-Host
 
