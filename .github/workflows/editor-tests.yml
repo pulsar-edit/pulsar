@@ -257,6 +257,12 @@ jobs:
     # Reproduces in 15-35 minutes when it reproduces at all; anything much past
     # that means page heap has changed the timing rather than caught something.
     timeout-minutes: 150
+    # Necessity test: stubs `GitRepository#refreshStatus`, which is the only
+    # route to git-utils' three async workers. Every stop we have has been on a
+    # pool thread under `StatusWorker::Execute`. If the crash survives this, git
+    # is not involved at all and we have been looking at the wrong library.
+    env:
+      PULSAR_DISABLE_ASYNC_GIT: 1
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-editor-ci]')
@@ -314,36 +320,31 @@ jobs:
         }
 
         Write-Host "Using $($gflags.FullName)"
-        # Page heap on for the process, with `/full` aimed at a module that
-        # never loads.
+        # Light page heap, process-wide. No `/full`, no `/dlls`.
         #
-        # `test_extension.node` is better-sqlite3's test fixture: it exists on
-        # disk so gflags accepts it, and nothing in Pulsar ever requires it. So
-        # no live allocation gets full page heap, while page heap itself stays
-        # on — which is what installs the delay-free list and the fill-pattern
-        # checking that has caught every stop so far.
+        # This is the minimum configuration we have found that still
+        # reproduces, arrived at by elimination:
         #
-        # This is an experiment, not a settled configuration. Every stop we have
-        # has come through `AVrfpDphCheckNormalFreeHeapBlock` — page heap's
-        # *normal* path, not its full path. Full treatment means guarded pages
-        # and decommit-on-free; the fill-pattern check only exists for blocks
-        # that don't get it. So the corrupted block was never under full page
-        # heap, and the fourteen-module list we used to pass here contributed
-        # nothing to catching it.
+        #  * `/full /dlls <fourteen addons>` reproduced 5 times in 5.
+        #  * `/full /dlls test_extension.node` — a module that never loads, so
+        #    no live allocation got full treatment — reproduced too. The module
+        #    list was never doing any work.
+        #  * Every stop has come through `AVrfpDphCheckNormalFreeHeapBlock`,
+        #    page heap's *normal* path. Full page heap decommits freed pages and
+        #    faults at the write; the fill-pattern check that has caught all six
+        #    stops only exists for blocks that are NOT getting full treatment.
         #
-        # If this still reproduces — it did five times out of five with the real
-        # list — then the module list is noise, and the next thing to try is
-        # dropping `/full` altogether for plain light page heap, which would be
-        # far cheaper to run repeatedly. If it stops reproducing, that
-        # contradicts the evidence above and means full page heap on the addons
-        # is somehow perturbing layout into the state the bug needs.
+        # So `/full` was never involved in the detection either. Light page heap
+        # is cheap enough to run repeatedly, which matters more than it sounds:
+        # sampling cost is what has forced every decision here onto one-shot
+        # data.
         #
-        # Either way: a crash here is conclusive from one run, a clean run is
-        # not. At five-for-five, one clean run happens by chance often enough
-        # to mean nothing; three would be needed.
-        $dlls = @('test_extension.node')
-        Write-Host "Page heap for: $($dlls -join ', ')"
-        & $gflags.FullName /p /enable electron.exe /full /dlls @dlls | Write-Host
+        # The limitation is unchanged and fundamental to this detection mode: a
+        # freed block's fill pattern is checked when it leaves the delay-free
+        # list, so the stack names whoever called `free` next, not whoever
+        # corrupted the block. Identifying the writer needs a different tool,
+        # not a different page heap setting.
+        & $gflags.FullName /p /enable electron.exe | Write-Host
 
         $memory = Get-CimInstance Win32_OperatingSystem
         Write-Host ("Memory: {0:N0} MB total, {1:N0} MB free" -f `
