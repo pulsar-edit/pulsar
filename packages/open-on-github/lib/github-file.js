@@ -1,6 +1,5 @@
 /** @babel */
 
-import {shell} from 'electron'
 import {Range} from 'atom'
 import {parse as parseURL} from 'url'
 import path from 'path'
@@ -145,7 +144,7 @@ export default class GitHubFile {
 
   // Internal
   openURLInBrowser (url) {
-    shell.openExternal(url)
+    atom.openExternal(url)
   }
 
   // Internal

@@ -1,5 +1,3 @@
-const { shell } = require('electron');
-
 describe('link package', () => {
   beforeEach(async () => {
     await atom.packages.activatePackage('language-hyperlink');
@@ -20,29 +18,29 @@ describe('link package', () => {
       editor.setText('// http://github.com ');
       await languageMode.atTransactionEnd();
 
-      spyOn(shell, 'openExternal');
+      spyOn(atom, 'openExternal');
       atom.commands.dispatch(atom.views.getView(editor), 'link:open');
-      expect(shell.openExternal).not.toHaveBeenCalled();
+      expect(atom.openExternal).not.toHaveBeenCalled();
 
       editor.setCursorBufferPosition([0, 4]);
       atom.commands.dispatch(atom.views.getView(editor), 'link:open');
 
-      expect(shell.openExternal).toHaveBeenCalled();
-      expect(shell.openExternal.argsForCall[0][0]).toBe('http://github.com');
+      expect(atom.openExternal).toHaveBeenCalled();
+      expect(atom.openExternal.argsForCall[0][0]).toBe('http://github.com');
 
-      shell.openExternal.reset();
+      atom.openExternal.reset();
       editor.setCursorBufferPosition([0, 8]);
       atom.commands.dispatch(atom.views.getView(editor), 'link:open');
 
-      expect(shell.openExternal).toHaveBeenCalled();
-      expect(shell.openExternal.argsForCall[0][0]).toBe('http://github.com');
+      expect(atom.openExternal).toHaveBeenCalled();
+      expect(atom.openExternal.argsForCall[0][0]).toBe('http://github.com');
 
-      shell.openExternal.reset();
+      atom.openExternal.reset();
       editor.setCursorBufferPosition([0, 20]);
       atom.commands.dispatch(atom.views.getView(editor), 'link:open');
 
-      expect(shell.openExternal).toHaveBeenCalled();
-      expect(shell.openExternal.argsForCall[0][0]).toBe('http://github.com');
+      expect(atom.openExternal).toHaveBeenCalled();
+      expect(atom.openExternal.argsForCall[0][0]).toBe('http://github.com');
     });
 
     // NOTE: I don't think anyone realized that this was a feature. Our
@@ -57,33 +55,33 @@ describe('link package', () => {
         '// atom://core/open/file?filename=sample.js&line=1&column=2 '
       );
 
-      spyOn(shell, 'openExternal');
+      spyOn(atom, 'openExternal');
       atom.commands.dispatch(atom.views.getView(editor), 'link:open');
-      expect(shell.openExternal).not.toHaveBeenCalled();
+      expect(atom.openExternal).not.toHaveBeenCalled();
 
       editor.setCursorBufferPosition([0, 4]);
       atom.commands.dispatch(atom.views.getView(editor), 'link:open');
 
-      expect(shell.openExternal).toHaveBeenCalled();
-      expect(shell.openExternal.argsForCall[0][0]).toBe(
+      expect(atom.openExternal).toHaveBeenCalled();
+      expect(atom.openExternal.argsForCall[0][0]).toBe(
         'atom://core/open/file?filename=sample.js&line=1&column=2'
       );
 
-      shell.openExternal.reset();
+      atom.openExternal.reset();
       editor.setCursorBufferPosition([0, 8]);
       atom.commands.dispatch(atom.views.getView(editor), 'link:open');
 
-      expect(shell.openExternal).toHaveBeenCalled();
-      expect(shell.openExternal.argsForCall[0][0]).toBe(
+      expect(atom.openExternal).toHaveBeenCalled();
+      expect(atom.openExternal.argsForCall[0][0]).toBe(
         'atom://core/open/file?filename=sample.js&line=1&column=2'
       );
 
-      shell.openExternal.reset();
+      atom.openExternal.reset();
       editor.setCursorBufferPosition([0, 59]);
       atom.commands.dispatch(atom.views.getView(editor), 'link:open');
 
-      expect(shell.openExternal).toHaveBeenCalled();
-      expect(shell.openExternal.argsForCall[0][0]).toBe(
+      expect(atom.openExternal).toHaveBeenCalled();
+      expect(atom.openExternal.argsForCall[0][0]).toBe(
         'atom://core/open/file?filename=sample.js&line=1&column=2'
       );
     });
@@ -106,22 +104,22 @@ you should not [click][her]
         // Allow for time for injections to populate
         await languageMode.atTransactionEnd();
 
-        spyOn(shell, 'openExternal');
+        spyOn(atom, 'openExternal');
         editor.setCursorBufferPosition([0, 0]);
         atom.commands.dispatch(atom.views.getView(editor), 'link:open');
-        expect(shell.openExternal).not.toHaveBeenCalled();
+        expect(atom.openExternal).not.toHaveBeenCalled();
 
         editor.setCursorBufferPosition([0, 19]);
         atom.commands.dispatch(atom.views.getView(editor), 'link:open');
 
-        expect(shell.openExternal).toHaveBeenCalled();
-        expect(shell.openExternal.argsForCall[0][0]).toBe('http://github.com');
+        expect(atom.openExternal).toHaveBeenCalled();
+        expect(atom.openExternal.argsForCall[0][0]).toBe('http://github.com');
 
-        shell.openExternal.reset();
+        atom.openExternal.reset();
         editor.setCursorBufferPosition([1, 24]);
         atom.commands.dispatch(atom.views.getView(editor), 'link:open');
 
-        expect(shell.openExternal).not.toHaveBeenCalled();
+        expect(atom.openExternal).not.toHaveBeenCalled();
       }));
 
     it('does not open non http/https/atom links', async () => {
@@ -130,14 +128,14 @@ you should not [click][her]
       const editor = atom.workspace.getActiveTextEditor();
       editor.setText('// ftp://github.com\n');
 
-      spyOn(shell, 'openExternal');
+      spyOn(atom, 'openExternal');
       atom.commands.dispatch(atom.views.getView(editor), 'link:open');
-      expect(shell.openExternal).not.toHaveBeenCalled();
+      expect(atom.openExternal).not.toHaveBeenCalled();
 
       editor.setCursorBufferPosition([0, 5]);
       atom.commands.dispatch(atom.views.getView(editor), 'link:open');
 
-      expect(shell.openExternal).not.toHaveBeenCalled();
+      expect(atom.openExternal).not.toHaveBeenCalled();
     });
   });
 });

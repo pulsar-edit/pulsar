@@ -6,7 +6,6 @@ import url from 'url'
 
 import _ from 'underscore-plus'
 import fs from 'fs-plus'
-import {shell} from 'electron'
 import {CompositeDisposable, Disposable} from 'atom'
 import etch from 'etch'
 
@@ -49,9 +48,9 @@ export default class PackageDetailView {
       const repoUrl = this.packageManager.getRepositoryUrl(this.pack)
       if (typeof repoUrl === 'string') {
         if (url.parse(repoUrl).pathname === '/pulsar-edit/pulsar') {
-          shell.openExternal(`${repoUrl}/tree/master/packages/${this.pack.name}`)
+          atom.openExternal(`${repoUrl}/tree/master/packages/${this.pack.name}`)
         } else {
-          shell.openExternal(repoUrl)
+          atom.openExternal(repoUrl)
         }
       }
     }
@@ -62,7 +61,7 @@ export default class PackageDetailView {
       event.preventDefault()
       let bugUri = this.packageManager.getRepositoryBugUri(this.pack)
       if (bugUri) {
-        shell.openExternal(bugUri)
+        atom.openExternal(bugUri)
       }
     }
     this.refs.issueButton.addEventListener('click', issueButtonClickHandler)
@@ -97,7 +96,7 @@ export default class PackageDetailView {
 
     const learnMoreButtonClickHandler = (event) => {
       event.preventDefault()
-      shell.openExternal(`https://web.pulsar-edit.dev/packages/${this.pack.name}`)
+      atom.openExternal(`https://web.pulsar-edit.dev/packages/${this.pack.name}`)
     }
     this.refs.learnMoreButton.addEventListener('click', learnMoreButtonClickHandler)
     this.disposables.add(new Disposable(() => { this.refs.learnMoreButton.removeEventListener('click', learnMoreButtonClickHandler) }))
