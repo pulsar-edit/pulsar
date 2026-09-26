@@ -40,7 +40,6 @@ module.exports = function ({logFile, headless, testPaths, buildAtomEnvironment})
   require('../helpers/attach-to-dom');
   require('../helpers/deprecation-snapshots');
   require('../helpers/platform-filter');
-  require('../helpers/disable-async-git')();
   require('../helpers/suppress-devtools-on-error')(headless);
   require('../helpers/log-uncaught-errors')();
 
