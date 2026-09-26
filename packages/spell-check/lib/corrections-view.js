@@ -44,12 +44,10 @@ export default class CorrectionsView {
                             this.editor.buffer.file &&
                             this.editor.buffer.file.path
                         ) {
-                            [
-                                projectPath,
-                                relativePath,
-                            ] = atom.project.relativizePath(
-                                this.editor.buffer.file.path
-                            );
+                            [projectPath, relativePath] =
+                                atom.project.relativizePath(
+                                    this.editor.buffer.file.path
+                                );
                         }
 
                         const args = { id: this.id, projectPath, relativePath };

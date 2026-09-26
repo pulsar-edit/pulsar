@@ -23,6 +23,7 @@ module.exports = class MarkdownPreviewView {
     this.loaded = false
     this.disposables = new CompositeDisposable()
     this.registerScrollCommands()
+    this.registerAnchorScrolling()
     if (this.editorId != null) {
       this.resolveEditor(this.editorId)
     } else if (atom.packages.hasActivatedInitialPackages()) {
@@ -81,6 +82,40 @@ module.exports = class MarkdownPreviewView {
         }
       })
     )
+  }
+
+  // Pulsar's global link handler prevents native fragment navigation.
+  registerAnchorScrolling() {
+    const handleClick = event => this.scrollToAnchor(event)
+    this.element.addEventListener('click', handleClick)
+    this.disposables.add(
+      new Disposable(() =>
+        this.element.removeEventListener('click', handleClick)
+      )
+    )
+  }
+
+  scrollToAnchor(event) {
+    const anchor = event.target.closest('a[href^="#"]')
+    if (anchor == null) return
+
+    let id = anchor.getAttribute('href').slice(1)
+    try {
+      id = decodeURIComponent(id)
+    } catch (error) {
+      // Fall back to the raw fragment.
+    }
+    if (!id) return
+
+    // Prefer generated heading ids over colliding raw ids.
+    const prefixedId = `user-content-${id}`
+    const target =
+      this.element.querySelector(`[id="${CSS.escape(prefixedId)}"]`) ??
+      this.element.querySelector(`[id="${CSS.escape(id)}"]`)
+    if (target == null) return
+
+    event.preventDefault()
+    target.scrollIntoView()
   }
 
   onDidChangeTitle(callback) {

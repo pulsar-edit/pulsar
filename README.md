@@ -61,9 +61,9 @@
 
 <!---------------------------{ Documents }--------------------------->
 
-[Documentation]: https://pulsar-edit.dev/docs/ 'Information how to use & work with Pulsar.'
-[Install]: https://pulsar-edit.dev/docs/launch-manual/sections/getting-started/#installing-pulsar 'How to install Pulsar on your system.'
-[Build]: https://pulsar-edit.dev/docs/launch-manual/sections/core-hacking/#building-pulsar 'Instructions on how to build Pulsar by yourself.'
+[Documentation]: https://docs.pulsar-edit.dev/ 'Information how to use & work with Pulsar.'
+[Install]: https://docs.pulsar-edit.dev/getting-started/installing-pulsar/ 'How to install Pulsar on your system.'
+[Build]: https://docs.pulsar-edit.dev/contributing-to-pulsar/building-pulsar/ 'Instructions on how to build Pulsar by yourself.'
 
 [License]: LICENSE.md
 

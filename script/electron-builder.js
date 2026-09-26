@@ -78,15 +78,9 @@ async function modifyMainPackageJson(
 
 // END Monkey-patch.
 
-// eslint-disable-next-line node/no-unpublished-require
 const builder = require('electron-builder');
 
 const ARGS = yargs(hideBin(process.argv))
-  .command('[platform]', 'build for a given platform', () => {
-    return yargs.positional('platform', {
-      describe: 'One of "mac", "linux", or "win".'
-    })
-  })
   .option('target', {
     alias: 't',
     type: 'string',
@@ -98,7 +92,6 @@ const ARGS = yargs(hideBin(process.argv))
     description: 'Builds a "canary" with a separate bundle identifier and app name so it can run alongside ordinary Pulsar.'
   })
   .parse();
-
 
 // The difference in base name matters for the app ID (which helps the OS
 // understand that PulsarNext is not the same as Pulsar), but also for other
@@ -119,7 +112,9 @@ const ICONS = {
   svg: `resources/app-icons/${iconName}.svg`,
   icns: `resources/app-icons/${iconName}.icns`
 };
-
+const WINDOWS_INSTALLER_SIDEBAR = ARGS.next
+  ? 'resources/win/installerSidebar-next.bmp'
+  : 'resources/win/installerSidebar.bmp';
 
 let options = {
   appId: `dev.pulsar-edit.${baseName}`,
@@ -190,8 +185,8 @@ let options = {
     "!**/node_modules/.bin",
     "!**/node_modules/native-mate",
     // node_modules of the fuzzy-native package are only required for building it
-    "!node_modules/fuzzy-native/node_modules",
-    "!**/node_modules/spellchecker/vendor/hunspell/.*",
+    "!node_modules/@pulsar-edit/fuzzy-native/node_modules",
+    "!**/node_modules/@pulsar-edit/spellchecker/vendor/hunspell/.*",
     "!**/git-utils/deps",
     "!**/oniguruma/deps",
     "!**/less/dist",
@@ -352,7 +347,11 @@ let options = {
     extraResources: [
       { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
       { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
-    ]
+    ],
+    target: [
+      { target: 'dmg' },
+      { target: 'zip' }
+    ],
   },
 
   dmg: {
@@ -387,6 +386,7 @@ let options = {
     runAfterFinish: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
+    installerSidebar: WINDOWS_INSTALLER_SIDEBAR,
     guid: "0949b555-c22c-56b7-873a-a960bdefa81f",
     // The GUID is generated from Electron-Builder based on our AppID.
     // Hardcoding it here means it will always be used as generated from the
@@ -408,7 +408,7 @@ let options = {
     "node_modules/github/bin/*",
     "node_modules/github/lib/*",       // Resolves error in console
     "**/node_modules/dugite/git/**",   // Include dugite postInstall output (matching glob used for Atom)
-    "**/node_modules/spellchecker/**", // Matching Atom Glob
+    "**/node_modules/@pulsar-edit/spellchecker/**", // Matching Atom Glob
   ]
 };
 
@@ -418,10 +418,25 @@ if (ARGS.next) {
   delete options.nsis.guid;
 }
 
+const PLATFORMS = {
+  darwin: 'mac',
+  win32: 'win',
+  linux: 'linux'
+};
+
 function whatToBuild() {
-  if (!ARGS.target) return options;
-  if (!(ARGS.platform in options)) return options;
-  options[ARGS.platform] = options[ARGS.platform].filter(e => e.target === ARGS.target);
+  let platform = PLATFORMS[process.platform];
+  if (!platform) {
+    throw new Error(`Unrecognized platform: ${platform}`);
+  }
+  if (ARGS.target) {
+    let targets = ARGS.target.split(',');
+    // Replace the `target` array with the targets provided by the user. It's
+    // up to the user to ensure these are valid targets for the given platform.
+    options[platform].target = targets.map(t => {
+      return { target: t }
+    });
+  }
   return options;
 }
 

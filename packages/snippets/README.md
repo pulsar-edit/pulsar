@@ -201,7 +201,7 @@ Likewise, if your snippet includes literal references to `$` or `{`, you may hav
 
 ## Multiple snippets for the same scope
 
-Snippets for the same scope must be placed within the same key. See [this section of the Pulsar Flight Manual](https://pulsar-edit.dev/docs/launch-manual/sections/using-pulsar/#configuring-with-cson) for more information.
+Snippets for the same scope must be placed within the same key. See [this section of the Pulsar documentation](https://docs.pulsar-edit.dev/customizing-pulsar/configuring-with-cson/) for more information.
 
 
 [lsp]: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#variables

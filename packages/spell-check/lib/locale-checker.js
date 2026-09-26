@@ -1,4 +1,4 @@
-const spellchecker = require('spellchecker');
+const spellchecker = require('@pulsar-edit/spellchecker');
 const pathspec = require('./pathspec');
 const env = require('./checker-env');
 
