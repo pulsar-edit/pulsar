@@ -331,31 +331,41 @@ jobs:
         }
 
         Write-Host "Using $($gflags.FullName)"
-        # Light page heap, process-wide. No `/full`, no `/dlls`.
+        # The fourteen native addons, under full page heap.
         #
-        # This is the minimum configuration we have found that still
-        # reproduces, arrived at by elimination:
+        # This is the configuration with the most evidence behind it: five
+        # verifier stops in five runs, each `CORRUPTED_FREED_HEAP_BLOCK` —
+        # something wrote into a freed block, detected when that block left the
+        # delay-free list. It is kept here as an assay rather than as a
+        # diagnostic, because it tests the mechanism directly: if the write was
+        # the kernel storing `STATUS_CANCELLED` into an `OVERLAPPED` that a
+        # watcher freed while its I/O was still pending, these stops should now
+        # be gone.
         #
-        #  * `/full /dlls <fourteen addons>` reproduced 5 times in 5.
-        #  * `/full /dlls test_extension.node` — a module that never loads, so
-        #    no live allocation got full treatment — reproduced too. The module
-        #    list was never doing any work.
-        #  * Every stop has come through `AVrfpDphCheckNormalFreeHeapBlock`,
-        #    page heap's *normal* path. Full page heap decommits freed pages and
-        #    faults at the write; the fill-pattern check that has caught all six
-        #    stops only exists for blocks that are NOT getting full treatment.
+        # Reading it:
         #
-        # So `/full` was never involved in the detection either. Light page heap
-        # is cheap enough to run repeatedly, which matters more than it sounds:
-        # sampling cost is what has forced every decision here onto one-shot
-        # data.
+        #  * A stop means the corruption survives the pathwatcher fix. That is
+        #    decisive on its own and worth acting on immediately.
+        #  * Clean runs accumulate. At the historical hit rate, three of them
+        #    put the odds of the bug still being present under one in a
+        #    thousand — far stronger than the same effort spent counting green
+        #    runs of the ordinary Windows job, where the natural crash rate is
+        #    somewhere around one in four and a green run means little.
         #
-        # The limitation is unchanged and fundamental to this detection mode: a
-        # freed block's fill pattern is checked when it leaves the delay-free
-        # list, so the stack names whoever called `free` next, not whoever
-        # corrupted the block. Identifying the writer needs a different tool,
-        # not a different page heap setting.
-        & $gflags.FullName /p /enable electron.exe | Write-Host
+        # Two configurations were tried and abandoned. Process-wide `/full` taxes
+        # the suite about tenfold and ran past the six-hour job limit without
+        # crashing, so a clean run proved nothing. Light page heap (`/p /enable`
+        # alone) has never caught a stop, so it cannot serve as an assay — do not
+        # quietly drop `/full` again without validating it first.
+        $dlls = @(
+          'superstring.node', 'build_libiconv.node', 'git.node',
+          'pathwatcher.node', 'nsfw.node', 'fs_admin.node',
+          'spellchecker.node', 'keytar.node', 'ctags.node',
+          'fuzzy-native.node', 'keyboard-layout-manager.node',
+          'get_scrollbar_style_native.node', 'better_sqlite3.node', 'pty.node'
+        )
+        Write-Host "Page heap for: $($dlls -join ', ')"
+        & $gflags.FullName /p /enable electron.exe /full /dlls @dlls | Write-Host
 
         $memory = Get-CimInstance Win32_OperatingSystem
         Write-Host ("Memory: {0:N0} MB total, {1:N0} MB free" -f `
