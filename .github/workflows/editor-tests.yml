@@ -48,8 +48,7 @@ jobs:
     # On Azure VMs, D: is faster than C: for mysterious reasons. The specs
     # touch `ATOM_HOME` quite a bit (because of config reading and the compile
     # cache) and `TEMP` almost as much (any temporary folders created during the
-    # spec run), so make sure both point to locations on D:. This alone speeds
-    # up the test suite by 2-3x.
+    # spec run), so make sure both point to locations on D:.
     - name: Use the fast disk for temp files
       if: runner.os == 'Windows'
       continue-on-error: true
