@@ -1,27 +1,25 @@
-// Keeps the uncaught-error handler from opening the dev tools during a headless
-// run.
+// Keeps the uncaught-error handler from opening the dev tools during a
+// headless run.
 //
 // `AtomEnvironment#installUncaughtErrorHandler` opens the dev tools on any
-// uncaught error unless a `will-throw-error` listener calls `preventDefault()`.
-// In a full suite that happens sooner or later, and docked dev tools take 555px
-// out of the content area — measured on all three platforms, with the window
-// going from 800x572 to 245x572 on macOS and Linux and from 784x535 to 229x535
-// on Windows. Every geometry-sensitive spec that runs afterwards is then
-// measuring in a third of the intended viewport, which is how
-// `TextEditorComponent overlay decorations` came to fail only on Windows: it
-// needs 240px, and 229 is just short of it while 245 is just enough.
+// uncaught error unless a `will-throw-error` listener calls
+// `preventDefault()`. In a full suite that happens sooner or later.
 //
-// Only headless runs are affected. Someone running the spec GUI inside Pulsar
-// wants the dev tools to open on an error, and that behaviour is left alone.
+// Docked dev tools eat into the viewport by ~550px in width, thereafter
+// affecting geometry-sensitive specs. We think this contributes to the
+// flakiness of some specs related to `TextEditorComponent` overlay
+// decorations.
 //
-// This stubs the two methods rather than calling `preventDefault()` on
-// `will-throw-error`, because the suppression must not be visible to the specs
-// that assert on this behaviour. `atom-environment-spec.js` spies on both
-// methods in a `beforeEach`, and a spy shadows these stubs and restores them
-// afterwards, so those specs still exercise the real logic.
+// Only headless runs are affected, on the logic that there's no point in
+// showing dev tools that a human can't see. Testing via the GUI runner will
+// still spawn dev tools on uncaught errors.
 module.exports = function suppressDevToolsOnError(headless) {
   if (!headless) return;
 
+  // Don't attach to `onWillThrowError` and call `preventDefault`; that gets in
+  // the way of specs that assert on this behavior. Redefine these methods
+  // instead. Any spec that tests this behavior will spy on these methods and
+  // test that they were called, so that will continue to work just fine.
   atom.openDevTools = () => Promise.resolve();
   atom.executeJavaScriptInDevTools = () => Promise.resolve();
 

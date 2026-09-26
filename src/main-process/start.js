@@ -47,6 +47,9 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   // in turn slows or stops `requestAnimationFrame` callbacks. Defensible for a
   // web site, but not the right call for a desktop application.
   //
+  // Ideally this also helps us run specs a bit faster in CI on Windows! It
+  // hasn't yet, but we hold out hope.
+  //
   // VS Code also disables this flag unconditionally.
   const featuresToDisable = [
     'CalculateNativeWinOcclusion',

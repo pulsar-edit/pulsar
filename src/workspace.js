@@ -43,21 +43,21 @@ function filePathMatchesGlob(filePath, matcher) {
 }
 
 // Transform a pattern prior to handing it off to `minimatch`.
-function normalizePattern (rawPath) {
+function normalizePattern(rawPath) {
   // On Windows, a user may write a pattern with either `\` or `/` as the path
-  // separator; we accept both, and convert to `/` here, once, up front. Every
+  // separator. We accept both, and convert to `/` here, once, up front. Every
   // check below can then assume `/`.
   //
   // This conversion is load-bearing, not cosmetic. Inside a _pattern_,
-  // minimatch treats `\` as an escape character rather than as a separator,
+  // `minimatch` treats `\` as an escape character rather than as a separator,
   // so `b-dir\*.js` would otherwise match only a file literally named
-  // `b-dir*.js`. minimatch used to do this conversion on our behalf; when it
+  // `b-dir*.js`. `minimatch` used to do this conversion on our behalf; when it
   // stopped doing so in v5, every backslashed pattern silently stopped
   // matching anything.
   //
   // The trade-off is that `\` can no longer escape a glob metacharacter on
-  // Windows — which is the same trade-off minimatch itself used to make. The
-  // paths we match _against_ are still normalized by minimatch, so only the
+  // Windows — which is the same trade-off `minimatch` itself used to make. The
+  // paths we match _against_ are still normalized by `minimatch`, so only the
   // pattern side needs this.
   if (path.sep !== '/') {
     rawPath = rawPath.split(path.sep).join('/');
@@ -116,7 +116,7 @@ function normalizePattern (rawPath) {
 // If `foo` _is not_ in `rootBasenames`, pattern `!foo/bar` will remain as-is;
 // `[null, '!foo/bar']` will be returned.
 //
-function extractProjectRootsFromPathPattern (pathPattern, rootBasenames) {
+function extractProjectRootsFromPathPattern(pathPattern, rootBasenames) {
   let negated = pathPattern.startsWith('!');
   if (negated) {
     pathPattern = pathPattern.substring(1);
@@ -128,7 +128,7 @@ function extractProjectRootsFromPathPattern (pathPattern, rootBasenames) {
   // Normalize the pattern, then express it with `/` separators, so that the
   // logic below has only one separator to consider. A user on Windows may
   // write either separator, and a pattern written with `/` contains no
-  // `path.sep` at all — so testing for `path.sep` alone would treat
+  // `path.sep` at all; so testing for `path.sep` alone would treat
   // `some-root/foo` as though it had no separator, make `some-root/foo` the
   // root basename, match no root, and silently apply the pattern to _every_
   // root instead of the one the user named.
@@ -153,7 +153,7 @@ function extractProjectRootsFromPathPattern (pathPattern, rootBasenames) {
   return [null, `${prefix}${originalPathPattern}`];
 }
 
-function getBasenamesFromProjectRoots () {
+function getBasenamesFromProjectRoots() {
   let roots = atom.project.getPaths();
   return roots.map(r => path.basename(r));
 }

@@ -65,6 +65,15 @@ let nextId = 0;
 // Chromium notifications that arrive through `window.onerror` despite not
 // indicating a fault; see `installUncaughtErrorHandler`.
 const IGNORED_ERROR_MESSAGES = [
+  // These errors mean that a `ResizeObserver` handler made a change that would
+  // ordinarily trigger a resize and recursively trigger the handler again;
+  // when this happens, Chromium reports it and defers the handler until the
+  // next frame.
+  //
+  // This is not actually an error! It's not unusual to have this happen during
+  // ordinary layout-heavy work. Ideally it would be a `console.warn`. At any
+  // rate, the presence of such an error in the console _definitely_ should not
+  // trigger dev tools opening!
   /ResizeObserver loop completed with undelivered notifications/,
   /ResizeObserver loop limit exceeded/
 ];
@@ -1186,14 +1195,9 @@ class AtomEnvironment {
 
       const eventObject = { message, url, line, column, originalError };
 
-      // Chromium reports a deferred `ResizeObserver` notification as an error
-      // event, but it is not one: it means a resize callback caused another
-      // resize, so the notification was delivered on the next frame instead.
-      // It fires readily during layout-heavy work — resizing a window while
-      // editors are attaching, for instance — and throwing the dev tools open
-      // over it is worse than ignoring it. The error is still emitted to
-      // `will-throw-error` and `did-throw-error` listeners; only the dev tools
-      // are held back.
+      // Calling `preventDefault` will suppress the opening of the dev tools.
+      // But some errors are common enough that we should not let them open
+      // the dev tools under any circumstances.
       let openDevTools = !IGNORED_ERROR_MESSAGES.some(pattern =>
         pattern.test(message)
       );

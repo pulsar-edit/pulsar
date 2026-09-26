@@ -51,13 +51,17 @@ function restoreDefaultScheduler() {
   TextEditorComponent.setScheduler(defaultScheduler);
 }
 
-// Some specs have to drive updates through the alternative scheduler above.
-// The real condition is not the platform as such, but whether the browser
-// believes the editor is visible: where it does not, `requestAnimationFrame`
-// callbacks are throttled or never delivered at all, so an update scheduled
-// through `ViewRegistry::requestDocumentUpdate` never runs and anything
-// awaiting `getNextUpdatePromise` hangs until the spec times out. That is the
-// situation on our headless Linux and Windows CI runners.
+// The view registry uses `requestAnimationFrame` to schedule view updates. But
+// if the browser thinks the editor is hidden, it will throttle
+// `requestAnimationFrame`. CI jobs run the headless test runner, so the window
+// is hidden. If we can't work around this throttling, we need an alternative
+// scheduler.
+//
+// Currently we haven't found any workarounds on Linux or Windows in CI, so
+// that's where we're using an alternative scheduler that bypasses
+// `requestAnimationFrame`. We need this just as much on desktop (where hidden
+// windows are still throttled) as on CI, so that's why we don't check
+// `process.env.CI`.
 const NEEDS_ALTERNATIVE_SCHEDULER =
   process.platform === 'linux' || process.platform === 'win32';
 
@@ -1199,10 +1203,9 @@ describe('TextEditorComponent', () => {
           useAlternativeScheduler();
         }
         originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-        // A floor, not an assignment: these tests need well over the 5s local
-        // default, but CI already grants 120s and a plain assignment would cut
-        // that in half — which is how this spec ended up being the only one in
-        // the file given *less* time than its neighbours.
+
+        // Change the timeout, but be careful not to lower the timeout if it's
+        // already higher than 60s (as it is in CI).
         jasmine.DEFAULT_TIMEOUT_INTERVAL = Math.max(originalTimeout, 60 * 1000);
       });
 
@@ -1216,14 +1219,15 @@ describe('TextEditorComponent', () => {
       it('renders the visible rows correctly after randomly mutating the editor', async () => {
         // Bound this loop by time as well as by iteration count. Twenty
         // iterations is more work than the slowest CI runners can finish
-        // within the spec budget — Windows has spent the entire 120s here and
-        // still timed out — and the failure that produces is a timeout, which
-        // tells us nothing about the editor. Deriving the deadline from the
-        // budget rather than hardcoding it means this keeps pace if the
-        // budget changes, and leaves room for the final iteration to finish
-        // and for teardown. Fast machines still run all twenty; slow ones run
-        // as many as fit and report real assertions. Each iteration seeds
-        // itself and logs that seed, so a failure stays reproducible.
+        // within the spec budget (Windows has spent the entire 120s here and
+        // still timed out).
+        //
+        // Deriving the deadline from the budget rather than hardcoding it
+        // means this keeps pace if the budget changes, and leaves room for the
+        // final iteration to finish and for teardown. Fast machines still run
+        // all twenty; slow ones run as many as fit and report real assertions.
+        // Each iteration seeds itself and logs that seed, so a failure stays
+        // reproducible.
         const deadline = Date.now() + jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.6;
         const initialSeed = Date.now();
         for (var i = 0; i < 20; i++) {
@@ -2658,15 +2662,13 @@ describe('TextEditorComponent', () => {
     function attachFakeWindow(component) {
       const fakeWindow = document.createElement('div');
       fakeWindow.style.position = 'absolute';
-      // An explicit content width, because `position: absolute` shrink-to-fit
-      // is clamped by the viewport: when an uncaught error opened the dev tools
-      // mid-run the viewport dropped to 229px on Windows, squeezing this
-      // element to 177px instead of the 240px these assertions assume.
+
+      // We set an explicit width here in order to try to remove the viewport
+      // as a confounding variable. This can happen if an uncaught error
+      // triggers opening of the dev tools.
       //
-      // 200px is the component's width; `content-box` keeps the 20px of padding
-      // outside it, so the element's own box is 240px — the same as the
-      // shrink-to-fit result it replaces. Setting 240px here instead would make
-      // the box 280px and every overflow assertion below would be 40px out.
+      // It expects a border-to-border width of 240px, so we'll give it a width
+      // of 200px with 20px of padding all around.
       fakeWindow.style.boxSizing = 'content-box';
       fakeWindow.style.width = 200 + 'px';
       fakeWindow.style.padding = 20 + 'px';
@@ -3802,31 +3804,36 @@ describe('TextEditorComponent', () => {
 
         if (process.platform === 'win32') {
           // The spec window is never shown (see `AtomWindow`'s `show: false`),
-          // and on Windows that means `requestAnimationFrame` callbacks are not
-          // delivered. The update that `ViewRegistry::requestDocumentUpdate`
-          // queues in response to the resize above would therefore never run,
-          // and this `await` would hang until the spec timed out.
+          // and on Windows that means `requestAnimationFrame` callbacks are
+          // not delivered. The update that
+          // `ViewRegistry::requestDocumentUpdate` queues in response to the
+          // resize above would therefore never run, and this `await` would
+          // hang until the spec timed out.
           //
-          // Prefer the real thing: wait for the update to arrive on its own,
-          // and only flush the queue by hand if it does not. Flushing also
-          // resets `animationFrameRequest`, which would otherwise stay latched
-          // and silently suppress every subsequent update in the suite.
+          // Despite our efforts otherwise, this test is still flaky on
+          // Windows. This is a fallback aimed at reducing the worst-case
+          // scenario: wait for the promise to resolve, but after a second, try
+          // to kick it and force an update.
           const TIMED_OUT = Symbol('timed out');
           const winner = await Promise.race([
             updatePromise,
             wait(1000).then(() => TIMED_OUT)
           ]);
           if (winner === TIMED_OUT) {
-            // Two ways the update can fail to arrive. `didAttach` decides
-            // visibility synchronously from `isVisible()`; if the element had
-            // not been laid out yet at that moment the component marks itself
-            // hidden, and only the (frame-driven, therefore absent)
-            // IntersectionObserver would ever correct it — whereupon
-            // `scheduleUpdate` returns before queuing anything. Or the update
-            // was queued and the frame never came.
+            // There are two ways the update can fail to arrive:
             //
-            // Handle both. `didShow` is a no-op when the component already
-            // knows it is visible, and updates synchronously when it does not.
+            // * the update was queued, but the animation frame never arrived
+            //   (the rAF throttling discussed above); or
+            // * the element may consider itself to be invisible shortly after
+            //   initial render (because its width and height are still 0) and
+            //   never gets corrected (because the same throttling that slows
+            //   down rAF also affects `ResizeObserver` and
+            //   `IntersectionObserver`).
+            //
+            // So we log this information on timeouts to figure out more about
+            // this spec's flakiness; then we force an update on the component
+            // and manually tell it it's visible. (`didShow` is idempotent; if
+            // it triggers an update, it will be synchronous.)
             console.log(
               '[diag] forcing update:',
               JSON.stringify({
