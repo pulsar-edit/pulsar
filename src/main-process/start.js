@@ -42,6 +42,18 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
+  // Disable Chromium's Windows-only feature for native window occlusion
+  // tracking. It stops compositing once it believes a window is covered; this
+  // in turn slows or stops `requestAnimationFrame` callbacks. Defensible for a
+  // web site, but not the right call for a desktop application.
+  //
+  // VS Code also disables this flag unconditionally.
+  const featuresToDisable = [
+    'CalculateNativeWinOcclusion',
+    app.commandLine.getSwitchValue('disable-features')
+  ].filter(Boolean).join(',');
+  app.commandLine.appendSwitch('disable-features', featuresToDisable);
+
   const releaseChannel = getReleaseChannel(app.getVersion());
   process.env.ATOM_CHANNEL ??= releaseChannel;
   atomPaths.setAtomHome(app.getPath('home'));

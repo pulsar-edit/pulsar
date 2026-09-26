@@ -2855,9 +2855,13 @@ describe('Workspace', () => {
             // * a-dir/sample1.js ("smapdi" exists in the modified buffer, but
             //   this path doesn't match our glob!)
             expect(paths.length).toBe(2, glob);
-            expect(paths.includes('b-dir/sample1.js')).toBe(true, glob);
-            expect(paths.includes('b-dir/sample2.js')).toBe(true, glob);
-            expect(paths.includes('a-dir/sample1.js')).toBe(false, glob);
+            // NOTE: `relativize` gives us paths with the platform's own
+            // separator, so these must be built with `path.join` rather than
+            // written with `/`; otherwise every one of these comparisons
+            // fails on Windows.
+            expect(paths.includes(path.join('b-dir', 'sample1.js'))).toBe(true, glob);
+            expect(paths.includes(path.join('b-dir', 'sample2.js'))).toBe(true, glob);
+            expect(paths.includes(path.join('a-dir', 'sample1.js'))).toBe(false, glob);
           }
 
           for (let glob of negativeGlobs) {
@@ -2877,9 +2881,9 @@ describe('Workspace', () => {
             // * b-dir/sample2.js ("smapdi" exists on disk, but should fail our
             //   negated glob!)
             expect(paths.length).toBe(1, glob);
-            expect(paths.includes('b-dir/sample1.js')).toBe(false, glob);
-            expect(paths.includes('b-dir/sample2.js')).toBe(false, glob);
-            expect(paths.includes('a-dir/sample1.js')).toBe(true, glob);
+            expect(paths.includes(path.join('b-dir', 'sample1.js'))).toBe(false, glob);
+            expect(paths.includes(path.join('b-dir', 'sample2.js'))).toBe(false, glob);
+            expect(paths.includes(path.join('a-dir', 'sample1.js'))).toBe(true, glob);
           }
         });
 

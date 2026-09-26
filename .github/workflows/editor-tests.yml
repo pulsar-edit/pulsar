@@ -15,8 +15,7 @@ jobs:
       !startsWith(github.event.pull_request.title, '[skip-editor-ci]')
     strategy:
       matrix:
-        # os: [ubuntu-20.04, macos-13, windows-2019]
-        os: [ubuntu-latest, macos-14]
+        os: [ubuntu-latest, macos-14, windows-2022]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -46,6 +45,25 @@ jobs:
     - name: Build Dependencies
       run: yarn build
 
+    # On Azure VMs, D: is faster than C: for mysterious reasons. The specs
+    # touch `ATOM_HOME` quite a bit (because of config reading and the compile
+    # cache) and `TEMP` almost as much (any temporary folders created during the
+    # spec run), so make sure both point to locations on D:.
+    - name: Use the fast disk for temp files
+      if: runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        $t = Join-Path $env:RUNNER_TEMP "spec-temp"
+        New-Item -ItemType Directory -Force -Path $t | Out-Null
+        "TEMP=$t" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        "TMP=$t"  | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        Write-Host "TEMP and TMP now point at $t"
+
+        $home2 = Join-Path $env:RUNNER_TEMP "atom-home"
+        New-Item -ItemType Directory -Force -Path $home2 | Out-Null
+        "ATOM_HOME=$home2" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        Write-Host "ATOM_HOME now points at $home2"
     - name: Run Tests
       if: runner.os != 'Linux'
       run: yarn start --test spec
@@ -53,3 +71,479 @@ jobs:
     - name: Run Tests with xvfb-run (Linux)
       if: runner.os == 'Linux'
       run: xvfb-run --auto-servernum yarn start --test spec
+
+    # The probe specs write their readings to a file as well as to stderr, and
+    # the crash-dump collector below only runs on failure — so print the file
+    # here, where a green run can still show it.
+    - name: Environment probe readings
+      if: always() && runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        $root = if ($env:ATOM_HOME) { $env:ATOM_HOME } else { Join-Path $env:USERPROFILE ".pulsar" }
+        $log = Join-Path $root "environment-probe.log"
+        if (Test-Path $log) {
+          Write-Host "--- $log"
+          Get-Content $log | Write-Host
+        } else {
+          Write-Host "No probe log at $log"
+        }
+
+    # The renderer can die without producing any JS-level output, so we should
+    # grab a crashdump whenever that happens.
+    - name: Collect crash dumps
+      if: failure() && runner.os == 'Windows'
+      shell: bash
+      run: |
+        mkdir -p crash-dumps
+        # ATOM_HOME may now be a Windows path (D:\a\...), which bash cannot stat.
+        ATOM_HOME_UNIX=$(cygpath -u "$ATOM_HOME" 2>/dev/null || echo "$ATOM_HOME")
+        DUMPS="${ATOM_HOME_UNIX:-$HOME/.pulsar}/crashdumps"
+        echo "HOME=$HOME ATOM_HOME=${ATOM_HOME:-<unset>}"
+        echo "Looking for crash dumps in $DUMPS"
+        if [ -d "$DUMPS" ]; then
+          echo "Source directory exists; contents:"
+          ls -laR "$DUMPS" || true
+          cp -R "$DUMPS/." crash-dumps/ || true
+        else
+          echo "Source directory does NOT exist; listing its parent:"
+          ls -la "$(dirname "$DUMPS")" || echo "parent does not exist either"
+        fi
+        # Spec runs relocate userData to a temp directory (start.js), and
+        # Electron derives its default dump path from userData — so sweep the
+        # temp tree too, in case the dumps are landing there rather than in
+        # ATOM_HOME.
+        # Do NOT trust $TEMP here: Git Bash sets it to its own /tmp, not the
+        # Windows temp directory that Node's `temp` package actually uses.
+        # Search every plausible root instead.
+        mkdir -p crash-dumps/stray
+        for root in "$HOME/AppData" "$HOME/.pulsar" /tmp /c/Windows/Temp .; do
+          [ -d "$root" ] || continue
+          echo "--- searching $root"
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" -print 2>/dev/null | head -50 || true
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -type d \( -iname "Crashpad" -o -iname "crashdumps" \) -print 2>/dev/null | head -20 || true
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" 2>/dev/null | while read -r dmp; do
+            cp "$dmp" crash-dumps/stray/ || true
+          done || true
+        done
+        # Native symbols, so a dump can still be symbolized long after the
+        # runner has been destroyed.
+        mkdir -p crash-dumps/pdb
+        find node_modules -maxdepth 6 -path "*/build/Release/*.pdb" 2>/dev/null | while read -r pdb; do
+          cp "$pdb" crash-dumps/pdb/ || true
+        done || true
+        echo "Staged for upload:"
+        ls -laR crash-dumps || true
+
+    # Runs only when a Windows run fails. Resolves `minidump` frames to symbols
+    # so the stack can go into the CI output rather than just the artifact.
+    - name: Symbolize crash dumps
+      if: failure() && runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        # Debugging Tools for Windows is an optional SDK feature and may not be
+        # on the image, so search rather than assume a path.
+        $roots = @('C:\Program Files (x86)\Windows Kits', 'C:\Program Files\Windows Kits', 'C:\Program Files\WindowsApps')
+        function Find-Cdb {
+          foreach ($r in $roots) {
+            if (-not (Test-Path $r)) { continue }
+            $hit = Get-ChildItem $r -Recurse -Filter cdb.exe -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match 'x64' } | Select-Object -First 1
+            if ($hit) { return $hit }
+          }
+          return $null
+        }
+        $cdb = Find-Cdb
+        if (-not $cdb) {
+          Write-Host "No cdb.exe. The dump and its matching PDBs are both in the artifact;"
+          Write-Host "symbolize offline with WinDbg, or llvm-symbolizer which can read PDBs."
+          exit 0
+        }
+        Write-Host "Using $($cdb.FullName)"
+        $dumps = Get-ChildItem "$env:GITHUB_WORKSPACE\crash-dumps" -Recurse -Filter *.dmp -ErrorAction SilentlyContinue
+        if (-not $dumps) { Write-Host "No dumps to symbolize."; exit 0 }
+        $symDirs = Get-ChildItem "$env:GITHUB_WORKSPACE\node_modules" -Recurse -Depth 6 -Filter *.pdb -ErrorAction SilentlyContinue |
+          Select-Object -ExpandProperty DirectoryName -Unique
+        # Microsoft's symbol server, so `ntdll` resolves. Without it every
+        # dump we have symbolized has landed in a `ntdll.wrong.symbols.dll`
+        # bucket, and `!analyze` cannot decode an Application Verifier stop —
+        # the stop code and the block's allocation and free stacks all live
+        # behind ntdll symbols. Downloads are cached in the directory below and
+        # cost a minute or two on the first dump.
+        $symbolCache = Join-Path $env:RUNNER_TEMP "symcache"
+        New-Item -ItemType Directory -Force -Path $symbolCache | Out-Null
+        $symDirs += "srv*$symbolCache*https://msdl.microsoft.com/download/symbols"
+        $symPath = ($symDirs -join ';')
+        Write-Host "PDBs found: $($symDirs.Count) directories"
+        Write-Host "Symbol path: $symPath"
+        if (-not $symDirs) { Write-Host "WARNING: no PDBs found — native frames will not resolve." }
+        foreach ($d in $dumps) {
+          Write-Host ""
+          Write-Host "=============================================================="
+          Write-Host "=== $($d.FullName)"
+          Write-Host "=============================================================="
+          # `!avrf` first: on an Application Verifier stop it names the stop.
+          # It prints nothing useful on an ordinary crash, which costs nothing.
+          $analysis = & $cdb.FullName -z $d.FullName -y $symPath `
+            -c '.reload; !avrf; !analyze -v; k 40; lm; q' 2>&1 | Out-String
+          Write-Host $analysis
+
+          # A verifier stop names the offending block as Arg2. The stack above
+          # it belongs to whoever called `free` and tripped the check — which
+          # is not necessarily whoever corrupted the block, since a freed block
+          # sits on a delay list and the bad write can come from anywhere that
+          # shares the heap. `!heap -p -a` asks page heap for that block's own
+          # allocation and free stacks, which is what says who owned it.
+          $block = [regex]::Match(
+            $analysis, 'Arg2:\s*([0-9a-fA-F]+),\s*Heap block being freed')
+          if ($block.Success) {
+            $address = "0x" + $block.Groups[1].Value
+            Write-Host ""
+            Write-Host "=== !heap -p -a $address"
+            & $cdb.FullName -z $d.FullName -y $symPath `
+              -c ".reload; !heap -p -a $address; q" 2>&1 | Out-String | Write-Host
+          } else {
+            Write-Host "No verifier stop block address in the analysis; skipping !heap."
+          }
+        }
+    - name: Upload crash dumps
+      if: failure() && runner.os == 'Windows'
+      uses: actions/upload-artifact@v7
+      with:
+        name: Crash dumps (${{ matrix.os }})
+        path: ./crash-dumps/*
+        if-no-files-found: ignore
+        retention-days: 7
+
+  # A manual run of the Windows suite under full page heap.
+  #
+  # We get an intermittent 0xC0000005 whose stack is always the same: the
+  # destructor of `MarkerIndex::node_position_cache` walking a corrupted list.
+  # That is where the damage is detected, not where it was caused — the write
+  # that corrupted the list happened earlier, and the crash only materializes
+  # when the garbage collector happens to finalize the wrapper afterwards.
+  #
+  # What page heap buys, in order of usefulness:
+  #
+  # 1. Use-after-free detection. A freed block's pages become PAGE_NOACCESS and
+  #    stay reserved, so a write through a stale pointer faults at the instant
+  #    of the write with the guilty stack live. Every theory we have left is a
+  #    lifetime bug of this shape, so this is the reason to run it.
+  # 2. It takes the collector out of the equation. The fault no longer waits on
+  #    a finalizer, which is what made this crash intermittent — the corrupting
+  #    write is probably common and only its detection was a lottery.
+  # 3. Overrun detection, but only of a module's own allocations — see below.
+  #
+  # Page heap is enabled process-wide rather than for a list of modules. A
+  # targeted `/dlls` list relocates only those modules' allocations onto guarded
+  # pages, which destroys adjacency and means it can only catch a listed module
+  # overrunning *itself* — not somebody else corrupting its memory. Since we do
+  # not know who the offender is, restricting the trap to a guess about it is
+  # backwards.
+  #
+  # Still invisible: a wild write landing inside a still-valid block, and
+  # anything Chromium allocates through PartitionAlloc, which bypasses the
+  # Windows heap entirely. A clean run here is not an acquittal.
+  #
+  # Cost: every targeted allocation occupies at least one page. superstring
+  # allocates small objects prolifically — every `MarkerIndex::Node`, every
+  # patch node — so a ~100-byte object becoming 4KB+ is a large multiplier on
+  # the busiest structures in the process. If the job dies of memory rather
+  # than of the bug, narrow the `/dlls` list or add `/size` bounds.
+  pageheap:
+    name: PageHeap assay (Windows)
+    # A slice, not the suite. Every stop this configuration has produced landed
+    # at spec 35, 261, 35, 35 or 332 of 2,367, so the first 400 specs cover the
+    # whole observed crash window with margin — and unlike the full suite, which
+    # takes about six hours under page heap and therefore always ends as a
+    # cancellation, a slice finishes. A completed clean run is the result we
+    # want; a cancelled one is not.
+    timeout-minutes: 90
+    # NEXT STEP, deliberately not enabled yet: setting
+    # `PULSAR_DISABLE_ASYNC_GIT: 1` here redirects git-utils' four async methods
+    # to their synchronous counterparts (see
+    # `spec/helpers/disable-async-git.js`), which moves libgit2's status work off
+    # the libuv pool threads where all seven of our symbolized crashes have run.
+    #
+    # It is off for now because this page-heap configuration is itself
+    # unvalidated: light page heap has never caught a stop — all six verifier
+    # stops came from `/full` configurations — so a clean run with the stub on
+    # would be unreadable. It could mean the stub worked, or that nothing was
+    # being detected in the first place.
+    #
+    # So: validate the trigger first. If a run in this configuration produces a
+    # verifier stop, set the variable and the necessity test becomes meaningful.
+    # If two or three runs stay clean, light page heap does not detect and the
+    # trigger should go back to `/full /dlls test_extension.node`, which is
+    # 1-for-1.
+    if: |
+      !startsWith(github.event.pull_request.title, '[skip-ci]') &&
+      !startsWith(github.event.pull_request.title, '[skip-editor-ci]')
+    runs-on: windows-2022
+    steps:
+    - name: Checkout the latest code
+      uses: actions/checkout@v6
+      with:
+        submodules: true
+    - name: Setup node
+      uses: actions/setup-node@v6
+      with:
+        node-version-file: '.nvmrc'
+    - name: Install Python setuptools
+      # This is needed for Python 3.12+, since many versions of node-gyp
+      # are incompatible with Python 3.12+, which no-longer ships 'distutils'
+      # out of the box. 'setuptools' package provides 'distutils'.
+      run: python3 -m pip install setuptools --break-system-packages
+    - name: Install Dependencies
+      run: yarn install --ignore-engines || yarn install --ignore-engines
+    - name: Build Dependencies
+      run: yarn build
+    - name: Use the fast disk for temp files
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        $t = Join-Path $env:RUNNER_TEMP "spec-temp"
+        New-Item -ItemType Directory -Force -Path $t | Out-Null
+        "TEMP=$t" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        "TMP=$t"  | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        Write-Host "TEMP and TMP now point at $t"
+
+        $home2 = Join-Path $env:RUNNER_TEMP "atom-home"
+        New-Item -ItemType Directory -Force -Path $home2 | Out-Null
+        "ATOM_HOME=$home2" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+        Write-Host "ATOM_HOME now points at $home2"
+    # `gflags.exe` ships with Debugging Tools for Windows, in the same place the
+    # symbolize step finds `cdb.exe`. Page heap is keyed on the image name in
+    # the registry, so enabling it here applies to the Electron the test step
+    # launches.
+    - name: Enable full page heap
+      shell: pwsh
+      run: |
+        $roots = @('C:\Program Files (x86)\Windows Kits', 'C:\Program Files\Windows Kits')
+        $gflags = $null
+        foreach ($r in $roots) {
+          if (-not (Test-Path $r)) { continue }
+          $gflags = Get-ChildItem $r -Recurse -Filter gflags.exe -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match 'x64' } | Select-Object -First 1
+          if ($gflags) { break }
+        }
+        if (-not $gflags) {
+          Write-Host "::error::gflags.exe not found; cannot enable page heap."
+          exit 1
+        }
+
+        Write-Host "Using $($gflags.FullName)"
+        # The fourteen native addons, under full page heap.
+        #
+        # This is the configuration with the most evidence behind it: five
+        # verifier stops in five runs, each `CORRUPTED_FREED_HEAP_BLOCK` —
+        # something wrote into a freed block, detected when that block left the
+        # delay-free list. It is kept here as an assay rather than as a
+        # diagnostic, because it tests the mechanism directly: if the write was
+        # the kernel storing `STATUS_CANCELLED` into an `OVERLAPPED` that a
+        # watcher freed while its I/O was still pending, these stops should now
+        # be gone.
+        #
+        # Reading it:
+        #
+        #  * A stop means the corruption survives the pathwatcher fix. That is
+        #    decisive on its own and worth acting on immediately.
+        #  * Clean runs accumulate. At the historical hit rate, three of them
+        #    put the odds of the bug still being present under one in a
+        #    thousand — far stronger than the same effort spent counting green
+        #    runs of the ordinary Windows job, where the natural crash rate is
+        #    somewhere around one in four and a green run means little.
+        #
+        # Two configurations were tried and abandoned. Process-wide `/full` taxes
+        # the suite about tenfold and ran past the six-hour job limit without
+        # crashing, so a clean run proved nothing. Light page heap (`/p /enable`
+        # alone) has never caught a stop, so it cannot serve as an assay — do not
+        # quietly drop `/full` again without validating it first.
+        $dlls = @(
+          'superstring.node', 'build_libiconv.node', 'git.node',
+          'pathwatcher.node', 'nsfw.node', 'fs_admin.node',
+          'spellchecker.node', 'keytar.node', 'ctags.node',
+          'fuzzy-native.node', 'keyboard-layout-manager.node',
+          'get_scrollbar_style_native.node', 'better_sqlite3.node', 'pty.node'
+        )
+        Write-Host "Page heap for: $($dlls -join ', ')"
+        & $gflags.FullName /p /enable electron.exe /full /dlls @dlls | Write-Host
+
+        $memory = Get-CimInstance Win32_OperatingSystem
+        Write-Host ("Memory: {0:N0} MB total, {1:N0} MB free" -f `
+          ($memory.TotalVisibleMemorySize / 1KB), ($memory.FreePhysicalMemory / 1KB))
+
+        Write-Host "--- images with page heap enabled ---"
+        & $gflags.FullName /p | Write-Host
+
+    # Page heap keeps each block's allocation and free stacks in heap memory,
+    # and a minidump does not capture it — `!heap -p -a` came back empty on our
+    # first attempt for exactly that reason. Ask Windows Error Reporting for a
+    # full-memory dump instead. WER is already producing the dumps we collect
+    # (`electron.exe.<pid>.dmp`); this only changes their type.
+    #
+    # These are large — expect something on the order of gigabytes, versus tens
+    # of megabytes for a minidump — so `DumpCount` is 1 and they go on the fast
+    # disk. If the artifact upload becomes intolerable, symbolize in the job and
+    # stop uploading the dump rather than going back to minidumps, which cannot
+    # answer the question we are asking.
+    - name: Ask for full-memory crash dumps
+      shell: pwsh
+      run: |
+        $key = 'HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\electron.exe'
+        New-Item -Path $key -Force | Out-Null
+        $folder = Join-Path $env:RUNNER_TEMP "werdumps"
+        New-Item -ItemType Directory -Force -Path $folder | Out-Null
+        New-ItemProperty -Path $key -Name DumpType   -PropertyType DWord     -Value 2        -Force | Out-Null
+        New-ItemProperty -Path $key -Name DumpCount  -PropertyType DWord     -Value 1        -Force | Out-Null
+        New-ItemProperty -Path $key -Name DumpFolder -PropertyType ExpandString -Value $folder -Force | Out-Null
+        Get-ItemProperty -Path $key | Format-List DumpType, DumpCount, DumpFolder | Out-String | Write-Host
+
+    # The first 25 spec files alphabetically, which is roughly the first 400
+    # specs — past every stop we have recorded. Derived at runtime rather than
+    # hardcoded so that adding or removing a spec file does not silently change
+    # what this covers.
+    - name: Run the opening specs
+      shell: pwsh
+      run: |
+        $files = Get-ChildItem spec -Filter *-spec.js | Sort-Object Name |
+          Select-Object -First 25 | ForEach-Object { "spec/$($_.Name)" }
+        Write-Host "Running $($files.Count) spec files:"
+        $files | ForEach-Object { Write-Host "  $_" }
+        yarn start --test @files
+
+    - name: Environment probe readings
+      if: always()
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        $root = if ($env:ATOM_HOME) { $env:ATOM_HOME } else { Join-Path $env:USERPROFILE ".pulsar" }
+        $log = Join-Path $root "environment-probe.log"
+        if (Test-Path $log) {
+          Write-Host "--- $log"
+          Get-Content $log | Write-Host
+        } else {
+          Write-Host "No probe log at $log"
+        }
+    - name: Collect crash dumps
+      if: failure()
+      shell: bash
+      run: |
+        mkdir -p crash-dumps
+        # ATOM_HOME may now be a Windows path (D:\a\...), which bash cannot stat.
+        ATOM_HOME_UNIX=$(cygpath -u "$ATOM_HOME" 2>/dev/null || echo "$ATOM_HOME")
+        DUMPS="${ATOM_HOME_UNIX:-$HOME/.pulsar}/crashdumps"
+        echo "HOME=$HOME ATOM_HOME=${ATOM_HOME:-<unset>}"
+        echo "Looking for crash dumps in $DUMPS"
+        if [ -d "$DUMPS" ]; then
+          echo "Source directory exists; contents:"
+          ls -laR "$DUMPS" || true
+          cp -R "$DUMPS/." crash-dumps/ || true
+        else
+          echo "Source directory does NOT exist; listing its parent:"
+          ls -la "$(dirname "$DUMPS")" || echo "parent does not exist either"
+        fi
+        # Spec runs relocate userData to a temp directory (start.js), and
+        # Electron derives its default dump path from userData — so sweep the
+        # temp tree too, in case the dumps are landing there rather than in
+        # ATOM_HOME.
+        # Do NOT trust $TEMP here: Git Bash sets it to its own /tmp, not the
+        # Windows temp directory that Node's `temp` package actually uses.
+        # Search every plausible root instead.
+        mkdir -p crash-dumps/stray
+        for root in "$HOME/AppData" "$HOME/.pulsar" /tmp /c/Windows/Temp "$(cygpath -u "$RUNNER_TEMP" 2>/dev/null)/werdumps" .; do
+          [ -d "$root" ] || continue
+          echo "--- searching $root"
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" -print 2>/dev/null | head -50 || true
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -type d \( -iname "Crashpad" -o -iname "crashdumps" \) -print 2>/dev/null | head -20 || true
+          find "$root" -maxdepth 7 -not -path "./crash-dumps/*" -not -path "./node_modules/*" -not -path "./.git/*" -iname "*.dmp" 2>/dev/null | while read -r dmp; do
+            cp "$dmp" crash-dumps/stray/ || true
+          done || true
+        done
+        # Native symbols, so a dump can still be symbolized long after the
+        # runner has been destroyed.
+        mkdir -p crash-dumps/pdb
+        find node_modules -maxdepth 6 -path "*/build/Release/*.pdb" 2>/dev/null | while read -r pdb; do
+          cp "$pdb" crash-dumps/pdb/ || true
+        done || true
+        echo "Staged for upload:"
+        ls -laR crash-dumps || true
+    - name: Symbolize crash dumps
+      if: failure()
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        # Debugging Tools for Windows is an optional SDK feature and may not be
+        # on the image, so search rather than assume a path.
+        $roots = @('C:\Program Files (x86)\Windows Kits', 'C:\Program Files\Windows Kits', 'C:\Program Files\WindowsApps')
+        function Find-Cdb {
+          foreach ($r in $roots) {
+            if (-not (Test-Path $r)) { continue }
+            $hit = Get-ChildItem $r -Recurse -Filter cdb.exe -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match 'x64' } | Select-Object -First 1
+            if ($hit) { return $hit }
+          }
+          return $null
+        }
+        $cdb = Find-Cdb
+        if (-not $cdb) {
+          Write-Host "No cdb.exe. The dump and its matching PDBs are both in the artifact;"
+          Write-Host "symbolize offline with WinDbg, or llvm-symbolizer which can read PDBs."
+          exit 0
+        }
+        Write-Host "Using $($cdb.FullName)"
+        $dumps = Get-ChildItem "$env:GITHUB_WORKSPACE\crash-dumps" -Recurse -Filter *.dmp -ErrorAction SilentlyContinue
+        if (-not $dumps) { Write-Host "No dumps to symbolize."; exit 0 }
+        $symDirs = Get-ChildItem "$env:GITHUB_WORKSPACE\node_modules" -Recurse -Depth 6 -Filter *.pdb -ErrorAction SilentlyContinue |
+          Select-Object -ExpandProperty DirectoryName -Unique
+        # Microsoft's symbol server, so `ntdll` resolves. Without it every
+        # dump we have symbolized has landed in a `ntdll.wrong.symbols.dll`
+        # bucket, and `!analyze` cannot decode an Application Verifier stop —
+        # the stop code and the block's allocation and free stacks all live
+        # behind ntdll symbols. Downloads are cached in the directory below and
+        # cost a minute or two on the first dump.
+        $symbolCache = Join-Path $env:RUNNER_TEMP "symcache"
+        New-Item -ItemType Directory -Force -Path $symbolCache | Out-Null
+        $symDirs += "srv*$symbolCache*https://msdl.microsoft.com/download/symbols"
+        $symPath = ($symDirs -join ';')
+        Write-Host "PDBs found: $($symDirs.Count) directories"
+        Write-Host "Symbol path: $symPath"
+        if (-not $symDirs) { Write-Host "WARNING: no PDBs found — native frames will not resolve." }
+        foreach ($d in $dumps) {
+          Write-Host ""
+          Write-Host "=============================================================="
+          Write-Host "=== $($d.FullName)"
+          Write-Host "=============================================================="
+          # `!avrf` first: on an Application Verifier stop it names the stop.
+          # It prints nothing useful on an ordinary crash, which costs nothing.
+          $analysis = & $cdb.FullName -z $d.FullName -y $symPath `
+            -c '.reload; !avrf; !analyze -v; k 40; lm; q' 2>&1 | Out-String
+          Write-Host $analysis
+
+          # A verifier stop names the offending block as Arg2. The stack above
+          # it belongs to whoever called `free` and tripped the check — which
+          # is not necessarily whoever corrupted the block, since a freed block
+          # sits on a delay list and the bad write can come from anywhere that
+          # shares the heap. `!heap -p -a` asks page heap for that block's own
+          # allocation and free stacks, which is what says who owned it.
+          $block = [regex]::Match(
+            $analysis, 'Arg2:\s*([0-9a-fA-F]+),\s*Heap block being freed')
+          if ($block.Success) {
+            $address = "0x" + $block.Groups[1].Value
+            Write-Host ""
+            Write-Host "=== !heap -p -a $address"
+            & $cdb.FullName -z $d.FullName -y $symPath `
+              -c ".reload; !heap -p -a $address; q" 2>&1 | Out-String | Write-Host
+          } else {
+            Write-Host "No verifier stop block address in the analysis; skipping !heap."
+          }
+        }
+    - name: Upload crash dumps
+      if: failure()
+      uses: actions/upload-artifact@v7
+      with:
+        name: Crash dumps (PageHeap)
+        path: ./crash-dumps/*
+        if-no-files-found: ignore
+        retention-days: 7

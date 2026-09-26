@@ -51,6 +51,16 @@ function restoreDefaultScheduler() {
   TextEditorComponent.setScheduler(defaultScheduler);
 }
 
+// Some specs have to drive updates through the alternative scheduler above.
+// The real condition is not the platform as such, but whether the browser
+// believes the editor is visible: where it does not, `requestAnimationFrame`
+// callbacks are throttled or never delivered at all, so an update scheduled
+// through `ViewRegistry::requestDocumentUpdate` never runs and anything
+// awaiting `getNextUpdatePromise` hangs until the spec times out. That is the
+// situation on our headless Linux and Windows CI runners.
+const NEEDS_ALTERNATIVE_SCHEDULER =
+  process.platform === 'linux' || process.platform === 'win32';
+
 const SAMPLE_TEXT = fs.readFileSync(
   path.join(__dirname, 'fixtures', 'sample.js'),
   'utf8'
@@ -1185,21 +1195,36 @@ describe('TextEditorComponent', () => {
       let originalTimeout;
 
       beforeEach(() => {
-        if (process.platform === 'linux') {
+        if (NEEDS_ALTERNATIVE_SCHEDULER) {
           useAlternativeScheduler();
         }
         originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
+        // A floor, not an assignment: these tests need well over the 5s local
+        // default, but CI already grants 120s and a plain assignment would cut
+        // that in half — which is how this spec ended up being the only one in
+        // the file given *less* time than its neighbours.
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = Math.max(originalTimeout, 60 * 1000);
       });
 
       afterEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
-        if (process.platform === 'linux') {
+        if (NEEDS_ALTERNATIVE_SCHEDULER) {
           restoreDefaultScheduler();
         }
       });
 
       it('renders the visible rows correctly after randomly mutating the editor', async () => {
+        // Bound this loop by time as well as by iteration count. Twenty
+        // iterations is more work than the slowest CI runners can finish
+        // within the spec budget — Windows has spent the entire 120s here and
+        // still timed out — and the failure that produces is a timeout, which
+        // tells us nothing about the editor. Deriving the deadline from the
+        // budget rather than hardcoding it means this keeps pace if the
+        // budget changes, and leaves room for the final iteration to finish
+        // and for teardown. Fast machines still run all twenty; slow ones run
+        // as many as fit and report real assertions. Each iteration seeds
+        // itself and logs that seed, so a failure stays reproducible.
+        const deadline = Date.now() + jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.6;
         const initialSeed = Date.now();
         for (var i = 0; i < 20; i++) {
           let seed = initialSeed + i;
@@ -1309,6 +1334,8 @@ describe('TextEditorComponent', () => {
 
           element.remove();
           editor.destroy();
+
+          if (Date.now() > deadline) break;
         }
       });
     });
@@ -2301,13 +2328,13 @@ describe('TextEditorComponent', () => {
 
   describe('highlight decorations', () => {
     beforeEach(() => {
-      if (process.platform === 'linux') {
+      if (NEEDS_ALTERNATIVE_SCHEDULER) {
         useAlternativeScheduler();
       }
     });
 
     afterEach(() => {
-      if (process.platform === 'linux') {
+      if (NEEDS_ALTERNATIVE_SCHEDULER) {
         restoreDefaultScheduler();
       }
     });
@@ -2631,6 +2658,17 @@ describe('TextEditorComponent', () => {
     function attachFakeWindow(component) {
       const fakeWindow = document.createElement('div');
       fakeWindow.style.position = 'absolute';
+      // An explicit content width, because `position: absolute` shrink-to-fit
+      // is clamped by the viewport: when an uncaught error opened the dev tools
+      // mid-run the viewport dropped to 229px on Windows, squeezing this
+      // element to 177px instead of the 240px these assertions assume.
+      //
+      // 200px is the component's width; `content-box` keeps the 20px of padding
+      // outside it, so the element's own box is 240px — the same as the
+      // shrink-to-fit result it replaces. Setting 240px here instead would make
+      // the box 280px and every overflow assertion below would be 40px out.
+      fakeWindow.style.boxSizing = 'content-box';
+      fakeWindow.style.width = 200 + 'px';
       fakeWindow.style.padding = 20 + 'px';
       fakeWindow.style.backgroundColor = 'blue';
       fakeWindow.appendChild(component.element);
@@ -3760,7 +3798,51 @@ describe('TextEditorComponent', () => {
         });
 
         element.style.width = '50px';
-        await component.getNextUpdatePromise();
+        const updatePromise = component.getNextUpdatePromise();
+
+        if (process.platform === 'win32') {
+          // The spec window is never shown (see `AtomWindow`'s `show: false`),
+          // and on Windows that means `requestAnimationFrame` callbacks are not
+          // delivered. The update that `ViewRegistry::requestDocumentUpdate`
+          // queues in response to the resize above would therefore never run,
+          // and this `await` would hang until the spec timed out.
+          //
+          // Prefer the real thing: wait for the update to arrive on its own,
+          // and only flush the queue by hand if it does not. Flushing also
+          // resets `animationFrameRequest`, which would otherwise stay latched
+          // and silently suppress every subsequent update in the suite.
+          const TIMED_OUT = Symbol('timed out');
+          const winner = await Promise.race([
+            updatePromise,
+            wait(1000).then(() => TIMED_OUT)
+          ]);
+          if (winner === TIMED_OUT) {
+            // Two ways the update can fail to arrive. `didAttach` decides
+            // visibility synchronously from `isVisible()`; if the element had
+            // not been laid out yet at that moment the component marks itself
+            // hidden, and only the (frame-driven, therefore absent)
+            // IntersectionObserver would ever correct it — whereupon
+            // `scheduleUpdate` returns before queuing anything. Or the update
+            // was queued and the frame never came.
+            //
+            // Handle both. `didShow` is a no-op when the component already
+            // knows it is visible, and updates synchronously when it does not.
+            console.log(
+              '[diag] forcing update:',
+              JSON.stringify({
+                visible: component.visible,
+                isVisible: component.isVisible(),
+                updateScheduled: component.updateScheduled,
+                queuedWriters: TextEditorComponent.getScheduler()
+                  .documentWriters.length
+              })
+            );
+            component.didShow();
+            TextEditorComponent.getScheduler().performDocumentUpdate();
+          }
+        }
+
+        await updatePromise;
         assertLinesAreAlignedWithLineNumbers(component);
       }
     });

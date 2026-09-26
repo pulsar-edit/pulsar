@@ -44,10 +44,27 @@ function filePathMatchesGlob(filePath, matcher) {
 
 // Transform a pattern prior to handing it off to `minimatch`.
 function normalizePattern (rawPath) {
+  // On Windows, a user may write a pattern with either `\` or `/` as the path
+  // separator; we accept both, and convert to `/` here, once, up front. Every
+  // check below can then assume `/`.
+  //
+  // This conversion is load-bearing, not cosmetic. Inside a _pattern_,
+  // minimatch treats `\` as an escape character rather than as a separator,
+  // so `b-dir\*.js` would otherwise match only a file literally named
+  // `b-dir*.js`. minimatch used to do this conversion on our behalf; when it
+  // stopped doing so in v5, every backslashed pattern silently stopped
+  // matching anything.
+  //
+  // The trade-off is that `\` can no longer escape a glob metacharacter on
+  // Windows — which is the same trade-off minimatch itself used to make. The
+  // paths we match _against_ are still normalized by minimatch, so only the
+  // pattern side needs this.
+  if (path.sep !== '/') {
+    rawPath = rawPath.split(path.sep).join('/');
+  }
+
   // Strip any trailing path separator.
-  // The path separator is `\` on Windows, but we also allow usage of `/`;
-  // hence we check for both here.
-  if (rawPath.endsWith(path.sep) || rawPath.endsWith('/')) {
+  if (rawPath.endsWith('/')) {
     rawPath = rawPath.substring(0, rawPath.length - 1);
   }
 
@@ -67,7 +84,7 @@ function normalizePattern (rawPath) {
   // to _all_ patterns unless the user specifically opts out by starting a
   // path with `/`. This would make plenty of sense for us, but would be a
   // change in behavior, so for now we're going with this as a compromise.
-  let prefix = (rawPath.includes(path.sep) || rawPath.includes('/')) ? '' : `**${path.sep}`;
+  let prefix = rawPath.includes('/') ? '' : '**/';
   return `${negation}${prefix}${rawPath}`;
 }
 
@@ -105,15 +122,27 @@ function extractProjectRootsFromPathPattern (pathPattern, rootBasenames) {
     pathPattern = pathPattern.substring(1);
   }
   let prefix = negated ? '!' : '';
-  let normalized = path.normalize(pathPattern);
   let originalPathPattern = pathPattern;
   if (pathPattern === "") return [null, ""];
+
+  // Normalize the pattern, then express it with `/` separators, so that the
+  // logic below has only one separator to consider. A user on Windows may
+  // write either separator, and a pattern written with `/` contains no
+  // `path.sep` at all — so testing for `path.sep` alone would treat
+  // `some-root/foo` as though it had no separator, make `some-root/foo` the
+  // root basename, match no root, and silently apply the pattern to _every_
+  // root instead of the one the user named.
+  let normalized = path.normalize(pathPattern);
+  if (path.sep !== '/') {
+    normalized = normalized.split(path.sep).join('/');
+  }
+
   let rootBasename;
-  if (!pathPattern.includes(path.sep)) {
-    rootBasename = pathPattern;
+  let index = normalized.indexOf('/');
+  if (index === -1) {
+    rootBasename = normalized;
     pathPattern = "";
   } else {
-    let index = normalized.indexOf(path.sep);
     rootBasename = normalized.substring(0, index);
     pathPattern = normalized.slice(index + 1);
   }
