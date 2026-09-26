@@ -40,6 +40,8 @@ module.exports = function ({logFile, headless, testPaths, buildAtomEnvironment})
   require('../helpers/attach-to-dom');
   require('../helpers/deprecation-snapshots');
   require('../helpers/platform-filter');
+  require('../helpers/suppress-devtools-on-error')(headless);
+  require('../helpers/log-uncaught-errors')();
 
   const jasmineContent = document.createElement('div');
   jasmineContent.setAttribute('id', 'jasmine-content');
