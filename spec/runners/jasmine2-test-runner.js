@@ -41,6 +41,7 @@ module.exports = function ({logFile, headless, testPaths, buildAtomEnvironment})
   require('../helpers/deprecation-snapshots');
   require('../helpers/platform-filter');
   require('../helpers/disable-async-git')();
+  require('../helpers/suppress-devtools-on-error')(headless);
 
   const jasmineContent = document.createElement('div');
   jasmineContent.setAttribute('id', 'jasmine-content');

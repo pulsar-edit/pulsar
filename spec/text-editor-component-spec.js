@@ -2658,6 +2658,15 @@ describe('TextEditorComponent', () => {
     function attachFakeWindow(component) {
       const fakeWindow = document.createElement('div');
       fakeWindow.style.position = 'absolute';
+      // An explicit width, because `position: absolute` shrink-to-fit is
+      // clamped by the viewport. Something resizes the spec window partway
+      // through a full run — we have measured it going from 784px wide to
+      // 229px — and without a width of its own this element was squeezed to
+      // 177px instead of the 240px the assertions below assume, making every
+      // overflow calculation in this spec wrong. 200px of component plus 20px
+      // of padding on each side.
+      fakeWindow.style.width = 240 + 'px';
+      fakeWindow.style.boxSizing = 'content-box';
       fakeWindow.style.padding = 20 + 'px';
       fakeWindow.style.backgroundColor = 'blue';
       fakeWindow.appendChild(component.element);
