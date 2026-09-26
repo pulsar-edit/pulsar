@@ -34,7 +34,7 @@
     "@pulsar-edit/fuzzy-native": "1.4.0",
     "@pulsar-edit/get-scrollbar-style": "^1.0.1",
     "@pulsar-edit/git-utils": "^8.1.1",
-    "@pulsar-edit/pathwatcher": "^9.0.3",
+    "@pulsar-edit/pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#584ac46ee2642605e97e9a1034b0a447ecb5238b",
     "@pulsar-edit/scandal": "^4.0.0",
     "@pulsar-edit/superstring": "^3.0.7",
     "@pulsar-edit/text-buffer": "^14.0.4",
@@ -320,7 +320,7 @@
     "es5-ext": "https://github.com/pulsar-edit/es5-ext#169f6ae9b2675675269a0ba265f83c29c7b56244",
     "@electron/remote": "2.1.2",
     "@pulsar-edit/superstring": "^3.0.7",
-    "@pulsar-edit/pathwatcher": "^9.0.3",
+    "@pulsar-edit/pathwatcher": "https://github.com/pulsar-edit/node-pathwatcher.git#584ac46ee2642605e97e9a1034b0a447ecb5238b",
     "@pulsar-edit/git-utils": "^8.1.1",
     "**/underscore-plus": "npm:@pulsar-edit/underscore-plus@1.8.3"
   }
