@@ -1227,12 +1227,29 @@ my @n = sort {$a <=> $b} @m;\
 
   describe("when package to tokenizes", () => it("does not highlight semicolon in package name", function() {
     const {tokens} = grammar.tokenizeLine("package Test::ASD; #this is my new class");
-    expect(tokens[0]).toEqual({value: "package", scopes: ["source.perl", "meta.class.perl", "keyword.control.perl"]});
-    expect(tokens[1]).toEqual({value: " ", scopes: ["source.perl", "meta.class.perl"]});
-    expect(tokens[2]).toEqual({value: "Test::ASD", scopes: ["source.perl", "meta.class.perl", "entity.name.type.class.perl"]});
+    expect(tokens[0]).toEqual({value: "package", scopes: ["source.perl", "meta.package.perl", "keyword.control.perl"]});
+    expect(tokens[1]).toEqual({value: " ", scopes: ["source.perl", "meta.package.perl"]});
+    expect(tokens[2]).toEqual({value: "Test::ASD", scopes: ["source.perl", "meta.package.perl", "entity.name.type.class.perl"]});
     expect(tokens[3]).toEqual({value: ";", scopes: ["source.perl", "punctuation.terminator.semicolon.perl"]});
     expect(tokens[5]).toEqual({value: "#", scopes: ["source.perl", "comment.line.number-sign.perl", "punctuation.definition.comment.perl"]});
     expect(tokens[6]).toEqual({value: "this is my new class", scopes: ["source.perl", "comment.line.number-sign.perl"]});
+}));
+
+describe("when class to tokenizes", function() {
+  it('properly parses the class syntax', function() {
+    const {tokens} = grammar.tokenizeLine('class Foo { field bar; method baz {} }');
+    expect(tokens[0]).toEqual({value: 'class', scopes: ['source.perl', 'meta.class.perl', 'keyword.control.perl']});
+    expect(tokens[2]).toEqual({value: 'Foo', scopes: ['source.perl', 'meta.class.perl', 'entity.name.type.class.perl']});
+    expect(tokens[6]).toEqual({value: 'field', scopes: ['source.perl', 'storage.modifier.perl']});
+    expect(tokens[7]).toEqual({value: ' bar', scopes: ['source.perl']});
+    expect(tokens[10]).toEqual({value: 'method', scopes: ['source.perl', 'meta.function.perl', 'storage.type.function.sub.perl']});
+    expect(tokens[12]).toEqual({value: 'baz', scopes: ['source.perl', 'meta.function.perl', 'entity.name.function.perl']})
+  });
+});
+
+describe("when class to tokenizes", () => it('properly parses the class-like syntax', function() {
+  const {tokens} = grammar.tokenizeLine('package Foo; use Moo; has bar => (is => "ro");');
+  expect(tokens[10]).toEqual({value: 'has', scopes: ['source.perl', 'storage.modifier.perl']});
 }));
 
   describe("when brackets are encountered", function() {
