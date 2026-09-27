@@ -8,6 +8,7 @@ const { sep } = path;
 
 const { CompositeDisposable } = require('event-kit');
 const { watchPath } = require('../src/path-watcher');
+const { NativeWatcherRegistry } = require('../src/native-watcher-registry');
 const { conditionPromise } = require('./helpers/async-spec-helpers');
 
 function waitsForCondition(label, condition) {
@@ -866,9 +867,8 @@ describe('watchPath', function () {
         await Promise.all([starting, stopping]);
 
         expect(native.isRunning()).toBe(false);
-        // The leak this guards: the watcher used to finish starting *after*
-        // the stop was ignored, leaving a worker subscription nothing could
-        // ever release.
+        // The watcher used to finish starting after the stop was ignored,
+        // leaving a worker subscription that could never be disposed.
         expect(Isolated.INSTANCES.size).toBe(0);
         expect(Isolated.task).toBe(null);
       });
@@ -886,6 +886,159 @@ describe('watchPath', function () {
         expect(native.isRunning()).toBe(false);
         // Not wedged in STARTING: it can be started again.
         expect(Isolated.task).toBe(null);
+      });
+
+      it('rejects a pending watchPath when the worker can never start', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+
+        // Point the worker at a script that doesn't exist. The bootstrap's
+        // `require` fails, it reports the failure and exits nonzero, so no
+        // amount of respawning will ever produce a usable worker.
+        const Isolated = await isolatedWatcherClass();
+        Isolated.taskPath = path.join(__dirname, 'fixtures', 'no-such-worker-script.js');
+
+        // Fail on the first bad spawn instead of waiting out five of them
+        // inside `RESTART_WINDOW_MS`. Five real forks is slow! Perhaps too
+        // slow for CI, even.
+        const createWatcherTask = Isolated.createWatcherTask;
+        Isolated.createWatcherTask = function () {
+          createWatcherTask.call(this);
+          this.task.MAX_RESTARTS = 0;
+        };
+
+        // The same wiring `PathWatcherManager.createWatcher` uses, but against
+        // our isolated native class. `PathWatcher` isn't exported, so reach it
+        // through a live watcher, the way `isolatedWatcherClass` does.
+        const probe = await watchPath(rootDir, {}, () => {});
+        const PathWatcherClass = probe.constructor;
+        probe.dispose();
+
+        const registry = new NativeWatcherRegistry(p => new Isolated(p));
+        const watcher = new PathWatcherClass(registry, rootDir, {});
+        watcher.onDidChange(() => {});
+
+        let error = null;
+        try {
+          await watcher.getStartPromise();
+        } catch (err) {
+          error = err;
+        }
+
+        // Before this behavior existed, the `await` above never settled and
+        // the spec died of the jasmine timeout instead.
+        expect(error).not.toBe(null);
+        expect(error.message).toContain('exited repeatedly');
+
+        // The bookkeeping that lets a later `startTask` try again.
+        expect(Isolated.started).toBe(false);
+        expect(Isolated.PROMISE_META.has('self:start')).toBe(false);
+
+        // Every watcher is dead, so the user is told (once, however many
+        // watchers were affected) and pointed at the setting.
+        const notification = atom.notifications
+          .getNotifications()
+          .find(n => n.getMessage().includes('file watcher has failed'));
+        expect(notification).toBeTruthy();
+        expect(notification.getType()).toBe('error');
+        expect(notification.getOptions().buttons.length).toBe(1);
+      });
+
+      it('warns when the worker keeps crashing but recovers each time', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        // Two crashes rather than six: the threshold is policy, and six real
+        // forks is a slow way to assert a counter. Set after `start`, since
+        // `createWatcherTask` is what resets the count.
+        Isolated.MAX_RESPAWNS_BEFORE_WARNING = 2;
+
+        for (let i = 0; i < 2; i++) {
+          const respawned = new Promise(resolve =>
+            Isolated.task.once('task:respawned', resolve)
+          );
+          Isolated.task.childProcess.kill('SIGKILL');
+          await respawned;
+        }
+
+        const notification = atom.notifications
+          .getNotifications()
+          .find(n => n.getMessage().includes('keeps crashing'));
+        expect(notification).toBeTruthy();
+        // A warning, not an error: watching still works, it just keeps dropping
+        // events on the floor while it recovers.
+        expect(notification.getType()).toBe('warning');
+        expect(notification.getOptions().buttons.length).toBe(1);
+
+        await native.stop();
+      });
+
+      it('fails fast rather than waiting when there is no worker to send to', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        // An *expected* termination, so nothing respawns: from here on there is
+        // nobody to receive a message, let alone reply to one.
+        Isolated.task.terminate();
+
+        let error = null;
+        try {
+          await native.send('watcher:watch', native.buildWatchParams());
+        } catch (err) {
+          error = err;
+        }
+        expect(error).not.toBe(null);
+        expect(error.message).toContain('Cannot reach the file watcher worker');
+        // The request cleaned up after itself instead of waiting for a reply
+        // that can never arrive.
+        expect(Isolated.PROMISE_META.size).toBe(0);
+
+        // Ignored-name updates are deliberately silent — the names ride along
+        // with the next `watcher:watch` — so this must neither throw nor leave
+        // anything pending.
+        expect(() => native.setIgnoredNames(['*.log'])).not.toThrow();
+        expect(Isolated.PROMISE_META.size).toBe(0);
+
+        // A stop still unregisters. Skipping that would keep the task alive for
+        // the rest of the window, since it's the last instance leaving that
+        // destroys it.
+        await native.stop();
+        expect(Isolated.INSTANCES.size).toBe(0);
+        expect(Isolated.task).toBe(null);
+      });
+
+      it('starts a fresh worker for a watch that arrives after a fatal failure', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        // Exhaust the budget on a worker that had already started successfully.
+        // Unlike a first-spawn failure, nothing is waiting on `self:start` here.
+        Isolated.task.MAX_RESTARTS = 0;
+        const failed = new Promise(resolve =>
+          Isolated.task.once('task:failed', resolve)
+        );
+        Isolated.task.childProcess.kill('SIGKILL');
+        await failed;
+
+        expect(Isolated.started).toBe(false);
+
+        // The point of clearing that flag: this watcher gets a new worker,
+        // instead of posting `watcher:watch` into a dead one and hanging.
+        const second = new Isolated(rootDir);
+        await second.start();
+        expect(second.isRunning()).toBe(true);
+
+        await second.stop();
+        await native.stop();
       });
 
       it('does not throw on a rename event with no origin path', async () => {

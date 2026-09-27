@@ -235,6 +235,23 @@ class WorkerProcessWatcher extends NativeWatcher {
   // Whether the watcher task is currently running in its own process.
   static started = false;
 
+  // Whether we've already told the user that file-watching has failed. Reset
+  // when a new task is created so that a later failure can report afresh.
+  static reportedFatalFailure = false;
+
+  // Unexpected worker restarts since the last time we mentioned them to the
+  // user. Unlike `WatcherTask`'s own accounting, this does not expire; it's how
+  // we notice a worker that crashes steadily but slowly enough to be restarted
+  // every time.
+  static respawnCount = 0;
+
+  // How many restarts to tolerate before suggesting a different watcher.
+  //
+  // Deliberately greater than `WatcherTask`'s `MAX_RESTARTS`: a single burst of
+  // rapid crashes ends in `task:failed` and reports itself as a fatal error, and
+  // we don't want a warning about the same incident alongside it.
+  static MAX_RESPAWNS_BEFORE_WARNING = 6;
+
   // Keeps track of instances of `WorkerProcessWatch` indexed by ID.
   static INSTANCES = new Map();
 
@@ -246,7 +263,48 @@ class WorkerProcessWatcher extends NativeWatcher {
     this.initialized = false;
     this.pendingRespawn = false;
     this.logging = this.readLoggingSetting();
+    this.reportedFatalFailure = false;
+    this.respawnCount = 0;
     this.task = new WatcherTask(this.taskPath);
+  }
+
+  // Private: A button that takes the user to the settings where they can choose
+  // a different file-watcher implementation.
+  static openSettingsButton() {
+    return {
+      text: 'Open Settings',
+      onDidClick: () => atom.workspace.open('atom://config/core')
+    };
+  }
+
+  // Private: Tell the user that the worker keeps crashing, even though it has
+  // recovered each time. Events are lost with every restart, so a watcher in
+  // this state is worth mentioning without being fatal.
+  static reportRepeatedCrashes() {
+    atom.notifications?.addWarning('Pulsar’s file watcher keeps crashing.', {
+      description:
+        'It has restarted several times, and changes to your files may have been missed each time. You can try a different implementation with the **Core → File System Watcher** setting.',
+      dismissable: true,
+      buttons: [this.openSettingsButton()]
+    });
+  }
+
+  // Private: Tell the user that file-watching has stopped working.
+  //
+  // Called when the worker has failed in a way it can't recover from — either
+  // it never started, or it exhausted its restarts. In both cases every watcher
+  // is now dead, and the user's only recourse is to try another implementation,
+  // so point them at the setting.
+  static reportFatalFailure(error) {
+    if (this.reportedFatalFailure) return;
+    this.reportedFatalFailure = true;
+    atom.notifications?.addError('Pulsar’s file watcher has failed.', {
+      description:
+        'Pulsar can no longer detect changes that other programs make to your files. You can try a different implementation with the **Core → File System Watcher** setting.',
+      detail: error?.message,
+      dismissable: true,
+      buttons: [this.openSettingsButton()]
+    });
   }
 
   // Private: Whether the worker should report its activity to the renderer's
@@ -335,7 +393,10 @@ class WorkerProcessWatcher extends NativeWatcher {
 
     // The watcher signaling that it's ready to start listening to files.
     this.task.on('watcher:ready', () => {
+      // Clear the entry as well as resolving it, so that the presence of a
+      // `self:start` entry always means a start is genuinely in flight.
       this.PROMISE_META.get('self:start')?.resolve?.();
+      this.PROMISE_META.delete('self:start');
       if (!this.pendingRespawn) return;
       this.pendingRespawn = false;
       for (let instance of this.INSTANCES.values()) {
@@ -352,9 +413,39 @@ class WorkerProcessWatcher extends NativeWatcher {
         this.PROMISE_META.delete(id);
       }
       this.pendingRespawn = true;
+
+      // Reset rather than latch: a worker that goes on crashing should be able
+      // to say so again later, rather than mentioning it once per window.
+      this.respawnCount++;
+      if (this.respawnCount >= this.MAX_RESPAWNS_BEFORE_WARNING) {
+        this.respawnCount = 0;
+        this.reportRepeatedCrashes();
+      }
     });
 
     this.task.on('task:failed', (error) => {
+      // Anyone waiting for the worker to start is waiting for something that
+      // will never happen, so reject instead of leaving them hanging. Clearing
+      // the flag and the promise means a later `startTask` can try again from
+      // scratch.
+      // Whether or not anyone is waiting on a start, the task is no longer
+      // running anything. Clearing the flag means the next `doStart` calls
+      // `startTask` again rather than posting messages to a worker that isn't
+      // there — by then the rapid-failure window will have drained, so it gets
+      // a real attempt.
+      this.started = false;
+
+      let startMeta = this.PROMISE_META.get('self:start');
+      if (startMeta) {
+        this.PROMISE_META.delete('self:start');
+        startMeta.reject(error);
+      }
+
+      // Every watcher this task was serving is now dead, so this is worth
+      // interrupting the user over — unlike the `did-error` reports below,
+      // which are frequent enough that the console is the right place for them.
+      this.reportFatalFailure(error);
+
       for (let instance of this.INSTANCES.values()) {
         instance.onError(error);
       }
@@ -401,7 +492,12 @@ class WorkerProcessWatcher extends NativeWatcher {
     });
     meta.promise = promise;
     this.PROMISE_META.set(id, meta);
-    this.task.send(JSON.stringify(bundle));
+    if (!this.task?.send(JSON.stringify(bundle))) {
+      // Nothing received this, so nothing will ever reply to it. Waiting would
+      // mean waiting forever.
+      this.PROMISE_META.delete(id);
+      throw new Error(`Cannot reach the file watcher worker to send: ${event}`);
+    }
     return await promise;
   }
 
@@ -443,11 +539,14 @@ class WorkerProcessWatcher extends NativeWatcher {
   setIgnoredNames(ignoredNames) {
     this.ignoredNames = ignoredNames;
     if (this.state === WATCHER_STATE.RUNNING) {
+      // Deliberately swallowed: if there's no worker to tell, the names we just
+      // stored will be sent along with the `watcher:watch` that starts the next
+      // one, so they'll be accurate regardless. Nothing here is worth reporting.
       this.send('watcher:update', {
         normalizedPath: this.normalizedPath,
         instance: this.id,
         ignored: this.ignoredNames
-      });
+      }).catch(() => {});
     }
   }
 
@@ -476,12 +575,21 @@ class WorkerProcessWatcher extends NativeWatcher {
   }
 
   async doStop() {
-    let result = await this.send('watcher:unwatch', {
-      normalizedPath: this.normalizedPath,
-      instance: this.id
-    });
-    this.constructor.unregister(this);
-    return result;
+    try {
+      await this.send('watcher:unwatch', {
+        normalizedPath: this.normalizedPath,
+        instance: this.id
+      });
+    } catch (error) {
+      // A worker we can't reach has already stopped watching on our behalf,
+      // which is all this method wanted. Consumers are usually disposing, and
+      // there is nothing for them to do about it.
+    } finally {
+      // Either way: a stop that skipped this would keep the worker alive for the
+      // rest of the window, since the task is only destroyed once the last
+      // instance unregisters.
+      this.constructor.unregister(this);
+    }
   }
 
   // Private: Re-create this watcher's subscription in a freshly respawned
@@ -705,9 +813,18 @@ class PathWatcher {
       this.native.start();
     } else {
       // Attach to a new native listener and retry
-      this.nativeWatcherRegistry.attach(this).then(() => {
-        this.onDidChange(callback);
-      });
+      this.nativeWatcherRegistry.attach(this).then(
+        () => {
+          this.onDidChange(callback);
+        },
+        // `attach` awaits the normalized path and nothing else, so the only way
+        // it rejects is a path we couldn't resolve — which the constructor has
+        // already turned into a rejected `startPromise`, where the caller of
+        // `watchPath` will see it. There's no second audience for it here (no
+        // watcher is ever handed out to subscribe with), so this handler exists
+        // only to keep the rejection from going unhandled.
+        () => {}
+      );
     }
 
     return new Disposable(() => {
@@ -755,6 +872,12 @@ class PathWatcher {
 
     this.subs.add(
       native.onDidError(err => {
+        // A native watcher that fails before it ever starts will never emit
+        // `did-start`, so anyone awaiting `getStartPromise` — which is every
+        // `watchPath` caller — would otherwise wait forever. Rejecting a
+        // promise that has already settled is a no-op, so errors after a
+        // successful start keep reporting through `did-error` alone.
+        this.rejectStartPromise(err);
         this.emitter.emit('did-error', err);
       })
     );

@@ -95,8 +95,20 @@ class WatcherTask {
     return;
   }
 
+  // Hand a message to the worker.
+  //
+  // Returns `true` if there was a worker to hand it to. A `false` return means
+  // the message is gone and no reply is coming.
   send(message) {
-    this.childProcess?.send(message);
+    if (!this.childProcess) return false;
+    try {
+      this.childProcess.send(message);
+    } catch (error) {
+      // The channel can close underneath us — `ERR_IPC_CHANNEL_CLOSED` — in
+      // which case this is no different from having no worker at all.
+      return false;
+    }
+    return true;
   }
 
   on(eventName, callback) {
