@@ -350,11 +350,25 @@ jobs:
       # (`rebuildModuleAt` returns early), so removing the file is enough. We
       # confirm the prebuilt binary actually loads first, so that a missing
       # prebuild fails here instead of shipping a file watcher that can't start.
-    - name: Skip rebuilding `@parcel/watcher`
+    - name: Prepare `@parcel/watcher`
       shell: bash
       run: |
-        node -e "require('@parcel/watcher'); console.log('prebuilt @parcel/watcher loads')"
         rm -f node_modules/@parcel/watcher/binding.gyp
+        # A restored `node_modules` cache may still hold a `watcher.node` built
+        # before we stopped building one. Clear it so the check below can only
+        # be satisfied by the prebuilt package.
+        rm -rf node_modules/@parcel/watcher/build
+        # `yarn` installs every prebuild whose `os`/`cpu` match, which on Linux
+        # means the musl variant as well as the glibc one. `index.js` loads the
+        # musl build only when `detect-libc` reports a musl system, and our
+        # glibc-linked Electron never is — so it can't ever load, it ships in
+        # the artifact regardless, and on arm64 upstream built it against
+        # `GLIBCXX_3.4.29`, which trips `script/check-linux-abi-floor.sh`.
+        rm -rf node_modules/@parcel/watcher-*-musl
+        # Last, so that it tests the state we're actually shipping: if a future
+        # release stops publishing a prebuild for this platform, fail here
+        # rather than ship a file watcher that can't start.
+        node -e "require('@parcel/watcher'); console.log('prebuilt @parcel/watcher loads')"
 
     - name: Rebuild Pulsar Dependencies for Electron (non-Linux)
       if: ${{ runner.os != 'Linux' }}
