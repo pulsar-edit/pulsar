@@ -371,6 +371,13 @@ const configSchema = {
           }
         ]
       },
+      fileSystemWatcherLogging: {
+        title: 'File System Watcher Logging',
+        description:
+          'Log filesystem watcher activity to the developer console. Useful when troubleshooting missed or unexpected file changes.',
+        type: 'boolean',
+        default: false
+      },
       useTreeSitterParsers: {
         type: 'boolean',
         default: true,

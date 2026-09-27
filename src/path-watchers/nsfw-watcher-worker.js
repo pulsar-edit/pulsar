@@ -1,7 +1,7 @@
 /* global emit */
 
 // A worker script for `nsfw`. Runs as a `WatcherTask` (see
-// src/worker-task.js).
+// src/watcher-task.js).
 //
 // Manages any number of individual folder watchers in a single process,
 // communicating over IPC.
@@ -22,15 +22,15 @@ const console = {
   enabled: false,
   log(...args) {
     if (!this.enabled) return;
-    emit('console:log', ['nsfw-worker', ...args]);
+    emit('task:log', ['nsfw-worker', ...args]);
   },
   warn(...args) {
     if (!this.enabled) return;
-    emit('console:warn', ['nsfw-worker', ...args]);
+    emit('task:warn', ['nsfw-worker', ...args]);
   },
   error(...args) {
     // Send errors whether logging is enabled or not.
-    emit('console:error', ['nsfw-worker', ...args]);
+    emit('task:error', ['nsfw-worker', ...args]);
   }
 };
 
@@ -288,13 +288,26 @@ async function handleMessage(message) {
       emit('watcher:reply', { id, args: instance });
       break;
     }
+    case 'watcher:logging': {
+      // `core.fileSystemWatcherLogging` changed in the renderer.
+      console.enabled = Boolean(args?.logging);
+      emit('watcher:reply', { id, args: console.enabled });
+      break;
+    }
     default: {
       console.warn(`Unrecognized event:`, event);
     }
   }
 }
 
-function run() {
+function run(options) {
+  // Logging is opt-in via `core.fileSystemWatcherLogging`. The renderer passes
+  // the current value at startup and sends `watcher:logging` when it changes.
+  //
+  // No default parameter here. IPC serializes `undefined` to `null`, so a
+  // worker started without arguments is called with `null`, not with nothing.
+  console.enabled = Boolean(options?.logging);
+
   // Run a no-op on an interval just to keep the task alive.
   setInterval(() => {}, 10000);
   process.on('message', handleMessage);
@@ -302,9 +315,9 @@ function run() {
 }
 
 process.on('uncaughtException', (error) => {
-  // Dilemma: most of the things that can cause exceptions in this worker are
-  // things that prevent us from communicating the error to anything — e.g.,
-  // ERR_IPC_CHANNEL_CLOSED.
+  // Most of the things that can cause exceptions in this worker are things
+  // that prevent us from communicating the error to anything — e.g.,
+  // `ERR_IPC_CHANNEL_CLOSED`.
   //
   // The goal here is to try to emit the exception and then fall back to
   // exiting the process no matter what. But `uncaughtException` is
@@ -323,6 +336,7 @@ process.on('uncaughtException', (error) => {
 
 process.title = `Pulsar file watcher worker (NSFW) [PID: ${process.pid}]`;
 
+// eslint-disable-next-line no-process-exit
 process.on('disconnect', () => process.exit(0));
 
 module.exports = run;

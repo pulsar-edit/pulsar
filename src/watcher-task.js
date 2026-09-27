@@ -14,6 +14,10 @@ class WatcherTask {
   emitter = new Emitter();
   constructor(taskPath) {
     this.taskPath = taskPath;
+
+    this.on('task:log', (args) => console.log(...args));
+    this.on('task:warn', (args) => console.warn(...args));
+    this.on('task:error', (args) => console.error(...args));
   }
 
   createChildProcess() {

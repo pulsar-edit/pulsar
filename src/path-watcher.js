@@ -245,7 +245,36 @@ class WorkerProcessWatcher extends NativeWatcher {
     this.started = false;
     this.initialized = false;
     this.pendingRespawn = false;
+    this.logging = this.readLoggingSetting();
     this.task = new WatcherTask(this.taskPath);
+  }
+
+  // Private: Whether the worker should report its activity to the renderer's
+  // console. Read afresh whenever a worker is spawned; `restartTask` applies a
+  // change to an already-running worker.
+  static readLoggingSetting() {
+    return atom.config.get('core.fileSystemWatcherLogging') ?? false;
+  }
+
+  // Private: Tell a running worker that the logging setting has changed. A
+  // worker that hasn't spawned yet needs no message; `createWatcherTask` reads
+  // the setting for itself.
+  static async updateLogging() {
+    this.logging = this.readLoggingSetting();
+    if (!this.task || !this.started) return;
+
+    // The worker installs its own message handler inside `run`, immediately
+    // before emitting `watcher:ready` — so waiting on the start promise
+    // guarantees there's something on the other end to receive this.
+    await this.PROMISE_META.get('self:start')?.promise?.catch(() => {});
+    if (!this.task) return;
+
+    try {
+      await this.sendEvent('watcher:logging', { logging: this.logging });
+    } catch (error) {
+      // Nothing worth surfacing to the user: the worker keeps logging the way
+      // it was, and a respawn will pick up the new value regardless.
+    }
   }
 
   static destroyWatcherTask() {
@@ -331,11 +360,6 @@ class WorkerProcessWatcher extends NativeWatcher {
       }
     });
 
-    // Forward logging messages to the renderer's console.
-    this.task.on('console:log', (args) => console.log(...args));
-    this.task.on('console:warn', (args) => console.warn(...args));
-    this.task.on('console:error', (args) => console.error(...args));
-
     this.initialized = true;
   }
 
@@ -347,7 +371,7 @@ class WorkerProcessWatcher extends NativeWatcher {
       let promise = new Promise((resolve, reject) => {
         meta.resolve = resolve;
         meta.reject = reject;
-        this.task.start();
+        this.task.start({ logging: this.logging });
       });
       meta.promise = promise;
       this.PROMISE_META.set('self:start', meta);
@@ -897,6 +921,12 @@ class PathWatcherManager {
           this.transitionTo(newValue);
         }
       );
+      // A change of backend replaces the watcher class, and with it the worker.
+      // A change of logging keeps the same worker, which has to be told.
+      this.loggingSub = atom.config.onDidChange(
+        'core.fileSystemWatcherLogging',
+        () => this.activeManager?.updateWatcherLogging()
+      );
     }
     return this.activeManager;
   }
@@ -958,6 +988,7 @@ class PathWatcherManager {
     // Look up the proper watcher implementation based on the current value of
     // the `core.fileSystemWatcher` setting.
     let WatcherClass = WATCHERS_BY_VALUE[setting] ?? WATCHERS_BY_VALUE['default'];
+    this.WatcherClass = WatcherClass;
     initLocal(WatcherClass);
 
     this.isShuttingDown = false;
@@ -979,6 +1010,12 @@ class PathWatcherManager {
     w.onDidChange(eventCallback);
     await w.getStartPromise();
     return w;
+  }
+
+  // Private: Pass a change in the logging setting along to this manager's
+  // worker, if it has one.
+  updateWatcherLogging() {
+    this.WatcherClass?.updateLogging?.();
   }
 
   // Private: Return a {String} depicting the currently active native watchers.
@@ -1099,6 +1136,7 @@ watchPath.waitForTransition = async function waitForTransition() {
 watchPath.reset = function reset() {
   return PathWatcherManager.active().stopAllWatchers().then(() => {
     PathWatcherManager.sub.dispose();
+    PathWatcherManager.loggingSub?.dispose();
     PathWatcherManager.activeManager = null;
   });
 }

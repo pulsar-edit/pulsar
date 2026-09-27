@@ -903,8 +903,6 @@ describe('watchPath', function () {
         expect(received[0].action).toBe('created');
       });
 
-
-
       describe('when watching a single file', () => {
         let rootDir, filePath;
 
@@ -1017,6 +1015,94 @@ describe('watchPath', function () {
         await writeFile(path.join(rootDir, `after-${n++}.txt`), 'after\n');
         return events.length > 0;
       }, 'events after the switch');
+    });
+  });
+
+  describe('when the fileSystemWatcherLogging setting changes', () => {
+    // The worker warns about events it doesn't recognize, and it does so
+    // through the very `console` shim this setting controls. That makes it a
+    // deterministic way to ask "is this worker logging?" without any
+    // filesystem events or debouncing.
+    function provokeLog(native) {
+      // Nothing replies to an unrecognized event, so this request never
+      // settles. We only care about the log it produces on the way past.
+      native.send('watcher:unrecognized-by-design', {}).catch(() => {});
+    }
+
+    beforeEach(async () => {
+      jasmine.useRealClock();
+      atom.config.set('core.fileSystemWatcher', 'nsfw');
+      await watchPath.waitForTransition();
+    });
+
+    afterEach(() => {
+      atom.config.set('core.fileSystemWatcherLogging', false);
+    });
+
+    it('starts a worker with logging off, then turns it on without respawning it', async () => {
+      const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+      const Isolated = await isolatedWatcherClass();
+      const native = new Isolated(rootDir);
+      await native.start();
+
+      const logs = [];
+      Isolated.task.on('task:warn', (args) => logs.push(args));
+      const worker = Isolated.task.childProcess;
+
+      provokeLog(native);
+      await wait(500);
+      expect(logs.length).toBe(0);
+
+      atom.config.set('core.fileSystemWatcherLogging', true);
+      await Isolated.updateLogging();
+
+      provokeLog(native);
+      // Arriving here is also what proves the check above wasn't just
+      // impatience: the same provocation is silent before and audible after.
+      await waitsForCondition('a log message from the worker', () => logs.length > 0);
+      expect(logs[0][0]).toBe('nsfw-worker');
+
+      // The point of notifying rather than restarting: same worker throughout,
+      // so no watches were re-established and no events were missed.
+      expect(Isolated.task.childProcess).toBe(worker);
+
+      await native.stop();
+    });
+
+    it('passes the setting to a worker that spawns while logging is enabled', async () => {
+      atom.config.set('core.fileSystemWatcherLogging', true);
+
+      const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+      const Isolated = await isolatedWatcherClass();
+      const native = new Isolated(rootDir);
+      await native.start();
+
+      const logs = [];
+      Isolated.task.on('task:warn', (args) => logs.push(args));
+
+      provokeLog(native);
+      await waitsForCondition('a log message from the worker', () => logs.length > 0);
+
+      await native.stop();
+    });
+
+    it('carries a change through to the worker of a live watcher', async () => {
+      const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+      const watcher = await watchPath(rootDir, {}, () => {});
+      subs.add(watcher);
+
+      const logs = [];
+      watcher.native.constructor.task.on('task:warn', (args) => logs.push(args));
+
+      atom.config.set('core.fileSystemWatcherLogging', true);
+
+      // Nothing here calls `updateLogging`. The config subscription is what has
+      // to carry this to the worker. Provoke on each poll, since the message
+      // reaches the worker asynchronously.
+      await waitsForCondition('the worker to start logging', async () => {
+        provokeLog(watcher.native);
+        return logs.length > 0;
+      });
     });
   });
 
