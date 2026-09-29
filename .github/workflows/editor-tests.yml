@@ -64,6 +64,20 @@ jobs:
         New-Item -ItemType Directory -Force -Path $home2 | Out-Null
         "ATOM_HOME=$home2" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
         Write-Host "ATOM_HOME now points at $home2"
+      # TEMPORARY — delete along with `script/diagnostics/`. Asks
+      # `@parcel/watcher` directly whether unsubscribing a child directory watch
+      # kills an overlapping parent watch, which is the shape our `adopts
+      # existing child watchers` spec hits and the only spec still flaking on
+      # Windows. Repeated because that flake is intermittent; one clean pass
+      # proves nothing.
+    - name: Parcel nested-unsubscribe diagnostic
+      shell: bash
+      run: |
+        for i in 1 2 3 4 5; do
+          echo "--- attempt $i ---"
+          node script/diagnostics/parcel-nested-unsubscribe.js
+        done
+
     - name: Run Tests
       if: runner.os != 'Linux'
       run: yarn start --test spec/path-watcher-spec.js # TEMPORARY — restore `spec`
