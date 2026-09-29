@@ -355,6 +355,26 @@ describe('watchPath', function () {
     await wait(100);
   });
   
+  // Wait until a freshly created watcher is really delivering events.
+  //
+  // `watchPath` resolves once the backend reports its subscription as live, but
+  // that isn't the same as the OS having armed it. On Windows the gap is small —
+  // CI logs put a working first event 100-200ms after the subscribe — but a spec
+  // that writes exactly once inside it waits forever for an event nobody
+  // recorded, which is the flakiness we kept chasing. Poking repeatedly turns
+  // that one-shot race into a retry.
+  //
+  // The events collected while arming are discarded: they're this helper's, not
+  // the spec's.
+  async function armWatcher(dir, events, label = 'the watcher to deliver events') {
+    let n = 0;
+    await conditionPromise(async () => {
+      await writeFile(path.join(dir, `arm-${n++}.txt`), '!');
+      return events.length > 0;
+    }, label);
+    events.length = 0;
+  }
+
   // Resolve once an event has been seen for every named file.
   //
   // Rejects if they don't all turn up in time, naming the ones that didn't. That
@@ -618,6 +638,8 @@ describe('watchPath', function () {
 
           const eventsForFile = () => events.filter(e => e.path === filePath);
 
+          await armWatcher(rootDir, events);
+
           await writeFile(filePath, 'one\n');
           await conditionPromise(
             () => eventsForFile().some(e => e.action === 'created'),
@@ -798,6 +820,8 @@ describe('watchPath', function () {
         });
         disposables.add(watcher0);
 
+        await armWatcher(realRootDir, events0);
+
         await writeFile(path.join(realRootDir, 'foo.txt'), '!')
         await conditionPromise(() => events0.length > 0);
 
@@ -809,6 +833,48 @@ describe('watchPath', function () {
         expect(first0.path.startsWith(symlinkedPath)).toBe(true);
         expect(first0.path.startsWith(relativizedPath)).toBe(false);
       })
+
+      it('treats a sibling with a shared prefix as outside the root', async () => {
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const watcher = await watchPath(rootDir, {}, () => {});
+        disposables.add(watcher);
+
+        expect(watcher.pathStartsWith(rootDir, rootDir)).toBe(true);
+        expect(
+          watcher.pathStartsWith(path.join(rootDir, 'a.txt'), rootDir)
+        ).toBe(true);
+        // The reason this isn't a plain `startsWith`: `…-sibling` shares a
+        // prefix with the root without being inside it, and an atomic save
+        // leaves exactly that shape next to a watched file.
+        expect(watcher.pathStartsWith(`${rootDir}-sibling`, rootDir)).toBe(
+          false
+        );
+      });
+
+      it('matches paths case-insensitively on win32', function (done) {
+        jasmine.filterByPlatform({ only: ['win32'] }, done);
+
+        // Windows reports event paths in whatever spelling it likes, which need
+        // not match the spelling the watcher was rooted at. Every event from a
+        // shared native watcher is filtered through `pathStartsWith`, so a
+        // spelling we fail to recognize is an event delivered to nobody.
+        (async () => {
+          const rootDir = await tempMkdir('atom-fsmanager-test-').then(
+            realpath
+          );
+          const watcher = await watchPath(rootDir, {}, () => {});
+          disposables.add(watcher);
+
+          const shouted = path.join(rootDir.toUpperCase(), 'A.TXT');
+          expect(watcher.pathStartsWith(shouted, rootDir)).toBe(true);
+          // Case folding must not weaken the sibling check above.
+          expect(
+            watcher.pathStartsWith(`${rootDir.toUpperCase()}-SIBLING`, rootDir)
+          ).toBe(false);
+
+          done();
+        })().catch(err => done.fail(err));
+      });
 
       it("reuses existing native watchers even while they're still starting", async function () {
         const rootDir = await tempMkdir('atom-fsmanager-test-');
@@ -841,11 +907,22 @@ describe('watchPath', function () {
         await mkdir(subDir);
 
         // Keep the watchers alive with an undisposed subscription
-        const rootWatcher = await watchPath(rootDir, {}, () => {});
-        const childWatcher = await watchPath(subDir, {}, () => {});
+        const rootEvents = [];
+        const rootWatcher = await watchPath(rootDir, {}, events =>
+          rootEvents.push(...events)
+        );
+        const childEvents = [];
+        const childWatcher = await watchPath(subDir, {}, events =>
+          childEvents.push(...events)
+        );
 
         expect(rootWatcher.native).toBe(childWatcher.native);
         expect(rootWatcher.native.isRunning()).toBe(true);
+
+        // One native serves both watchers, so arming through the subdirectory
+        // establishes delivery for each of them.
+        await armWatcher(subDir, childEvents, 'the shared watcher to deliver events');
+        rootEvents.length = 0;
 
         const firstChanges = Promise.all([
           waitForChanges(rootWatcher, subFile),

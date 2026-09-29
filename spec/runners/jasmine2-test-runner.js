@@ -138,7 +138,13 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
             // A spec marked itself pending. Jasmine only recognizes that from
             // the exception itself, which this wrapper has already caught, so
             // the closest we can get is to end the spec without a failure.
-            done();
+            //
+            // Only finish it ourselves if the spec didn't take a `done`:
+            // helpers that mark a spec pending partway through call `done`
+            // first (see `jasmine.filterByPlatform`), and completing it twice
+            // is an error in later jasmine versions even where 2.5 tolerates
+            // it.
+            if (originalFn.length === 0) done();
             return;
           }
           reportFailure(done, err);
@@ -159,6 +165,12 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
             originalFn(done);
           }
         } catch (err) {
+          if (isPendingException(err)) {
+            // Same as in the spec wrapper above: a hook may mark the spec
+            // pending, and that isn't a failure.
+            if (originalFn.length === 0) done();
+            return;
+          }
           reportFailure(done, err);
         }
       })

@@ -985,7 +985,21 @@ class PathWatcher {
   // `startsWith` also matches a sibling whose name merely begins with `base` —
   // `/foo/barbaz` against `/foo/bar`, or the `thud.js.tmp` an atomic save
   // leaves beside a watched `thud.js`.
+  //
+  // On Windows the comparison ignores case, because the filesystem does: a
+  // watcher rooted at `C:\Users\Someone\project` has to recognize an event
+  // reported as `C:\users\someone\project\file.txt` as its own. Every event a
+  // shared native watcher delivers is filtered through here, so a spelling we
+  // don't recognize isn't an event delivered to the wrong watcher — it's an
+  // event silently delivered to nobody.
+  //
+  // This does not cover 8.3 short names (`RUNNER~1`), which no amount of case
+  // folding will reconcile; those would need `fs.realpath.native` on both sides.
   pathStartsWith(candidate, base) {
+    if (process.platform === 'win32') {
+      candidate = candidate.toLowerCase();
+      base = base.toLowerCase();
+    }
     return candidate === base || candidate.startsWith(base + path.sep);
   }
 
