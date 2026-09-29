@@ -239,6 +239,14 @@ class WorkerProcessWatcher extends NativeWatcher {
   // when a new task is created so that a later failure can report afresh.
   static reportedFatalFailure = false;
 
+  // How long to wait for the worker to answer a request before giving up on it.
+  //
+  // Generous on purpose: a `watcher:watch` over a large tree has real work to do
+  // first (walking it to turn ignore globs into exclusions), and a spurious
+  // rejection would surface to the user as a watcher error. This is a "something
+  // is wrong" threshold, not a latency budget.
+  static REPLY_TIMEOUT_MS = 60000;
+
   // Unexpected worker restarts since the last time we mentioned them to the
   // user. Unlike `WatcherTask`'s own accounting, this does not expire; it's how
   // we notice a worker that crashes steadily but slowly enough to be restarted
@@ -498,7 +506,29 @@ class WorkerProcessWatcher extends NativeWatcher {
       this.PROMISE_META.delete(id);
       throw new Error(`Cannot reach the file watcher worker to send: ${event}`);
     }
-    return await promise;
+
+    // A worker that accepts a message and then never answers it used to hang the
+    // caller for the life of the window — and since `stop` and `dispose` go
+    // through here too, that could strand teardown as easily as startup. Time it
+    // out instead, and say what went unanswered.
+    let timer = setTimeout(() => {
+      if (!this.PROMISE_META.has(id)) return;
+      this.PROMISE_META.delete(id);
+      let where = args?.normalizedPath ? ` (path: ${args.normalizedPath})` : '';
+      meta.reject(
+        new Error(
+          `File watcher worker did not reply to ${event} within ${this.REPLY_TIMEOUT_MS}ms${where}`
+        )
+      );
+    }, this.REPLY_TIMEOUT_MS);
+
+    try {
+      return await promise;
+    } finally {
+      // However it settled — a reply, a respawn, or the timeout above — the
+      // timer has no further use.
+      clearTimeout(timer);
+    }
   }
 
   constructor(...args) {

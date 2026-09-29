@@ -1055,6 +1055,41 @@ describe('watchPath', function () {
         expect(Isolated.task).toBe(null);
       });
 
+      it('gives up on a request the worker never answers', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        // Neither worker replies to an event it doesn't recognize — it warns and
+        // moves on — so this request can only ever settle by way of the timeout,
+        // which makes it a deterministic way to exercise it.
+        Isolated.REPLY_TIMEOUT_MS = 250;
+
+        let error = null;
+        try {
+          await native.send('watcher:unrecognized-by-design', {
+            normalizedPath: rootDir
+          });
+        } catch (err) {
+          error = err;
+        }
+
+        expect(error).not.toBe(null);
+        expect(error.message).toContain(
+          'did not reply to watcher:unrecognized-by-design'
+        );
+        // The path matters: a hung request is only useful if it says which
+        // watcher it belonged to.
+        expect(error.message).toContain(rootDir);
+        // And nothing is left waiting on a reply that will never come.
+        expect(Isolated.PROMISE_META.size).toBe(0);
+
+        Isolated.REPLY_TIMEOUT_MS = 60000;
+        await native.stop();
+      });
+
       it('starts a fresh worker for a watch that arrives after a fatal failure', async () => {
         jasmine.useRealClock();
         const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
