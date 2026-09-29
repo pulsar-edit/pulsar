@@ -100,6 +100,29 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
     window[key] = jasmineEnv[key];
   }
 
+  // Jasmine decides how to run a spec by the arity of the function it's given.
+  // The wrappers below all declare `done`, so jasmine treats them as
+  // callback-style and ignores the promise they return — which means a thrown
+  // error has nowhere to go. Rethrowing it only rejects that ignored promise:
+  // the console reports `Uncaught (in promise)`, `done` is never called, and the
+  // spec fails `DEFAULT_TIMEOUT_INTERVAL` later blaming "Async callback was not
+  // invoked" instead of naming the real error. So every failure has to be handed
+  // to jasmine explicitly, through `done.fail`.
+  const reportFailure = (done, err) => {
+    if (typeof done.fail === 'function') {
+      done.fail(err);
+    } else {
+      done(err);
+    }
+  };
+
+  // Jasmine's own test for the exception `pending()` throws. Ours used to check
+  // `typeof err === 'string'`, which missed the `Error`-shaped ones — and those
+  // then hit the rethrow, so a spec that marked itself pending at runtime hung
+  // until it timed out.
+  const isPendingException = (err) =>
+    !!(err && err.toString && err.toString().includes('marked Pending'));
+
   ['it', 'fit', 'xit'].forEach((key) => {
     window[key] = (name, originalFn) => {
       jasmineEnv[key](name, async (done) => {
@@ -111,12 +134,14 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
             originalFn(done);
           }
         } catch (err) {
-          if (typeof err === 'string' && err.includes('Pending')) {
-            // A test marked itself as pending. Swallow the exception and
-            // proceed.
+          if (isPendingException(err)) {
+            // A spec marked itself pending. Jasmine only recognizes that from
+            // the exception itself, which this wrapper has already caught, so
+            // the closest we can get is to end the spec without a failure.
+            done();
             return;
           }
-          throw err;
+          reportFailure(done, err);
         }
       });
     }
@@ -126,11 +151,15 @@ const defineJasmineHelpersOnWindow = (jasmineEnv) => {
   ['beforeEach', 'afterEach'].forEach((key) => {
     window[key] = (originalFn) => {
       jasmineEnv[key](async (done) => {
-        if (originalFn.length === 0) {
-          await originalFn()
-          done();
-        } else {
-          originalFn(done);
+        try {
+          if (originalFn.length === 0) {
+            await originalFn()
+            done();
+          } else {
+            originalFn(done);
+          }
+        } catch (err) {
+          reportFailure(done, err);
         }
       })
     }
