@@ -348,26 +348,68 @@ describe('watchPath', function () {
     await watchPath.reset();
   });
 
+  // Resolve once an event has been seen for every named file.
+  //
+  // Rejects if they don't all turn up in time, naming the ones that didn't. That
+  // matters more than it sounds: without a timeout, a filesystem event that
+  // never arrives leaves the spec sitting until jasmine's global limit and then
+  // reports only that two minutes elapsed — telling us nothing about which file
+  // went unreported, which is exactly what we need to know when a backend is at
+  // fault on one platform.
+  //
+  // A trailing number overrides the timeout, for a caller that legitimately
+  // needs longer.
+  const DEFAULT_CHANGE_TIMEOUT_MS = 10000;
   function waitForChanges(watcher, ...fileNames) {
+    let timeoutMs = DEFAULT_CHANGE_TIMEOUT_MS;
+    if (typeof fileNames[fileNames.length - 1] === 'number') {
+      timeoutMs = fileNames.pop();
+    }
+
     const waiting = new Set(fileNames);
-    let fired = false;
     const relevantEvents = [];
 
-    return new Promise(resolve => {
-      const sub = watcher.onDidChange(events => {
+    const promise = new Promise((resolve, reject) => {
+      let settled = false;
+      let sub = null;
+      let timer = null;
+
+      const settle = (settleWith, value) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        sub?.dispose();
+        settleWith(value);
+      };
+
+      sub = watcher.onDidChange(events => {
         for (const event of events) {
           if (waiting.delete(event.path)) {
             relevantEvents.push(event);
           }
         }
 
-        if (!fired && waiting.size === 0) {
-          fired = true;
-          resolve(relevantEvents);
-          sub.dispose();
-        }
+        if (waiting.size === 0) settle(resolve, relevantEvents);
       });
+
+      timer = setTimeout(() => {
+        settle(
+          reject,
+          new Error(
+            `Timed out after ${timeoutMs}ms waiting for filesystem events. ` +
+              `Never saw: ${[...waiting].join(', ')}`
+          )
+        );
+      }, timeoutMs);
     });
+
+    // Callers typically build these *before* the writes they cover and await
+    // them afterwards. If the timeout fires inside that gap there's no handler
+    // attached yet, and the rejection gets reported as unhandled on top of the
+    // spec failure. This no-op handler marks it as handled without affecting
+    // what the caller sees when it awaits.
+    promise.catch(() => {});
+    return promise;
   }
 
   const WATCHER_IMPLEMENTATIONS = ['nsfw', 'parcel'];
