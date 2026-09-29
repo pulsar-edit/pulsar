@@ -426,6 +426,14 @@ describe('watchPath', function () {
       let disposables;
       beforeEach(async () => {
         jasmine.useRealClock();
+        // TEMPORARY — remove once the Windows flakiness is understood.
+        //
+        // Makes the worker log every batch it sends, which is the view we don't
+        // otherwise have: what the OS actually reported, before any filtering on
+        // this side. When a spec times out waiting for an event, this says which
+        // half it went missing in — never delivered by the backend, or delivered
+        // and then dropped by our own path filter.
+        atom.config.set('core.fileSystemWatcherLogging', true);
         atom.config.set('core.fileSystemWatcher', impl);
         // Changing the config setting will trigger an async transition to new
         // file-watchers. This helper method lets us wait until that transition
