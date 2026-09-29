@@ -346,8 +346,15 @@ describe('watchPath', function () {
   afterEach(async function () {
     subs.dispose();
     await watchPath.reset();
+    // Let the teardown above actually land before the next spec subscribes.
+    // `reset` resolves when we've asked the watchers to stop, which isn't the
+    // same as the OS having released them — and nearly every spec here builds a
+    // fresh watcher and writes to it immediately, so it starts by racing the
+    // previous spec's cleanup. The `File` block above pauses here for the same
+    // reason.
+    await wait(100);
   });
-
+  
   // Resolve once an event has been seen for every named file.
   //
   // Rejects if they don't all turn up in time, naming the ones that didn't. That
