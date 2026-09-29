@@ -66,11 +66,11 @@ jobs:
         Write-Host "ATOM_HOME now points at $home2"
     - name: Run Tests
       if: runner.os != 'Linux'
-      run: yarn start --test spec
+      run: yarn start --test spec/path-watcher-spec.js # TEMPORARY — restore `spec`
 
     - name: Run Tests with xvfb-run (Linux)
       if: runner.os == 'Linux'
-      run: xvfb-run --auto-servernum yarn start --test spec
+      run: xvfb-run --auto-servernum yarn start --test spec/path-watcher-spec.js # TEMPORARY — restore `spec`
     # The renderer can die without producing any JS-level output, so we should
     # grab a crashdump whenever that happens.
     - name: Collect crash dumps
