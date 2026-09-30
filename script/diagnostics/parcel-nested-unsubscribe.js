@@ -40,7 +40,7 @@ function makeTree() {
   return { root, subs };
 }
 
-async function scenario(name, { settleBeforeUnsubscribe }) {
+async function scenario(name, { settleBeforeUnsubscribe, concurrent = false }) {
   const { root, subs } = makeTree();
   const parentEvents = [];
   const collect = (err, events) => {
@@ -67,7 +67,15 @@ async function scenario(name, { settleBeforeUnsubscribe }) {
     controlCount = parentEvents.length;
   }
 
-  for (const child of children) await child.unsubscribe();
+  if (concurrent) {
+    // What our worker actually does. Requests arrive as separate IPC messages
+    // handled by an `async` function, so the two child releases overlap rather
+    // than running one after the other — confirmed from the worker's own log,
+    // where both `unwatch start` lines appear before either `unwatch done`.
+    await Promise.all(children.map(child => child.unsubscribe()));
+  } else {
+    for (const child of children) await child.unsubscribe();
+  }
 
   parentEvents.length = 0;
   fs.writeFileSync(path.join(subs[0], 'after-in-child.txt'), 'x');
@@ -111,8 +119,14 @@ async function main() {
   const tight = await scenario('tight (unsubscribe immediately)', {
     settleBeforeUnsubscribe: false
   });
+  const concurrent = await scenario('concurrent (both children at once)', {
+    settleBeforeUnsubscribe: false,
+    concurrent: true
+  });
 
-  console.log(`\nSUMMARY (${process.platform}): relaxed=${relaxed} | tight=${tight}`);
+  console.log(
+    `\nSUMMARY (${process.platform}): relaxed=${relaxed} | tight=${tight} | concurrent=${concurrent}`
+  );
 }
 
 main().catch(err => {

@@ -166,6 +166,16 @@ function handler(instance, err, events) {
 // Organizes watchers by unique ID.
 const WATCHERS_BY_PATH = new Map();
 
+// TEMPORARY diagnostic state. Remove with the `[n] …` log lines below.
+//
+// Requests arrive as IPC messages handled by an `async` function, so several can
+// be in flight at once — a `subscribe` may still be awaiting when an
+// `unsubscribe` for an overlapping path begins. The sequence number makes that
+// interleaving visible, and the path map lets `watcher:unwatch` (which is given
+// only an instance id) say which directory it is releasing.
+let requestSeq = 0;
+const PATHS_BY_INSTANCE = new Map();
+
 // Reacts to messages sent by the renderer.
 async function handleMessage(message) {
   let { id, event = null, args } = JSON.parse(message);
@@ -183,6 +193,9 @@ async function handleMessage(message) {
       // has started.
       let existing = WATCHERS_BY_PATH.get(instance);
       let wrappedHandler = (err, events) => handler(instance, err, events);
+      let seq = ++requestSeq;
+      PATHS_BY_INSTANCE.set(instance, normalizedPath);
+      console.log(`[${seq}] ${event} start`, normalizedPath, `instance=${instance}`, existing ? '(replacing)' : '');
       try {
         let ignore = ignored.reduce((prev, ignoredName) => {
           prev.push(`${ignoredName}`, `**/${ignoredName}`);
@@ -193,6 +206,7 @@ async function handleMessage(message) {
           let handle = await watcher.subscribe(normalizedPath, wrappedHandler, {
             ignore
           });
+          console.log(`[${seq}] subscribe resolved`, normalizedPath);
           WATCHERS_BY_PATH.set(instance, handle);
         } else {
           console.log('Watching file path:', normalizedPath);
@@ -202,10 +216,13 @@ async function handleMessage(message) {
         if (existing) {
           // If there was a pre-existing watcher at this instance, we wait
           // until the new one is up and running before stopping this one.
+          console.log(`[${seq}] replacing: unsubscribing the previous handle`, normalizedPath);
           await existing.unsubscribe();
         }
+        console.log(`[${seq}] ${event} done`, normalizedPath);
         emit('watcher:reply', { id, args: instance });
       } catch (err) {
+        console.error(`[${seq}] ${event} failed`, normalizedPath, err.message);
         console.error('Error trying to watch path:', normalizedPath, err.message);
         emit('watcher:reply', { id, error: err.message });
       }
@@ -214,9 +231,14 @@ async function handleMessage(message) {
     case 'watcher:unwatch': {
       let { instance } = args;
       let handle = WATCHERS_BY_PATH.get(instance);
+      let seq = ++requestSeq;
+      let watchedPath = PATHS_BY_INSTANCE.get(instance) ?? '(unknown path)';
+      console.log(`[${seq}] unwatch start`, watchedPath, `instance=${instance}`, handle ? '' : '(no handle)');
       if (handle) {
         await handle.unsubscribe();
       }
+      console.log(`[${seq}] unwatch done`, watchedPath);
+      PATHS_BY_INSTANCE.delete(instance);
       emit('watcher:reply', { id, args: instance });
       break;
     }
