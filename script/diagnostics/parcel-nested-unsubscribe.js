@@ -45,20 +45,29 @@ async function timedSubscribe(dir, cb) {
   return handle;
 }
 
-function makeTree() {
+function makeTree({ preCreateFiles = false } = {}) {
   const root = fs.mkdtempSync(
     path.join(fs.realpathSync(os.tmpdir()), 'parcel-repro-')
   );
   const subs = [path.join(root, 'subdir0'), path.join(root, 'subdir1')];
   for (const dir of subs) fs.mkdirSync(dir);
+  if (preCreateFiles) {
+    // The files exist *before* anything is watching, which is what the spec
+    // does — and appending to an already-existing file is the shape of upstream
+    // issue #164 ("Change event is not emitted on Windows when continuously
+    // appending to an initially existing file"). Every scenario up to now has
+    // only ever created new files, so this variable has never been tested.
+    fs.writeFileSync(path.join(root, 'existing.txt'), 'hi\n');
+    fs.writeFileSync(path.join(subs[0], 'existing.txt'), 'hi\n');
+  }
   return { root, subs };
 }
 
 async function scenario(
   name,
-  { settleBeforeUnsubscribe, concurrent = false, burst = false }
+  { settleBeforeUnsubscribe, concurrent = false, burst = false, append = false }
 ) {
-  const { root, subs } = makeTree();
+  const { root, subs } = makeTree({ preCreateFiles: append });
   timings.length = 0;
   const parentEvents = [];
   const collect = (err, events) => {
@@ -92,7 +101,11 @@ async function scenario(
   let controlCount = null;
   if (settleBeforeUnsubscribe) {
     // Prove the parent is delivering before we touch anything.
-    fs.writeFileSync(path.join(subs[0], 'before.txt'), 'x');
+    if (append) {
+      fs.appendFileSync(path.join(subs[0], 'existing.txt'), 'before\n');
+    } else {
+      fs.writeFileSync(path.join(subs[0], 'before.txt'), 'x');
+    }
     await wait(SETTLE_MS);
     controlCount = parentEvents.length;
   }
@@ -108,8 +121,13 @@ async function scenario(
   }
 
   parentEvents.length = 0;
-  fs.writeFileSync(path.join(subs[0], 'after-in-child.txt'), 'x');
-  fs.writeFileSync(path.join(root, 'after-in-root.txt'), 'x');
+  if (append) {
+    fs.appendFileSync(path.join(subs[0], 'existing.txt'), 'after\n');
+    fs.appendFileSync(path.join(root, 'existing.txt'), 'after\n');
+  } else {
+    fs.writeFileSync(path.join(subs[0], 'after-in-child.txt'), 'x');
+    fs.writeFileSync(path.join(root, 'after-in-root.txt'), 'x');
+  }
   await wait(SETTLE_MS);
 
   const seen = parentEvents.length;
@@ -160,8 +178,17 @@ async function main() {
     burst: true
   });
 
+  // The spec's actual shape: files that predate the watchers, appended to rather
+  // than created, with everything issued in a burst.
+  const appendBurst = await scenario('append to pre-existing files (burst)', {
+    settleBeforeUnsubscribe: true,
+    concurrent: true,
+    burst: true,
+    append: true
+  });
+
   console.log(
-    `\nSUMMARY (${process.platform}): relaxed=${relaxed} | tight=${tight} | concurrent=${concurrent} | burst=${burst}`
+    `\nSUMMARY (${process.platform}): relaxed=${relaxed} | tight=${tight} | concurrent=${concurrent} | burst=${burst} | append=${appendBurst}`
   );
 }
 
