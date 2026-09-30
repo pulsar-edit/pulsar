@@ -73,9 +73,19 @@ jobs:
     - name: Parcel nested-unsubscribe diagnostic
       shell: bash
       run: |
-        for i in 1 2 3 4 5; do
-          echo "--- attempt $i ---"
+        # Run it under both hosts. The specs' watcher worker runs under the
+        # Electron binary in Node mode, not the runner's Node: same N-API
+        # binary, different libuv and thread pool, which is the largest
+        # remaining difference between this diagnostic (25 clean runs on
+        # Windows) and the spec that keeps failing.
+        ELECTRON=$(node -p "require('electron')")
+        echo "system node: $(node -v)"
+        echo "electron:    $ELECTRON"
+        for i in 1 2 3; do
+          echo "--- attempt $i (system node) ---"
           node script/diagnostics/parcel-nested-unsubscribe.js
+          echo "--- attempt $i (electron as node) ---"
+          ELECTRON_RUN_AS_NODE=1 "$ELECTRON" script/diagnostics/parcel-nested-unsubscribe.js
         done
 
     - name: Run Tests
