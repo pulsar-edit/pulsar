@@ -936,7 +936,14 @@ describe('watchPath', function () {
         await nextRootEvent;
       });
 
-      it('adopts existing child watchers and filters events appropriately to them', async function () {
+      // TEMPORARY — collapse back to a single `it` once the Windows failure is
+      // understood. This spec fails roughly one run in three, so repeating it
+      // makes a single run near-certain to catch one with the worker's
+      // subscribe/unsubscribe log attached, instead of spending runs on luck.
+      // Each repeat is a separate spec, so it gets the same setup and teardown
+      // the real one does.
+      for (let repeat = 0; repeat < 10; repeat++)
+      it(`adopts existing child watchers and filters events appropriately to them (repeat ${repeat})`, async function () {
         const parentDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
 
         // Create the directory tree
