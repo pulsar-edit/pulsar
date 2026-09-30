@@ -92,8 +92,10 @@ jobs:
         # Adds the IPC channel, the bootstrap and the worker's own code on top of
         # the Electron host — everything but the registry and `PathWatcher`.
         for i in 1 2 3 4 5; do
-          echo "--- attempt $i (real worker over IPC) ---"
+          echo "--- attempt $i (real worker over IPC, paced) ---"
           node script/diagnostics/parcel-worker-ipc.js
+          echo "--- attempt $i (real worker over IPC, pipelined) ---"
+          PIPELINE=1 node script/diagnostics/parcel-worker-ipc.js
         done
 
     - name: Run Tests

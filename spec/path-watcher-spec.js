@@ -936,65 +936,87 @@ describe('watchPath', function () {
         await nextRootEvent;
       });
 
-      // TEMPORARY — collapse back to a single `it` once the Windows failure is
-      // understood. This spec fails roughly one run in three, so repeating it
-      // makes a single run near-certain to catch one with the worker's
-      // subscribe/unsubscribe log attached, instead of spending runs on luck.
-      // Each repeat is a separate spec, so it gets the same setup and teardown
-      // the real one does.
-      for (let repeat = 0; repeat < 10; repeat++)
-      it(`adopts existing child watchers and filters events appropriately to them (repeat ${repeat})`, async function () {
-        const parentDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+      // TEMPORARY — collapse back to a single `it` when the Windows failure is
+      // understood.
+      //
+      // Four variants, each repeated so that one run is likely to catch a
+      // failure rather than needing several. Each variant removes exactly one
+      // element, so the pattern of which ones fail says what the failure
+      // actually needs — rather than relying on a theory being right:
+      //
+      //   control       — the spec as written
+      //   parent first  — no adoption at all; the child attaches to an existing
+      //                   parent native instead of the parent taking over
+      //   one child     — rules out the pair of concurrent child releases
+      //   new files     — writes files that didn't exist, instead of appending
+      //                   to files that predate the watchers
+      const ADOPTION_VARIANTS = [
+        { label: 'control', childCount: 2, parentFirst: false, append: true },
+        { label: 'parent first (no adoption)', childCount: 2, parentFirst: true, append: true },
+        { label: 'one child', childCount: 1, parentFirst: false, append: true },
+        { label: 'new files, not appends', childCount: 2, parentFirst: false, append: false }
+      ];
 
-        // Create the directory tree
-        const rootFile = path.join(parentDir, 'rootfile.txt');
-        const subDir0 = path.join(parentDir, 'subdir0');
-        const subFile0 = path.join(subDir0, 'subfile0.txt');
-        const subDir1 = path.join(parentDir, 'subdir1');
-        const subFile1 = path.join(subDir1, 'subfile1.txt');
+      for (const variant of ADOPTION_VARIANTS) {
+        for (let repeat = 0; repeat < 8; repeat++) {
+          it(`adopts existing child watchers — ${variant.label} (repeat ${repeat})`, async function () {
+            const parentDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
 
-        await mkdir(subDir0);
-        await mkdir(subDir1);
-        await Promise.all([
-          writeFile(rootFile, 'rootfile\n', { encoding: 'utf8' }),
-          writeFile(subFile0, 'subfile 0\n', { encoding: 'utf8' }),
-          writeFile(subFile1, 'subfile 1\n', { encoding: 'utf8' })
-        ]);
+            const rootFile = path.join(parentDir, 'rootfile.txt');
+            const subDirs = [];
+            const subFiles = [];
+            for (let i = 0; i < variant.childCount; i++) {
+              const dir = path.join(parentDir, `subdir${i}`);
+              await mkdir(dir);
+              subDirs.push(dir);
+              subFiles.push(path.join(dir, `subfile${i}.txt`));
+            }
 
-        // Begin the child watchers and keep them alive
-        const subWatcher0 = await watchPath(subDir0, {}, () => {});
-        const subWatcherChanges0 = waitForChanges(subWatcher0, subFile0);
+            if (variant.append) {
+              // The files predate the watchers, so the writes below are appends
+              // to existing files rather than creations.
+              await writeFile(rootFile, 'rootfile\n', { encoding: 'utf8' });
+              await Promise.all(
+                subFiles.map(f => writeFile(f, 'subfile\n', { encoding: 'utf8' }))
+              );
+            }
 
-        const subWatcher1 = await watchPath(subDir1, {}, () => {});
-        const subWatcherChanges1 = waitForChanges(subWatcher1, subFile1);
+            let parentWatcher;
+            const childWatchers = [];
+            if (variant.parentFirst) {
+              parentWatcher = await watchPath(parentDir, {}, () => {});
+              for (const dir of subDirs) {
+                childWatchers.push(await watchPath(dir, {}, () => {}));
+              }
+            } else {
+              for (const dir of subDirs) {
+                childWatchers.push(await watchPath(dir, {}, () => {}));
+              }
+              parentWatcher = await watchPath(parentDir, {}, () => {});
+            }
+            disposables.add(parentWatcher, ...childWatchers);
 
-        expect(subWatcher0.native).not.toBe(subWatcher1.native);
+            // Either order ends with one native serving all of them.
+            for (const child of childWatchers) {
+              expect(child.native).toBe(parentWatcher.native);
+            }
 
-        // Create the parent watcher
-        const parentWatcher = await watchPath(parentDir, {}, () => {});
-        const parentWatcherChanges = waitForChanges(
-          parentWatcher,
-          rootFile,
-          subFile0,
-          subFile1
-        );
+            const pending = [
+              ...childWatchers.map((watcher, i) =>
+                waitForChanges(watcher, subFiles[i])
+              ),
+              waitForChanges(parentWatcher, rootFile, ...subFiles)
+            ];
 
-        expect(subWatcher0.native).toBe(parentWatcher.native);
-        expect(subWatcher1.native).toBe(parentWatcher.native);
+            const touch = variant.append
+              ? file => appendFile(file, 'change\n', { encoding: 'utf8' })
+              : file => writeFile(file, 'new\n', { encoding: 'utf8' });
 
-        // Ensure events are filtered correctly
-        await Promise.all([
-          appendFile(rootFile, 'change\n', { encoding: 'utf8' }),
-          appendFile(subFile0, 'change\n', { encoding: 'utf8' }),
-          appendFile(subFile1, 'change\n', { encoding: 'utf8' })
-        ]);
-
-        await Promise.all([
-          subWatcherChanges0,
-          subWatcherChanges1,
-          parentWatcherChanges
-        ]);
-      });
+            await Promise.all([rootFile, ...subFiles].map(touch));
+            await Promise.all(pending);
+          });
+        }
+      }
 
       it('honors a stop that arrives while the watcher is still starting', async () => {
         jasmine.useRealClock();

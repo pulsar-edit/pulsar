@@ -98,9 +98,30 @@ async function main() {
   });
 
   // The adoption sequence, in the order the registry issues it.
-  await send('watcher:watch', { normalizedPath: subs[0], instance: 'child0', ignored: [] });
-  await send('watcher:watch', { normalizedPath: subs[1], instance: 'child1', ignored: [] });
-  await send('watcher:watch', { normalizedPath: root, instance: 'parent', ignored: [] });
+  //
+  // `PIPELINE=1` sends them without waiting for each reply. Awaiting paces the
+  // messages by a full IPC round trip, and the worker's own log shows that
+  // matters: in a failing spec run the whole handover collapses into ~2ms, with
+  // the second and third subscribes resolving in 0.2ms each, while this
+  // diagnostic's paced version takes ~7ms with 2ms subscribes — and survives.
+  // A passing spec run is slower still, ~20ms. Pipelining is the closest we can
+  // get to the failing cadence.
+  const pipeline = process.env.PIPELINE === '1';
+  const watches = [
+    send('watcher:watch', { normalizedPath: subs[0], instance: 'child0', ignored: [] }),
+    ...(pipeline ? [] : [null])
+  ].filter(Boolean);
+  if (pipeline) {
+    watches.push(
+      send('watcher:watch', { normalizedPath: subs[1], instance: 'child1', ignored: [] }),
+      send('watcher:watch', { normalizedPath: root, instance: 'parent', ignored: [] })
+    );
+    await Promise.all(watches);
+  } else {
+    await watches[0];
+    await send('watcher:watch', { normalizedPath: subs[1], instance: 'child1', ignored: [] });
+    await send('watcher:watch', { normalizedPath: root, instance: 'parent', ignored: [] });
+  }
 
   // Both children released at once, without awaiting either — matching the
   // `[4] unwatch start` / `[5] unwatch start` pairing in the worker's own log.
@@ -123,7 +144,9 @@ async function main() {
   const verdict = missing.length === 0
     ? 'survived'
     : `REPRODUCED — never saw: ${missing.join(', ')}`;
-  console.log(`\nVERDICT (${process.platform}, real worker over IPC): ${verdict}`);
+  console.log(
+    `\nVERDICT (${process.platform}, real worker over IPC, ${pipeline ? 'pipelined' : 'paced'}): ${verdict}`
+  );
 
   child.kill();
   fs.rmSync(root, { recursive: true, force: true });
