@@ -31,6 +31,20 @@ const path = require('path');
 const SETTLE_MS = 2000;
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+// How long each `subscribe` took. That turns out to be the tell: in a healthy CI
+// run each takes 18-100ms, and in a failing one the second and third resolve in
+// under a millisecond — apparently without establishing a watch of their own. If
+// a scenario here reports sub-millisecond subscribes and the parent still
+// survives, then fast resolution isn't sufficient to cause the failure and the
+// signature is something else.
+const timings = [];
+async function timedSubscribe(dir, cb) {
+  const started = performance.now();
+  const handle = await watcher.subscribe(dir, cb);
+  timings.push(`${path.basename(dir)}=${(performance.now() - started).toFixed(1)}ms`);
+  return handle;
+}
+
 function makeTree() {
   const root = fs.mkdtempSync(
     path.join(fs.realpathSync(os.tmpdir()), 'parcel-repro-')
@@ -40,8 +54,12 @@ function makeTree() {
   return { root, subs };
 }
 
-async function scenario(name, { settleBeforeUnsubscribe, concurrent = false }) {
+async function scenario(
+  name,
+  { settleBeforeUnsubscribe, concurrent = false, burst = false }
+) {
   const { root, subs } = makeTree();
+  timings.length = 0;
   const parentEvents = [];
   const collect = (err, events) => {
     if (err) {
@@ -54,10 +72,22 @@ async function scenario(name, { settleBeforeUnsubscribe, concurrent = false }) {
   // Subscribe in the order our registry consolidates in: children first, parent
   // afterwards.
   const children = [];
-  for (const dir of subs) children.push(await watcher.subscribe(dir, () => {}));
-  await wait(200);
-
-  const parent = await watcher.subscribe(root, collect);
+  let parent;
+  if (burst) {
+    // All three subscriptions issued back to back, with no settle between them.
+    // This is what a failing CI run looks like: the first subscribe takes ~100ms
+    // and the next two resolve in under a millisecond, all inside the same
+    // millisecond overall — whereas in a healthy run each takes 18-100ms. The
+    // instant returns suggest the later subscriptions are collapsing onto shared
+    // state rather than establishing watches of their own, which would explain
+    // why releasing the children then leaves the parent dead.
+    for (const dir of subs) children.push(await timedSubscribe(dir, () => {}));
+    parent = await timedSubscribe(root, collect);
+  } else {
+    for (const dir of subs) children.push(await timedSubscribe(dir, () => {}));
+    await wait(200);
+    parent = await timedSubscribe(root, collect);
+  }
 
   let controlCount = null;
   if (settleBeforeUnsubscribe) {
@@ -84,6 +114,7 @@ async function scenario(name, { settleBeforeUnsubscribe, concurrent = false }) {
 
   const seen = parentEvents.length;
   console.log(`  ${name}:`);
+  console.log(`    subscribe durations: ${timings.join(', ')}`);
   if (controlCount !== null) {
     console.log(`    control: parent saw ${controlCount} event(s) before the unsubscribes`);
   }
@@ -123,9 +154,14 @@ async function main() {
     settleBeforeUnsubscribe: false,
     concurrent: true
   });
+  const burst = await scenario('burst (no settle between subscribes)', {
+    settleBeforeUnsubscribe: false,
+    concurrent: true,
+    burst: true
+  });
 
   console.log(
-    `\nSUMMARY (${process.platform}): relaxed=${relaxed} | tight=${tight} | concurrent=${concurrent}`
+    `\nSUMMARY (${process.platform}): relaxed=${relaxed} | tight=${tight} | concurrent=${concurrent} | burst=${burst}`
   );
 }
 
