@@ -82,10 +82,18 @@ jobs:
         echo "system node: $(node -v)"
         echo "electron:    $ELECTRON"
         for i in 1 2 3; do
-          echo "--- attempt $i (system node) ---"
+          echo "--- attempt $i (library, system node) ---"
           node script/diagnostics/parcel-nested-unsubscribe.js
-          echo "--- attempt $i (electron as node) ---"
+          echo "--- attempt $i (library, electron as node) ---"
           ELECTRON_RUN_AS_NODE=1 "$ELECTRON" script/diagnostics/parcel-nested-unsubscribe.js
+        done
+        # One rung up: the real worker, forked exactly as `WatcherTask` forks it,
+        # driven with the same messages the registry sends during an adoption.
+        # Adds the IPC channel, the bootstrap and the worker's own code on top of
+        # the Electron host — everything but the registry and `PathWatcher`.
+        for i in 1 2 3 4 5; do
+          echo "--- attempt $i (real worker over IPC) ---"
+          node script/diagnostics/parcel-worker-ipc.js
         done
 
     - name: Run Tests
