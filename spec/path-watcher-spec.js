@@ -888,7 +888,16 @@ describe('watchPath', function () {
         await nextRootEvent;
       });
 
-      it('adopts existing child watchers and filters events appropriately to them', async function () {
+      // TEMPORARY — collapse back to a single `it` once the Windows failure is
+      // understood or written off.
+      //
+      // Repeats only; no logging, no arming, no pause. The per-attempt failure
+      // rate measured about 4%, so a single attempt passes 96% of the time
+      // whether or not anything has changed — which makes one attempt per run
+      // nearly useless as evidence. Ten attempts give a run a ~1-in-3 chance of
+      // catching one, which is what the earlier failures were caught with.
+      for (let repeat = 0; repeat < 10; repeat++)
+      it(`adopts existing child watchers and filters events appropriately to them (repeat ${repeat})`, async function () {
         const parentDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
 
         // Create the directory tree
