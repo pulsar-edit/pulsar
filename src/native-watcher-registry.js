@@ -97,13 +97,33 @@ class RegistryTree {
         // promise resolves, because `watchPath` resolving is the point at which
         // callers expect the sharing to have taken effect. So this hangs off
         // `did-start`, registered ahead of the watcher's own handler.
+        // TEMPORARY EXPERIMENT — not shippable as it stands. See below.
+        //
+        // Releasing the children is the one step of the handover we have never
+        // removed, and it is the last untested suspect for the Windows failure
+        // where three live subscriptions report nothing for ten seconds. So:
+        // re-point their event routing onto the replacement, but leave their own
+        // subscriptions alive.
+        //
+        // If the flake stops, the release is implicated and the shippable fix is
+        // to defer it until the replacement has demonstrably delivered an event,
+        // rather than merely reported itself subscribed. If the flake persists,
+        // the release is exonerated and the suspect is the re-pointing itself.
+        //
+        // Why it can't ship like this: the children's OS watches now live for
+        // the rest of the window, so a subtree can be watched twice over and
+        // nothing ever reclaims the duplicates.
+        const RELEASE_CHILDREN = false;
+
         const handOverChildren = () => {
           for (let i = 0; i < children.length; i++) {
             const childNode = children[i].node;
             const childNative = childNode.getNativeWatcher();
             childNative.reattachTo(newNative, absolutePath);
-            childNative.dispose();
-            childNative.stop();
+            if (RELEASE_CHILDREN) {
+              childNative.dispose();
+              childNative.stop();
+            }
           }
         };
 
