@@ -1013,22 +1013,6 @@ class PathWatcher {
 
     const filtered = [];
 
-    // TEMPORARY diagnostic. Remove with the rest of the Windows investigation.
-    //
-    // This is the one thing we have never observed. The worker logs what it
-    // sends; nothing has ever logged what the renderer receives. So when a spec
-    // times out waiting for an event we cannot currently tell "the backend never
-    // reported it" from "it arrived and we dropped it here" — and this method,
-    // with its path-prefix filter, is where dropping would happen.
-    const diagnosing =
-      atom?.config?.get('core.fileSystemWatcherLogging') ?? false;
-    if (diagnosing) {
-      console.log(
-        `[pathwatcher] received ${events.length} event(s) for ${this.normalizedPath}:`,
-        events.map(e => `${e.action} ${e.path}`).join(' | ')
-      );
-    }
-
     for (let i = 0; i < events.length; i++) {
       const event = events[i];
 
@@ -1067,14 +1051,6 @@ class PathWatcher {
           filtered.push(denormalizedEvent);
         }
       }
-    }
-
-    if (diagnosing) {
-      const kept = filtered.map(e => `${e.action} ${e.path}`);
-      console.log(
-        `[pathwatcher] kept ${filtered.length} of ${events.length} for ${this.normalizedPath}` +
-          (kept.length ? `: ${kept.join(' | ')}` : ' (all dropped)')
-      );
     }
 
     if (filtered.length > 0) {

@@ -346,35 +346,8 @@ describe('watchPath', function () {
   afterEach(async function () {
     subs.dispose();
     await watchPath.reset();
-    // Let the teardown above actually land before the next spec subscribes.
-    // `reset` resolves when we've asked the watchers to stop, which isn't the
-    // same as the OS having released them — and nearly every spec here builds a
-    // fresh watcher and writes to it immediately, so it starts by racing the
-    // previous spec's cleanup. The `File` block above pauses here for the same
-    // reason.
-    await wait(100);
   });
   
-  // Wait until a freshly created watcher is really delivering events.
-  //
-  // `watchPath` resolves once the backend reports its subscription as live, but
-  // that isn't the same as the OS having armed it. On Windows the gap is small —
-  // CI logs put a working first event 100-200ms after the subscribe — but a spec
-  // that writes exactly once inside it waits forever for an event nobody
-  // recorded, which is the flakiness we kept chasing. Poking repeatedly turns
-  // that one-shot race into a retry.
-  //
-  // The events collected while arming are discarded: they're this helper's, not
-  // the spec's.
-  async function armWatcher(dir, events, label = 'the watcher to deliver events') {
-    let n = 0;
-    await conditionPromise(async () => {
-      await writeFile(path.join(dir, `arm-${n++}.txt`), '!');
-      return events.length > 0;
-    }, label);
-    events.length = 0;
-  }
-
   // Resolve once an event has been seen for every named file.
   //
   // Rejects if they don't all turn up in time, naming the ones that didn't. That
@@ -446,14 +419,6 @@ describe('watchPath', function () {
       let disposables;
       beforeEach(async () => {
         jasmine.useRealClock();
-        // TEMPORARY — remove once the Windows flakiness is understood.
-        //
-        // Makes the worker log every batch it sends, which is the view we don't
-        // otherwise have: what the OS actually reported, before any filtering on
-        // this side. When a spec times out waiting for an event, this says which
-        // half it went missing in — never delivered by the backend, or delivered
-        // and then dropped by our own path filter.
-        atom.config.set('core.fileSystemWatcherLogging', true);
         atom.config.set('core.fileSystemWatcher', impl);
         // Changing the config setting will trigger an async transition to new
         // file-watchers. This helper method lets us wait until that transition
@@ -638,7 +603,6 @@ describe('watchPath', function () {
 
           const eventsForFile = () => events.filter(e => e.path === filePath);
 
-          await armWatcher(rootDir, events);
 
           await writeFile(filePath, 'one\n');
           await conditionPromise(
@@ -820,7 +784,6 @@ describe('watchPath', function () {
         });
         disposables.add(watcher0);
 
-        await armWatcher(realRootDir, events0);
 
         await writeFile(path.join(realRootDir, 'foo.txt'), '!')
         await conditionPromise(() => events0.length > 0);
@@ -907,22 +870,11 @@ describe('watchPath', function () {
         await mkdir(subDir);
 
         // Keep the watchers alive with an undisposed subscription
-        const rootEvents = [];
-        const rootWatcher = await watchPath(rootDir, {}, events =>
-          rootEvents.push(...events)
-        );
-        const childEvents = [];
-        const childWatcher = await watchPath(subDir, {}, events =>
-          childEvents.push(...events)
-        );
+        const rootWatcher = await watchPath(rootDir, {}, () => {});
+        const childWatcher = await watchPath(subDir, {}, () => {});
 
         expect(rootWatcher.native).toBe(childWatcher.native);
         expect(rootWatcher.native.isRunning()).toBe(true);
-
-        // One native serves both watchers, so arming through the subdirectory
-        // establishes delivery for each of them.
-        await armWatcher(subDir, childEvents, 'the shared watcher to deliver events');
-        rootEvents.length = 0;
 
         const firstChanges = Promise.all([
           waitForChanges(rootWatcher, subFile),
@@ -936,87 +888,58 @@ describe('watchPath', function () {
         await nextRootEvent;
       });
 
-      // TEMPORARY — collapse back to a single `it` when the Windows failure is
-      // understood.
-      //
-      // Four variants, each repeated so that one run is likely to catch a
-      // failure rather than needing several. Each variant removes exactly one
-      // element, so the pattern of which ones fail says what the failure
-      // actually needs — rather than relying on a theory being right:
-      //
-      //   control       — the spec as written
-      //   parent first  — no adoption at all; the child attaches to an existing
-      //                   parent native instead of the parent taking over
-      //   one child     — rules out the pair of concurrent child releases
-      //   new files     — writes files that didn't exist, instead of appending
-      //                   to files that predate the watchers
-      const ADOPTION_VARIANTS = [
-        { label: 'control', childCount: 2, parentFirst: false, append: true },
-        { label: 'parent first (no adoption)', childCount: 2, parentFirst: true, append: true },
-        { label: 'one child', childCount: 1, parentFirst: false, append: true },
-        { label: 'new files, not appends', childCount: 2, parentFirst: false, append: false }
-      ];
+      it('adopts existing child watchers and filters events appropriately to them', async function () {
+        const parentDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
 
-      for (const variant of ADOPTION_VARIANTS) {
-        for (let repeat = 0; repeat < 8; repeat++) {
-          it(`adopts existing child watchers — ${variant.label} (repeat ${repeat})`, async function () {
-            const parentDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        // Create the directory tree
+        const rootFile = path.join(parentDir, 'rootfile.txt');
+        const subDir0 = path.join(parentDir, 'subdir0');
+        const subFile0 = path.join(subDir0, 'subfile0.txt');
+        const subDir1 = path.join(parentDir, 'subdir1');
+        const subFile1 = path.join(subDir1, 'subfile1.txt');
 
-            const rootFile = path.join(parentDir, 'rootfile.txt');
-            const subDirs = [];
-            const subFiles = [];
-            for (let i = 0; i < variant.childCount; i++) {
-              const dir = path.join(parentDir, `subdir${i}`);
-              await mkdir(dir);
-              subDirs.push(dir);
-              subFiles.push(path.join(dir, `subfile${i}.txt`));
-            }
+        await mkdir(subDir0);
+        await mkdir(subDir1);
+        await Promise.all([
+          writeFile(rootFile, 'rootfile\n', { encoding: 'utf8' }),
+          writeFile(subFile0, 'subfile 0\n', { encoding: 'utf8' }),
+          writeFile(subFile1, 'subfile 1\n', { encoding: 'utf8' })
+        ]);
 
-            if (variant.append) {
-              // The files predate the watchers, so the writes below are appends
-              // to existing files rather than creations.
-              await writeFile(rootFile, 'rootfile\n', { encoding: 'utf8' });
-              await Promise.all(
-                subFiles.map(f => writeFile(f, 'subfile\n', { encoding: 'utf8' }))
-              );
-            }
+        // Begin the child watchers and keep them alive
+        const subWatcher0 = await watchPath(subDir0, {}, () => {});
+        const subWatcherChanges0 = waitForChanges(subWatcher0, subFile0);
 
-            let parentWatcher;
-            const childWatchers = [];
-            if (variant.parentFirst) {
-              parentWatcher = await watchPath(parentDir, {}, () => {});
-              for (const dir of subDirs) {
-                childWatchers.push(await watchPath(dir, {}, () => {}));
-              }
-            } else {
-              for (const dir of subDirs) {
-                childWatchers.push(await watchPath(dir, {}, () => {}));
-              }
-              parentWatcher = await watchPath(parentDir, {}, () => {});
-            }
-            disposables.add(parentWatcher, ...childWatchers);
+        const subWatcher1 = await watchPath(subDir1, {}, () => {});
+        const subWatcherChanges1 = waitForChanges(subWatcher1, subFile1);
 
-            // Either order ends with one native serving all of them.
-            for (const child of childWatchers) {
-              expect(child.native).toBe(parentWatcher.native);
-            }
+        expect(subWatcher0.native).not.toBe(subWatcher1.native);
 
-            const pending = [
-              ...childWatchers.map((watcher, i) =>
-                waitForChanges(watcher, subFiles[i])
-              ),
-              waitForChanges(parentWatcher, rootFile, ...subFiles)
-            ];
+        // Create the parent watcher
+        const parentWatcher = await watchPath(parentDir, {}, () => {});
+        const parentWatcherChanges = waitForChanges(
+          parentWatcher,
+          rootFile,
+          subFile0,
+          subFile1
+        );
 
-            const touch = variant.append
-              ? file => appendFile(file, 'change\n', { encoding: 'utf8' })
-              : file => writeFile(file, 'new\n', { encoding: 'utf8' });
+        expect(subWatcher0.native).toBe(parentWatcher.native);
+        expect(subWatcher1.native).toBe(parentWatcher.native);
 
-            await Promise.all([rootFile, ...subFiles].map(touch));
-            await Promise.all(pending);
-          });
-        }
-      }
+        // Ensure events are filtered correctly
+        await Promise.all([
+          appendFile(rootFile, 'change\n', { encoding: 'utf8' }),
+          appendFile(subFile0, 'change\n', { encoding: 'utf8' }),
+          appendFile(subFile1, 'change\n', { encoding: 'utf8' })
+        ]);
+
+        await Promise.all([
+          subWatcherChanges0,
+          subWatcherChanges1,
+          parentWatcherChanges
+        ]);
+      });
 
       it('honors a stop that arrives while the watcher is still starting', async () => {
         jasmine.useRealClock();
