@@ -119,7 +119,19 @@ class RegistryTree {
           for (let i = 0; i < children.length; i++) {
             const childNode = children[i].node;
             const childNative = childNode.getNativeWatcher();
+
+            if (!RELEASE_CHILDREN) {
+              // Holding a listener is the only way to keep this native alive.
+              // `NativeWatcher.onDidChange` hands back a disposable that stops
+              // the native once its last change listener goes away — and
+              // re-pointing a child disposes exactly that listener, so skipping
+              // `stop()` below achieves nothing on its own. This was the flaw in
+              // the first version of this experiment.
+              childNative.onDidChange(() => {});
+            }
+
             childNative.reattachTo(newNative, absolutePath);
+
             if (RELEASE_CHILDREN) {
               childNative.dispose();
               childNative.stop();
