@@ -92,8 +92,8 @@ jobs:
         # of each shape, because a few-percent rate needs volume to show up — the
         # earlier diagnostics each ran a handful of times and watched a single
         # subscription, which is why they all came back clean.
-        echo "--- dead-subscription sweep ---"
-        node script/diagnostics/parcel-dead-subscription.js 40
+        echo "--- delivery-latency sweep ---"
+        node script/diagnostics/parcel-delivery-latency.js 30
         # One rung up: the real worker, forked exactly as `WatcherTask` forks it,
         # driven with the same messages the registry sends during an adoption.
         # Adds the IPC channel, the bootstrap and the worker's own code on top of

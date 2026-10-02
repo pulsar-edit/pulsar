@@ -348,6 +348,26 @@ describe('watchPath', function () {
     await watchPath.reset();
   });
   
+  // TEMPORARY — arming, applied to the adoption spec only.
+  //
+  // Writes repeatedly until the watcher proves it is delivering, then discards
+  // what it collected. This is known to fix the three specs that flake on a
+  // single-shot write, which tells us delivery *begins* — just after the first
+  // write is already gone. What it has never been tried on is the adoption spec,
+  // whose wait saw nothing for a full ten seconds. If arming fixes that too, the
+  // failure is one phenomenon with a long tail; if it doesn't, that spec's
+  // subscription is dead rather than late, and needs a different answer.
+  //
+  // The other three specs are deliberately left unarmed as a control.
+  async function armWatcher(dir, events, label = 'the watcher to deliver events') {
+    let n = 0;
+    await conditionPromise(async () => {
+      await writeFile(path.join(dir, `arm-${n++}.txt`), '!');
+      return events.length > 0;
+    }, label);
+    events.length = 0;
+  }
+
   // Resolve once an event has been seen for every named file.
   //
   // Rejects if they don't all turn up in time, naming the ones that didn't. That
@@ -932,18 +952,34 @@ describe('watchPath', function () {
         ]);
 
         // Begin the child watchers and keep them alive
-        const subWatcher0 = await watchPath(subDir0, {}, () => {});
-        const subWatcherChanges0 = waitForChanges(subWatcher0, subFile0);
+        const subEvents0 = [];
+        const subWatcher0 = await watchPath(subDir0, {}, events =>
+          subEvents0.push(...events)
+        );
 
-        const subWatcher1 = await watchPath(subDir1, {}, () => {});
-        const subWatcherChanges1 = waitForChanges(subWatcher1, subFile1);
+        const subEvents1 = [];
+        const subWatcher1 = await watchPath(subDir1, {}, events =>
+          subEvents1.push(...events)
+        );
 
         if (SHARING) {
           expect(subWatcher0.native).not.toBe(subWatcher1.native);
         }
 
         // Create the parent watcher
-        const parentWatcher = await watchPath(parentDir, {}, () => {});
+        const parentEvents = [];
+        const parentWatcher = await watchPath(parentDir, {}, events =>
+          parentEvents.push(...events)
+        );
+
+        // Arm each of the three before asking anything of them. Arming the
+        // parent last, since writes under the children reach it too.
+        await armWatcher(subDir0, subEvents0, 'the subdir0 watcher');
+        await armWatcher(subDir1, subEvents1, 'the subdir1 watcher');
+        await armWatcher(parentDir, parentEvents, 'the parent watcher');
+
+        const subWatcherChanges0 = waitForChanges(subWatcher0, subFile0);
+        const subWatcherChanges1 = waitForChanges(subWatcher1, subFile1);
         const parentWatcherChanges = waitForChanges(
           parentWatcher,
           rootFile,
