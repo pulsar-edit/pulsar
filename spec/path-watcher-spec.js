@@ -347,36 +347,37 @@ describe('watchPath', function () {
     subs.dispose();
     await watchPath.reset();
   });
-  
+
   // Wait until a freshly created watcher is actually delivering events, by
   // writing until one arrives, then discard what was collected.
   //
-  // `watchPath` resolves when the backend reports its subscription as live, and
-  // with `@parcel/watcher` on Windows that isn't the same thing: a spec that
-  // writes exactly once can write into a window where the subscription exists
-  // but reports nothing, and then waits forever for an event nobody recorded.
-  // Writing repeatedly turns that one-shot race into a retry.
+  // `watchPath` resolves when the backend reports its subscription as live,
+  // and with `@parcel/watcher` on Windows that isn't the same thing: a spec
+  // that writes exactly once can write into a window where the subscription
+  // exists but reports nothing, and then waits forever for an event nobody
+  // recorded. Writing repeatedly turns that one-shot race into a retry.
   //
-  // Only the specs that watch a path and then immediately write to it need this.
-  // If you add such a spec, arm it.
+  // Only the specs that watch a path and then immediately write to it need
+  // this. If you add such a spec, arm it.
   //
-  // We chased the underlying defect a long way before settling for this, so to
-  // save the next person the trip: these were ruled out by experiment rather
-  // than by argument.
+  // We chased the underlying defect a long way before settling for this. To
+  // save the next person the trip… these were ruled out by experiment rather
+  // than by argument:
   //
-  //   * the watcher-sharing scheme — bypassed entirely, the failure survived
-  //   * releasing child watchers during a handover — kept alive, failure survived
-  //   * the order and timing of subscribe/unsubscribe, paced and pipelined
-  //   * case sensitivity in our own path filtering
-  //   * hung IPC replies and hung teardown
-  //   * `@parcel/watcher` in isolation: 120 consecutive subscriptions on Windows
-  //     each delivered within 116ms, none ever dead
-  //   * the same through our real worker over IPC, under both Node and Electron
+  // * the watcher-sharing scheme; bypassed entirely, the failure survived
+  // * releasing child watchers during a handover; kept alive, failure
+  //   survived
+  // * the order and timing of subscribe/unsubscribe, paced and pipelined
+  // * case sensitivity in our own path filtering
+  // * hung IPC replies and hung teardown
+  // * `@parcel/watcher` in isolation: 120 consecutive subscriptions on Windows
+  //   each delivered within 116ms, none ever dead
+  // * the same through our real worker over IPC, under both Node and Electron
   //
-  // VS Code, which uses the same library, stopped at the same wall: their parcel
-  // watcher suite is `suite.skip`, commented "this suite has shown flaky runs in
-  // Azure pipelines where tasks would just hang and timeout after a while".
-  // Arming at least keeps ours running.
+  // VS Code, which uses the same library, stopped at the same wall: their
+  // parcel watcher suite is `suite.skip`, commented "this suite has shown
+  // flaky runs in Azure pipelines where tasks would just hang and timeout
+  // after a while." Arming at least keeps ours running.
   async function armWatcher(dir, events, label = 'the watcher to deliver events') {
     let n = 0;
     await conditionPromise(async () => {
@@ -388,15 +389,15 @@ describe('watchPath', function () {
 
   // Resolve once an event has been seen for every named file.
   //
-  // Rejects if they don't all turn up in time, naming the ones that didn't. That
-  // matters more than it sounds: without a timeout, a filesystem event that
-  // never arrives leaves the spec sitting until jasmine's global limit and then
-  // reports only that two minutes elapsed — telling us nothing about which file
-  // went unreported, which is exactly what we need to know when a backend is at
-  // fault on one platform.
+  // Rejects if they don't all turn up in time, naming the ones that didn't.
+  // Without a timeout, a filesystem event that never arrives leaves the spec
+  // sitting until Jasmine's global limit and then reports only that two
+  // minutes elapsed. That tells us nothing about which file went unreported,
+  // which is exactly what we need to know when a backend is at fault on one
+  // platform.
   //
-  // A trailing number overrides the timeout, for a caller that legitimately
-  // needs longer.
+  // A trailing number overrides the timeout for a caller that legitimately
+  // needs more time.
   const DEFAULT_CHANGE_TIMEOUT_MS = 10000;
   function waitForChanges(watcher, ...fileNames) {
     let timeoutMs = DEFAULT_CHANGE_TIMEOUT_MS;
@@ -441,7 +442,7 @@ describe('watchPath', function () {
       }, timeoutMs);
     });
 
-    // Callers typically build these *before* the writes they cover and await
+    // Callers typically build these _before_ the writes they cover and await
     // them afterwards. If the timeout fires inside that gap there's no handler
     // attached yet, and the rejection gets reported as unhandled on top of the
     // spec failure. This no-op handler marks it as handled without affecting
