@@ -412,6 +412,12 @@ describe('watchPath', function () {
     return promise;
   }
 
+  // TEMPORARY — matches the bypass in `NativeWatcherRegistry.attach`. With
+  // sharing off, every watcher gets its own native, so the assertions about
+  // watchers sharing one are expected not to hold. The event-delivery
+  // assertions are the point of the experiment and stay in force.
+  const SHARING = process.env.PULSAR_WATCHER_NO_SHARING !== '1';
+
   const WATCHER_IMPLEMENTATIONS = ['nsfw', 'parcel'];
 
   for (let impl of WATCHER_IMPLEMENTATIONS) {
@@ -444,7 +450,9 @@ describe('watchPath', function () {
         const watcher0 = await watchPath(rootDir, {}, () => {});
         const watcher1 = await watchPath(rootDir, {}, () => {});
 
-        expect(watcher0.native).toBe(watcher1.native);
+        if (SHARING) {
+          expect(watcher0.native).toBe(watcher1.native);
+        }
       });
 
       // TODO: File-watchers cannot respect `core.ignoredNames` by default
@@ -697,7 +705,9 @@ describe('watchPath', function () {
 
         disposables.add(watcher0, watcher1);
 
-        expect(watcher0.native).toBe(watcher1.native);
+        if (SHARING) {
+          expect(watcher0.native).toBe(watcher1.native);
+        }
       });
 
       it("returns paths that appear to descend from the given path, even when symlinks are involved, when `realPaths` is `false`", async () => {
@@ -846,7 +856,9 @@ describe('watchPath', function () {
           watchPath(rootDir, {}, () => {}),
           watchPath(rootDir, {}, () => {})
         ]);
-        expect(watcher0.native).toBe(watcher1.native);
+        if (SHARING) {
+          expect(watcher0.native).toBe(watcher1.native);
+        }
       });
 
       it("doesn't attach new watchers to a native watcher that's stopping", async function () {
@@ -858,7 +870,9 @@ describe('watchPath', function () {
         watcher0.dispose();
         const watcher1 = await watchPath(rootDir, {}, () => {});
 
-        expect(watcher1.native).not.toBe(native0);
+        if (SHARING) {
+          expect(watcher1.native).not.toBe(native0);
+        }
       });
 
       it('reuses an existing native watcher on a parent directory and filters events', async function () {
@@ -873,7 +887,9 @@ describe('watchPath', function () {
         const rootWatcher = await watchPath(rootDir, {}, () => {});
         const childWatcher = await watchPath(subDir, {}, () => {});
 
-        expect(rootWatcher.native).toBe(childWatcher.native);
+        if (SHARING) {
+          expect(rootWatcher.native).toBe(childWatcher.native);
+        }
         expect(rootWatcher.native.isRunning()).toBe(true);
 
         const firstChanges = Promise.all([
@@ -922,7 +938,9 @@ describe('watchPath', function () {
         const subWatcher1 = await watchPath(subDir1, {}, () => {});
         const subWatcherChanges1 = waitForChanges(subWatcher1, subFile1);
 
-        expect(subWatcher0.native).not.toBe(subWatcher1.native);
+        if (SHARING) {
+          expect(subWatcher0.native).not.toBe(subWatcher1.native);
+        }
 
         // Create the parent watcher
         const parentWatcher = await watchPath(parentDir, {}, () => {});
@@ -933,8 +951,10 @@ describe('watchPath', function () {
           subFile1
         );
 
-        expect(subWatcher0.native).toBe(parentWatcher.native);
-        expect(subWatcher1.native).toBe(parentWatcher.native);
+        if (SHARING) {
+          expect(subWatcher0.native).toBe(parentWatcher.native);
+          expect(subWatcher1.native).toBe(parentWatcher.native);
+        }
 
         // Ensure events are filtered correctly
         await Promise.all([

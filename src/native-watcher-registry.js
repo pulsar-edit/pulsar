@@ -97,45 +97,13 @@ class RegistryTree {
         // promise resolves, because `watchPath` resolving is the point at which
         // callers expect the sharing to have taken effect. So this hangs off
         // `did-start`, registered ahead of the watcher's own handler.
-        // TEMPORARY EXPERIMENT — not shippable as it stands. See below.
-        //
-        // Releasing the children is the one step of the handover we have never
-        // removed, and it is the last untested suspect for the Windows failure
-        // where three live subscriptions report nothing for ten seconds. So:
-        // re-point their event routing onto the replacement, but leave their own
-        // subscriptions alive.
-        //
-        // If the flake stops, the release is implicated and the shippable fix is
-        // to defer it until the replacement has demonstrably delivered an event,
-        // rather than merely reported itself subscribed. If the flake persists,
-        // the release is exonerated and the suspect is the re-pointing itself.
-        //
-        // Why it can't ship like this: the children's OS watches now live for
-        // the rest of the window, so a subtree can be watched twice over and
-        // nothing ever reclaims the duplicates.
-        const RELEASE_CHILDREN = false;
-
         const handOverChildren = () => {
           for (let i = 0; i < children.length; i++) {
             const childNode = children[i].node;
             const childNative = childNode.getNativeWatcher();
-
-            if (!RELEASE_CHILDREN) {
-              // Holding a listener is the only way to keep this native alive.
-              // `NativeWatcher.onDidChange` hands back a disposable that stops
-              // the native once its last change listener goes away — and
-              // re-pointing a child disposes exactly that listener, so skipping
-              // `stop()` below achieves nothing on its own. This was the flaw in
-              // the first version of this experiment.
-              childNative.onDidChange(() => {});
-            }
-
             childNative.reattachTo(newNative, absolutePath);
-
-            if (RELEASE_CHILDREN) {
-              childNative.dispose();
-              childNative.stop();
-            }
+            childNative.dispose();
+            childNative.stop();
           }
         };
 
@@ -481,6 +449,7 @@ class NativeWatcherRegistry {
   // * `createNative` {Function} that will be called with a normalized filesystem path to create a new native
   //   filesystem watcher.
   constructor(createNative) {
+    this.createNative = createNative;
     this.tree = new RegistryTree([], createNative);
   }
 
@@ -496,6 +465,25 @@ class NativeWatcherRegistry {
   // * `watcher` an unattached {Watcher}.
   async attach(watcher) {
     const normalizedDirectory = await watcher.getNormalizedPathPromise();
+
+    // TEMPORARY EXPERIMENT, enabled by `PULSAR_WATCHER_NO_SHARING=1`.
+    //
+    // Skips the sharing scheme entirely: every watcher gets a native of its own,
+    // nothing is consolidated, nothing is adopted, nothing is reattached. The
+    // tree is left empty, so `print` reports nothing and the specs that assert
+    // sharing are expected to fail — they're guarded by the same environment
+    // variable.
+    //
+    // This exists because every narrower experiment inside the handover has come
+    // back negative. If the Windows flake survives even this, adoption isn't the
+    // trigger at all and the spec's only remaining distinguishing feature is
+    // three watchers in one directory tree.
+    if (process.env.PULSAR_WATCHER_NO_SHARING === '1') {
+      const native = this.createNative(normalizedDirectory);
+      watcher.attachToNative(native, normalizedDirectory);
+      return;
+    }
+
     const pathSegments = normalizedDirectory
       .split(path.sep)
       .filter(segment => segment.length > 0);

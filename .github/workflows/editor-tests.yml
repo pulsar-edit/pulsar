@@ -102,6 +102,17 @@ jobs:
       if: runner.os != 'Linux'
       run: yarn start --test spec/path-watcher-spec.js # TEMPORARY — restore `spec`
 
+      # TEMPORARY — the other half of the `PULSAR_WATCHER_NO_SHARING` experiment.
+      # Runs the same specs a second time with the native-watcher sharing scheme
+      # bypassed, so the comparison is on one machine in one run rather than
+      # across runs hours apart. `always()` because the first run is expected to
+      # fail sometimes — that failure is the thing being compared against.
+    - name: Run Tests (sharing bypassed)
+      if: ${{ always() && runner.os != 'Linux' }}
+      env:
+        PULSAR_WATCHER_NO_SHARING: '1'
+      run: yarn start --test spec/path-watcher-spec.js
+
     - name: Run Tests with xvfb-run (Linux)
       if: runner.os == 'Linux'
       run: xvfb-run --auto-servernum yarn start --test spec/path-watcher-spec.js # TEMPORARY — restore `spec`
