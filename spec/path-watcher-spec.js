@@ -348,17 +348,35 @@ describe('watchPath', function () {
     await watchPath.reset();
   });
   
-  // TEMPORARY — arming, applied to the adoption spec only.
+  // Wait until a freshly created watcher is actually delivering events, by
+  // writing until one arrives, then discard what was collected.
   //
-  // Writes repeatedly until the watcher proves it is delivering, then discards
-  // what it collected. This is known to fix the three specs that flake on a
-  // single-shot write, which tells us delivery *begins* — just after the first
-  // write is already gone. What it has never been tried on is the adoption spec,
-  // whose wait saw nothing for a full ten seconds. If arming fixes that too, the
-  // failure is one phenomenon with a long tail; if it doesn't, that spec's
-  // subscription is dead rather than late, and needs a different answer.
+  // `watchPath` resolves when the backend reports its subscription as live, and
+  // with `@parcel/watcher` on Windows that isn't the same thing: a spec that
+  // writes exactly once can write into a window where the subscription exists
+  // but reports nothing, and then waits forever for an event nobody recorded.
+  // Writing repeatedly turns that one-shot race into a retry.
   //
-  // The other three specs are deliberately left unarmed as a control.
+  // Only the specs that watch a path and then immediately write to it need this.
+  // If you add such a spec, arm it.
+  //
+  // We chased the underlying defect a long way before settling for this, so to
+  // save the next person the trip: these were ruled out by experiment rather
+  // than by argument.
+  //
+  //   * the watcher-sharing scheme — bypassed entirely, the failure survived
+  //   * releasing child watchers during a handover — kept alive, failure survived
+  //   * the order and timing of subscribe/unsubscribe, paced and pipelined
+  //   * case sensitivity in our own path filtering
+  //   * hung IPC replies and hung teardown
+  //   * `@parcel/watcher` in isolation: 120 consecutive subscriptions on Windows
+  //     each delivered within 116ms, none ever dead
+  //   * the same through our real worker over IPC, under both Node and Electron
+  //
+  // VS Code, which uses the same library, stopped at the same wall: their parcel
+  // watcher suite is `suite.skip`, commented "this suite has shown flaky runs in
+  // Azure pipelines where tasks would just hang and timeout after a while".
+  // Arming at least keeps ours running.
   async function armWatcher(dir, events, label = 'the watcher to deliver events') {
     let n = 0;
     await conditionPromise(async () => {
@@ -432,12 +450,6 @@ describe('watchPath', function () {
     return promise;
   }
 
-  // TEMPORARY — matches the bypass in `NativeWatcherRegistry.attach`. With
-  // sharing off, every watcher gets its own native, so the assertions about
-  // watchers sharing one are expected not to hold. The event-delivery
-  // assertions are the point of the experiment and stay in force.
-  const SHARING = process.env.PULSAR_WATCHER_NO_SHARING !== '1';
-
   const WATCHER_IMPLEMENTATIONS = ['nsfw', 'parcel'];
 
   for (let impl of WATCHER_IMPLEMENTATIONS) {
@@ -470,9 +482,7 @@ describe('watchPath', function () {
         const watcher0 = await watchPath(rootDir, {}, () => {});
         const watcher1 = await watchPath(rootDir, {}, () => {});
 
-        if (SHARING) {
-          expect(watcher0.native).toBe(watcher1.native);
-        }
+        expect(watcher0.native).toBe(watcher1.native);
       });
 
       // TODO: File-watchers cannot respect `core.ignoredNames` by default
@@ -631,6 +641,8 @@ describe('watchPath', function () {
 
           const eventsForFile = () => events.filter(e => e.path === filePath);
 
+          await armWatcher(rootDir, events);
+
 
           await writeFile(filePath, 'one\n');
           await conditionPromise(
@@ -725,9 +737,7 @@ describe('watchPath', function () {
 
         disposables.add(watcher0, watcher1);
 
-        if (SHARING) {
-          expect(watcher0.native).toBe(watcher1.native);
-        }
+        expect(watcher0.native).toBe(watcher1.native);
       });
 
       it("returns paths that appear to descend from the given path, even when symlinks are involved, when `realPaths` is `false`", async () => {
@@ -814,6 +824,7 @@ describe('watchPath', function () {
         });
         disposables.add(watcher0);
 
+        await armWatcher(realRootDir, events0);
 
         await writeFile(path.join(realRootDir, 'foo.txt'), '!')
         await conditionPromise(() => events0.length > 0);
@@ -876,9 +887,7 @@ describe('watchPath', function () {
           watchPath(rootDir, {}, () => {}),
           watchPath(rootDir, {}, () => {})
         ]);
-        if (SHARING) {
-          expect(watcher0.native).toBe(watcher1.native);
-        }
+        expect(watcher0.native).toBe(watcher1.native);
       });
 
       it("doesn't attach new watchers to a native watcher that's stopping", async function () {
@@ -890,9 +899,7 @@ describe('watchPath', function () {
         watcher0.dispose();
         const watcher1 = await watchPath(rootDir, {}, () => {});
 
-        if (SHARING) {
-          expect(watcher1.native).not.toBe(native0);
-        }
+        expect(watcher1.native).not.toBe(native0);
       });
 
       it('reuses an existing native watcher on a parent directory and filters events', async function () {
@@ -904,13 +911,22 @@ describe('watchPath', function () {
         await mkdir(subDir);
 
         // Keep the watchers alive with an undisposed subscription
-        const rootWatcher = await watchPath(rootDir, {}, () => {});
-        const childWatcher = await watchPath(subDir, {}, () => {});
+        const rootEvents = [];
+        const rootWatcher = await watchPath(rootDir, {}, events =>
+          rootEvents.push(...events)
+        );
+        const childEvents = [];
+        const childWatcher = await watchPath(subDir, {}, events =>
+          childEvents.push(...events)
+        );
 
-        if (SHARING) {
-          expect(rootWatcher.native).toBe(childWatcher.native);
-        }
+        expect(rootWatcher.native).toBe(childWatcher.native);
         expect(rootWatcher.native.isRunning()).toBe(true);
+
+        // One native serves both, so arming through the subdirectory
+        // establishes delivery for each of them.
+        await armWatcher(subDir, childEvents, 'the shared watcher');
+        rootEvents.length = 0;
 
         const firstChanges = Promise.all([
           waitForChanges(rootWatcher, subFile),
@@ -924,16 +940,7 @@ describe('watchPath', function () {
         await nextRootEvent;
       });
 
-      // TEMPORARY — collapse back to a single `it` once the Windows failure is
-      // understood or written off.
-      //
-      // Repeats only; no logging, no arming, no pause. The per-attempt failure
-      // rate measured about 4%, so a single attempt passes 96% of the time
-      // whether or not anything has changed — which makes one attempt per run
-      // nearly useless as evidence. Ten attempts give a run a ~1-in-3 chance of
-      // catching one, which is what the earlier failures were caught with.
-      for (let repeat = 0; repeat < 10; repeat++)
-      it(`adopts existing child watchers and filters events appropriately to them (repeat ${repeat})`, async function () {
+      it('adopts existing child watchers and filters events appropriately to them', async function () {
         const parentDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
 
         // Create the directory tree
@@ -962,9 +969,7 @@ describe('watchPath', function () {
           subEvents1.push(...events)
         );
 
-        if (SHARING) {
-          expect(subWatcher0.native).not.toBe(subWatcher1.native);
-        }
+        expect(subWatcher0.native).not.toBe(subWatcher1.native);
 
         // Create the parent watcher
         const parentEvents = [];
@@ -987,10 +992,8 @@ describe('watchPath', function () {
           subFile1
         );
 
-        if (SHARING) {
-          expect(subWatcher0.native).toBe(parentWatcher.native);
-          expect(subWatcher1.native).toBe(parentWatcher.native);
-        }
+        expect(subWatcher0.native).toBe(parentWatcher.native);
+        expect(subWatcher1.native).toBe(parentWatcher.native);
 
         // Ensure events are filtered correctly
         await Promise.all([

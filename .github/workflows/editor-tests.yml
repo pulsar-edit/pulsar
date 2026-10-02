@@ -64,65 +64,13 @@ jobs:
         New-Item -ItemType Directory -Force -Path $home2 | Out-Null
         "ATOM_HOME=$home2" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
         Write-Host "ATOM_HOME now points at $home2"
-      # TEMPORARY — delete along with `script/diagnostics/`. Asks
-      # `@parcel/watcher` directly whether unsubscribing a child directory watch
-      # kills an overlapping parent watch, which is the shape our `adopts
-      # existing child watchers` spec hits and the only spec still flaking on
-      # Windows. Repeated because that flake is intermittent; one clean pass
-      # proves nothing.
-    - name: Parcel nested-unsubscribe diagnostic
-      shell: bash
-      run: |
-        # Run it under both hosts. The specs' watcher worker runs under the
-        # Electron binary in Node mode, not the runner's Node: same N-API
-        # binary, different libuv and thread pool, which is the largest
-        # remaining difference between this diagnostic (25 clean runs on
-        # Windows) and the spec that keeps failing.
-        ELECTRON=$(node -p "require('electron')")
-        echo "system node: $(node -v)"
-        echo "electron:    $ELECTRON"
-        for i in 1 2 3; do
-          echo "--- attempt $i (library, system node) ---"
-          node script/diagnostics/parcel-nested-unsubscribe.js
-          echo "--- attempt $i (library, electron as node) ---"
-          ELECTRON_RUN_AS_NODE=1 "$ELECTRON" script/diagnostics/parcel-nested-unsubscribe.js
-        done
-        # The narrow one, and the only hypothesis still standing: that parcel
-        # sometimes hands back a subscription that never delivers. 40 iterations
-        # of each shape, because a few-percent rate needs volume to show up — the
-        # earlier diagnostics each ran a handful of times and watched a single
-        # subscription, which is why they all came back clean.
-        echo "--- delivery-latency sweep ---"
-        node script/diagnostics/parcel-delivery-latency.js 30
-        # One rung up: the real worker, forked exactly as `WatcherTask` forks it,
-        # driven with the same messages the registry sends during an adoption.
-        # Adds the IPC channel, the bootstrap and the worker's own code on top of
-        # the Electron host — everything but the registry and `PathWatcher`.
-        for i in 1 2 3 4 5; do
-          echo "--- attempt $i (real worker over IPC, paced) ---"
-          node script/diagnostics/parcel-worker-ipc.js
-          echo "--- attempt $i (real worker over IPC, pipelined) ---"
-          PIPELINE=1 node script/diagnostics/parcel-worker-ipc.js
-        done
-
     - name: Run Tests
       if: runner.os != 'Linux'
-      run: yarn start --test spec/path-watcher-spec.js # TEMPORARY — restore `spec`
-
-      # TEMPORARY — the other half of the `PULSAR_WATCHER_NO_SHARING` experiment.
-      # Runs the same specs a second time with the native-watcher sharing scheme
-      # bypassed, so the comparison is on one machine in one run rather than
-      # across runs hours apart. `always()` because the first run is expected to
-      # fail sometimes — that failure is the thing being compared against.
-    - name: Run Tests (sharing bypassed)
-      if: ${{ always() && runner.os != 'Linux' }}
-      env:
-        PULSAR_WATCHER_NO_SHARING: '1'
-      run: yarn start --test spec/path-watcher-spec.js
+      run: yarn start --test spec
 
     - name: Run Tests with xvfb-run (Linux)
       if: runner.os == 'Linux'
-      run: xvfb-run --auto-servernum yarn start --test spec/path-watcher-spec.js # TEMPORARY — restore `spec`
+      run: xvfb-run --auto-servernum yarn start --test spec
     # The renderer can die without producing any JS-level output, so we should
     # grab a crashdump whenever that happens.
     - name: Collect crash dumps

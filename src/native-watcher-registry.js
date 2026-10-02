@@ -466,24 +466,6 @@ class NativeWatcherRegistry {
   async attach(watcher) {
     const normalizedDirectory = await watcher.getNormalizedPathPromise();
 
-    // TEMPORARY EXPERIMENT, enabled by `PULSAR_WATCHER_NO_SHARING=1`.
-    //
-    // Skips the sharing scheme entirely: every watcher gets a native of its own,
-    // nothing is consolidated, nothing is adopted, nothing is reattached. The
-    // tree is left empty, so `print` reports nothing and the specs that assert
-    // sharing are expected to fail — they're guarded by the same environment
-    // variable.
-    //
-    // This exists because every narrower experiment inside the handover has come
-    // back negative. If the Windows flake survives even this, adoption isn't the
-    // trigger at all and the spec's only remaining distinguishing feature is
-    // three watchers in one directory tree.
-    if (process.env.PULSAR_WATCHER_NO_SHARING === '1') {
-      const native = this.createNative(normalizedDirectory);
-      watcher.attachToNative(native, normalizedDirectory);
-      return;
-    }
-
     const pathSegments = normalizedDirectory
       .split(path.sep)
       .filter(segment => segment.length > 0);
