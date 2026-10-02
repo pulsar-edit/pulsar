@@ -87,6 +87,13 @@ jobs:
           echo "--- attempt $i (library, electron as node) ---"
           ELECTRON_RUN_AS_NODE=1 "$ELECTRON" script/diagnostics/parcel-nested-unsubscribe.js
         done
+        # The narrow one, and the only hypothesis still standing: that parcel
+        # sometimes hands back a subscription that never delivers. 40 iterations
+        # of each shape, because a few-percent rate needs volume to show up — the
+        # earlier diagnostics each ran a handful of times and watched a single
+        # subscription, which is why they all came back clean.
+        echo "--- dead-subscription sweep ---"
+        node script/diagnostics/parcel-dead-subscription.js 40
         # One rung up: the real worker, forked exactly as `WatcherTask` forks it,
         # driven with the same messages the registry sends during an adoption.
         # Adds the IPC channel, the bootstrap and the worker's own code on top of
