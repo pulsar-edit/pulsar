@@ -247,17 +247,34 @@ class WorkerProcessWatcher extends NativeWatcher {
   // is wrong" threshold, not a latency budget.
   static REPLY_TIMEOUT_MS = 60000;
 
-  // Unexpected worker restarts since the last time we mentioned them to the
-  // user. Unlike `WatcherTask`'s own accounting, this does not expire; it's how
-  // we notice a worker that crashes steadily but slowly enough to be restarted
-  // every time.
-  static respawnCount = 0;
+  // When the worker has restarted unexpectedly, as a list of timestamps. This
+  // is how we notice a worker that crashes steadily, but slowly enough that
+  // `WatcherTask` restarts it every time.
+  static respawnTimes = [];
 
-  // How many restarts to tolerate before suggesting a different watcher.
+  // Whether we've already told the user that the worker keeps crashing. Latched
+  // for the life of the task: they've read the message and been shown the
+  // setting, so saying it again after another six crashes is nagging, not news.
+  //
+  // Deliberately not set by `reportFatalFailure`. A watcher that goes from
+  // crashing-but-coping to dead has gotten worse, and the escalation is worth
+  // reporting even though we've already complained once.
+  static reportedRepeatedCrashes = false;
+
+  // How long a restart stays on the books for the warning below.
+  //
+  // Six crashes over a month is a different thing from six crashes over lunch,
+  // and only the latter says anything about how the watcher is behaving now.
+  static RESPAWN_WINDOW_MS = 60 * 60 * 1000;
+
+  // How many restarts within `RESPAWN_WINDOW_MS` to tolerate before suggesting
+  // a different watcher.
   //
   // Deliberately greater than `WatcherTask`'s `MAX_RESTARTS`: a single burst of
   // rapid crashes ends in `task:failed` and reports itself as a fatal error, and
-  // we don't want a warning about the same incident alongside it.
+  // we don't want a warning about the same incident alongside it. The window is
+  // correspondingly longer for the same reason: this is a "something is
+  // sub-optimal, though we're working around it" threshold, not an alarm.
   static MAX_RESPAWNS_BEFORE_WARNING = 6;
 
   // Keeps track of instances of `WorkerProcessWatch` indexed by ID.
@@ -272,7 +289,8 @@ class WorkerProcessWatcher extends NativeWatcher {
     this.pendingRespawn = false;
     this.logging = this.readLoggingSetting();
     this.reportedFatalFailure = false;
-    this.respawnCount = 0;
+    this.reportedRepeatedCrashes = false;
+    this.respawnTimes = [];
     this.task = new WatcherTask(this.taskPath);
   }
 
@@ -289,6 +307,12 @@ class WorkerProcessWatcher extends NativeWatcher {
   // recovered each time. Events are lost with every restart, so a watcher in
   // this state is worth mentioning without being fatal.
   static reportRepeatedCrashes() {
+    // A task that has already failed fatally can still be started again, and
+    // can still crash afterwards — so this can come up behind an error that
+    // said the same thing about the same worker, only more severely. Stay quiet
+    // rather than piling on.
+    if (this.reportedFatalFailure || this.reportedRepeatedCrashes) return;
+    this.reportedRepeatedCrashes = true;
     atom.notifications?.addWarning('Pulsar’s file watcher keeps crashing.', {
       description:
         'It has restarted several times, and changes to your files may have been missed each time. You can try a different implementation with the **Core → File System Watcher** setting.',
@@ -422,11 +446,12 @@ class WorkerProcessWatcher extends NativeWatcher {
       }
       this.pendingRespawn = true;
 
-      // Reset rather than latch: a worker that goes on crashing should be able
-      // to say so again later, rather than mentioning it once per window.
-      this.respawnCount++;
-      if (this.respawnCount >= this.MAX_RESPAWNS_BEFORE_WARNING) {
-        this.respawnCount = 0;
+      let now = Date.now();
+      this.respawnTimes = this.respawnTimes.filter(
+        t => now - t < this.RESPAWN_WINDOW_MS
+      );
+      this.respawnTimes.push(now);
+      if (this.respawnTimes.length >= this.MAX_RESPAWNS_BEFORE_WARNING) {
         this.reportRepeatedCrashes();
       }
     });

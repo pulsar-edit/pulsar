@@ -1131,6 +1131,113 @@ describe('watchPath', function () {
         await native.stop();
       });
 
+      it('warns about repeated crashes only once per task', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        Isolated.MAX_RESPAWNS_BEFORE_WARNING = 2;
+
+        // Four crashes: two to reach the threshold, two more to pass it again.
+        // Stays under `WatcherTask`'s rapid-restart limit, so none of these is
+        // fatal.
+        for (let i = 0; i < 4; i++) {
+          const respawned = new Promise(resolve =>
+            Isolated.task.once('task:respawned', resolve)
+          );
+          Isolated.task.childProcess.kill('SIGKILL');
+          await respawned;
+        }
+
+        const notifications = atom.notifications
+          .getNotifications()
+          .filter(n => n.getMessage().includes('keeps crashing'));
+        expect(notifications.length).toBe(1);
+
+        await native.stop();
+      });
+
+      it('stays quiet about repeated crashes once it has reported a fatal failure', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        Isolated.MAX_RESPAWNS_BEFORE_WARNING = 2;
+        // A failed task can be started again and crash afresh, so respawns can
+        // follow the fatal error. Stand in for that rather than staging it.
+        Isolated.reportedFatalFailure = true;
+
+        for (let i = 0; i < 2; i++) {
+          const respawned = new Promise(resolve =>
+            Isolated.task.once('task:respawned', resolve)
+          );
+          Isolated.task.childProcess.kill('SIGKILL');
+          await respawned;
+        }
+
+        const notification = atom.notifications
+          .getNotifications()
+          .find(n => n.getMessage().includes('keeps crashing'));
+        expect(notification).toBeFalsy();
+
+        // The suppression is one-way: having warned must not stop a later
+        // fatal failure from reporting the escalation.
+        expect(Isolated.reportedRepeatedCrashes).toBe(false);
+
+        await native.stop();
+      });
+
+      it('still reports a fatal failure after warning about repeated crashes', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        Isolated.reportedRepeatedCrashes = true;
+        Isolated.reportFatalFailure(new Error('worker gave up'));
+
+        const notification = atom.notifications
+          .getNotifications()
+          .find(n => n.getMessage().includes('file watcher has failed'));
+        expect(notification).toBeTruthy();
+
+        await native.stop();
+      });
+
+      it('forgets restarts that fall outside the warning window', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        Isolated.MAX_RESPAWNS_BEFORE_WARNING = 2;
+        // Short enough that the first crash has aged out by the time the second
+        // happens — standing in for the slow crash-every-few-hours case.
+        Isolated.RESPAWN_WINDOW_MS = 1;
+
+        for (let i = 0; i < 2; i++) {
+          const respawned = new Promise(resolve =>
+            Isolated.task.once('task:respawned', resolve)
+          );
+          Isolated.task.childProcess.kill('SIGKILL');
+          await respawned;
+          await wait(5);
+        }
+
+        const notification = atom.notifications
+          .getNotifications()
+          .find(n => n.getMessage().includes('keeps crashing'));
+        expect(notification).toBeFalsy();
+
+        await native.stop();
+      });
+
       it('fails fast rather than waiting when there is no worker to send to', async () => {
         jasmine.useRealClock();
         const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
