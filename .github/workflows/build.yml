@@ -330,6 +330,46 @@ jobs:
         command: yarn install --ignore-engines
         on_retry_command: rm -R node_modules
 
+      # `@parcel/watcher` ships prebuilt, platform-specific binaries as optional
+      # dependencies (`@parcel/watcher-linux-x64-glibc` and friends), and its
+      # `index.js` prefers them over anything in `build/Release`. They're N-API,
+      # so they load under Electron without being rebuilt. Upstream agrees:
+      # the package's `install` script compiles only when
+      # `npm_config_build_from_source=true`, so nothing but `electron-rebuild`
+      # ever asks for a local build.
+      #
+      # We have to stop it asking, because that compile fails on `glibc` 2.32
+      # and below. `src/unix/legacy.cc` blanks out `__THROW` before including
+      # `<sys/stat.h>`; `glibc` declares `stat` twice, taking `noexcept` from
+      # `__THROW` in one declaration and hardcoding it in the other, so the two
+      # end up disagreeing and `g++` rejects them. `glibc` deleted the second
+      # declaration in 2.33 — above the 2.31 floor we support — so we can't fix
+      # this by moving to a newer build image.
+      #
+      # `electron-rebuild` skips any module without a `binding.gyp`
+      # (`rebuildModuleAt` returns early), so removing the file is enough. We
+      # confirm the prebuilt binary actually loads first, so that a missing
+      # prebuild fails here instead of shipping a file watcher that can't start.
+    - name: Prepare `@parcel/watcher`
+      shell: bash
+      run: |
+        rm -f node_modules/@parcel/watcher/binding.gyp
+        # A restored `node_modules` cache may still hold a `watcher.node` built
+        # before we stopped building one. Clear it so the check below can only
+        # be satisfied by the prebuilt package.
+        rm -rf node_modules/@parcel/watcher/build
+        # `yarn` installs every prebuild whose `os`/`cpu` match, which on Linux
+        # means the musl variant as well as the glibc one. `index.js` loads the
+        # musl build only when `detect-libc` reports a musl system, and our
+        # glibc-linked Electron never is — so it can't ever load, it ships in
+        # the artifact regardless, and on arm64 upstream built it against
+        # `GLIBCXX_3.4.29`, which trips `script/check-linux-abi-floor.sh`.
+        rm -rf node_modules/@parcel/watcher-*-musl
+        # Last, so that it tests the state we're actually shipping: if a future
+        # release stops publishing a prebuild for this platform, fail here
+        # rather than ship a file watcher that can't start.
+        node -e "require('@parcel/watcher'); console.log('prebuilt @parcel/watcher loads')"
+
     - name: Rebuild Pulsar Dependencies for Electron (non-Linux)
       if: ${{ runner.os != 'Linux' }}
       uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60
