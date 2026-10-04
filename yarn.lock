@@ -1836,9 +1836,9 @@
     fs-plus "^3.0.0"
 
 "@pulsar-edit/keyboard-layout@^3.0.5":
-  version "3.0.5"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/keyboard-layout/-/keyboard-layout-3.0.5.tgz#efe5c73a5619e40cc1569030e28947176f013a6b"
-  integrity sha512-+Fr3is/HY7E1in7ZgRvCDjkUDDfO8mZdFC1YqaGabUSfMzRAg/jMBR7VEvm57avr1mqpFNOjh+QRzxZciml3YA==
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/keyboard-layout/-/keyboard-layout-3.0.6.tgz#447f80104b807619911021e359743149c99cc522"
+  integrity sha512-soQyy6zIupyWc7pKev/KqpVJ3Uo9UFXk+N82u1ObYWbT3HEwMW8enSsGJxHoj0OqVTA5tUXgd5u18CrYBobZGQ==
   dependencies:
     event-kit "^2.0.0"
     node-addon-api "^7.1.1"
