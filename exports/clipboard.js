@@ -1,4 +1,4 @@
-module.exports = require('electron').clipboard;
+module.exports = require('@electron/remote').clipboard;
 
 const Grim = require('grim');
 Grim.deprecate(

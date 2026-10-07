@@ -1017,7 +1017,12 @@ module.exports = class AtomApplication extends EventEmitter {
       ipcHelpers.on(
         ipcMain,
         'write-text-to-selection-clipboard',
-        (event, text) => clipboard.writeText(text, 'selection')
+        (event, text) => {
+          if (clipboard.selection) {
+            return clipboard.selection.writeText(text);
+          }
+          return clipboard.writeText(text, 'selection');
+        }
       )
     );
 
