@@ -1,5 +1,4 @@
 const path = require('path');
-const { shell } = require('@electron/remote');
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const { CompositeDisposable, Emitter } = require('atom');
@@ -825,7 +824,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return atom.showItemInFolder(filePath);
   }
 
   showCurrentFileInFileManager() {
@@ -837,7 +836,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return atom.showItemInFolder(filePath);
   }
 
   getFileManagerName() {
@@ -932,7 +931,7 @@ class TreeView {
 
           this.emitter.emit('will-delete-entry', meta);
 
-          let promise = shell.trashItem(selectedPath).then(() => {
+          let promise = atom.trashItem(selectedPath).then(() => {
             this.emitter.emit('entry-deleted', meta);
           }).catch(() => {
             this.emitter.emit('delete-entry-failed', meta);

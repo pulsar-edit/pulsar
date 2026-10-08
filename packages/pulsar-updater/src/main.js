@@ -207,10 +207,9 @@ class PulsarUpdater {
 
     const openWebGitHub = (e) => {
       e.preventDefault();
-      shell ??= shell || require("electron").shell;
       let latestVersion = this.cache.getCacheItem("last-update-check")?.latestVersion;
       let tagSegment = latestVersion ? `tag/${latestVersion}` : "";
-      shell.openExternal(`https://github.com/pulsar-edit/pulsar/releases/${tagSegment}`);
+      atom.openExternal(`https://github.com/pulsar-edit/pulsar/releases/${tagSegment}`);
     };
 
     switch (installMethod.installMethod) {
