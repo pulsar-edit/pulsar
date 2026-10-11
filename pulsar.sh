@@ -274,7 +274,7 @@ elif [ $OS == 'Linux' ]; then
   fi
 
   if [ $EXPECT_OUTPUT ]; then
-    "$PULSAR_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox
+    "$PULSAR_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@"
     ATOM_EXIT=$?
     if [ ${ATOM_EXIT} -eq 0 ] && [ -n "${EXIT_CODE_OVERRIDE}" ]; then
       exit "${EXIT_CODE_OVERRIDE}"
@@ -283,7 +283,7 @@ elif [ $OS == 'Linux' ]; then
     fi
   else
     (
-    nohup "$PULSAR_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" --no-sandbox > "$ATOM_HOME/nohup.out" 2>&1
+    nohup "$PULSAR_EXECUTABLE" --executed-from="$(pwd)" --pid=$$ "$@" > "$ATOM_HOME/nohup.out" 2>&1
     if [ $? -ne 0 ]; then
       cat "$ATOM_HOME/nohup.out"
       exit $?
