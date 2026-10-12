@@ -1,4 +1,5 @@
 const Registry = require('winreg');
+const { execFile } = require('child_process');
 const Path = require('path');
 const { getAppName } = require('../get-app-details.js');
 
@@ -34,15 +35,17 @@ class ShellOption {
   register(callback) {
     let doneCount = this.parts.length;
     this.parts.forEach(part => {
-      let reg = new Registry({
-        hive: 'HKCU',
-        key: part.key != null ? `${this.key}\\${part.key}` : this.key
+      const keyPath = `HKCU${part.key != null ? `${this.key}\\${part.key}` : this.key}`;
+      const args = ['ADD', keyPath];
+      if (part.name === '') {
+        args.push('/ve');
+      } else {
+        args.push('/v', part.name);
+      }
+      args.push('/t', 'REG_SZ', '/d', part.value, '/f');
+      execFile('reg.exe', args, { shell: false }, () => {
+        if (--doneCount === 0) return callback();
       });
-      return reg.create(() =>
-        reg.set(part.name, Registry.REG_SZ, part.value, () => {
-          if (--doneCount === 0) return callback();
-        })
-      );
     });
   }
 
