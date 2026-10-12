@@ -1642,17 +1642,36 @@ describe("TreeView", function () {
     describe("when the file exists outside of the project", () => {
       let tempDirOutsideProject, tempFileOutsideProject;
 
+      // These specs move a file into a `bar` directory inside the fixtures —
+      // which are tracked in git. Git can't track an empty directory, so a
+      // `bar` left behind by an earlier run is invisible to `git status` but
+      // very much visible to the specs that assert the contents of the fixture
+      // roots, which will fail on every subsequent run. Clean it up on both
+      // sides: before, in case a previous run left one behind; after, so this
+      // run doesn't.
+      const removeFixtureArtifacts = () => {
+        for (let projectPath of atom.project.getPaths()) {
+          let barPath = path.resolve(projectPath, 'bar');
+          let fooPath = path.resolve(barPath, 'foo.txt');
+          if (fs.existsSync(fooPath)) {
+            fs.unlinkSync(fooPath);
+          }
+          // Guard against `ENOTEMPTY`; if something else is in there, leave it
+          // alone rather than failing the spec run.
+          if (fs.isDirectorySync(barPath) && fs.readdirSync(barPath).length === 0) {
+            fs.rmdirSync(barPath);
+          }
+        }
+      };
+
       beforeEach(() => {
         tempDirOutsideProject = temp.mkdirSync('tree-view-external-path');
         tempFileOutsideProject = path.resolve(tempDirOutsideProject, 'foo.txt');
         fs.writeFileSync(tempFileOutsideProject, '');
-        for (let projectPath of atom.project.getPaths()) {
-          let possibleFixtureNeedingRemoval = path.resolve(projectPath, 'bar', 'foo.txt');
-          if (fs.existsSync(possibleFixtureNeedingRemoval)) {
-            fs.unlinkSync(possibleFixtureNeedingRemoval);
-          }
-        }
+        removeFixtureArtifacts();
       });
+
+      afterEach(() => removeFixtureArtifacts());
 
       describe("and its destination is within the project", () => {
         it("accepts a relative path for a destination when it is unambiguous", async () => {
