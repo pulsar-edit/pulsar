@@ -1,0 +1,25 @@
+{
+  "name": "theme-with-variants",
+  "themes": [
+    {
+      "name": "theme-variant-day-ui",
+      "theme": "ui",
+      "stylesheetsPath": "styles/day-ui"
+    },
+    {
+      "name": "theme-variant-night-ui",
+      "theme": "ui",
+      "stylesheetsPath": "styles/night-ui"
+    },
+    {
+      "name": "theme-variant-day-syntax",
+      "theme": "syntax",
+      "stylesheetsPath": "styles/day-syntax"
+    },
+    {
+      "name": "theme-variant-night-syntax",
+      "theme": "syntax",
+      "stylesheetsPath": "styles/night-syntax"
+    }
+  ]
+}

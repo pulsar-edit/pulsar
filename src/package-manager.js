@@ -600,7 +600,10 @@ module.exports = class PackageManager {
       viewRegistry: this.viewRegistry
     };
 
-    pack = metadata.theme ? new ThemePackage(options) : new Package(options);
+    pack =
+      metadata.theme || Array.isArray(metadata.themes)
+        ? new ThemePackage(options)
+        : new Package(options);
     pack.preload();
     this.preloadedPackages[packageName] = pack;
     return pack;
@@ -705,9 +708,10 @@ module.exports = class PackageManager {
       viewRegistry: this.viewRegistry
     };
 
-    const pack = metadata.theme
-      ? new ThemePackage(options)
-      : new Package(options);
+    const pack =
+      metadata.theme || Array.isArray(metadata.themes)
+        ? new ThemePackage(options)
+        : new Package(options);
     pack.load();
     this.loadedPackages[pack.name] = pack;
     this.emitter.emit('did-load-package', pack);

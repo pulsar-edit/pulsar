@@ -299,7 +299,7 @@ export default class PackageDetailView {
 
   populate () {
     this.refs.title.textContent = `${_.undasherize(_.uncamelcase(this.pack.name))}`
-    this.type = this.pack.metadata.theme ? 'theme' : 'package'
+    this.type = this.pack.metadata.theme || this.pack.metadata.themes ? 'theme' : 'package'
 
     const repoUrl = this.packageManager.getRepositoryUrl(this.pack)
     if (repoUrl) {
