@@ -163,7 +163,7 @@ class CtagsProvider {
   }
 
   getLanguage(editor) {
-    if (['.cson', '.gyp'].includes(path.extname(this.path))) {
+    if (['.cson', '.gyp'].includes(path.extname(this.getPath()))) {
       return 'Cson';
     }
 
