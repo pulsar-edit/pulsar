@@ -56,6 +56,7 @@ class MockNative {
     this.attached = [];
     this.disposed = false;
     this.stopped = false;
+    this.started = false;
 
     this.emitter = new Emitter();
   }
@@ -68,6 +69,20 @@ class MockNative {
 
   onWillStop(callback) {
     return this.emitter.on('will-stop', callback);
+  }
+
+  onDidStart(callback) {
+    return this.emitter.on('did-start', callback);
+  }
+
+  // The registry starts a replacement native itself and waits for `did-start`
+  // before handing the children over, so a mock has to be startable and has to
+  // announce it. Resolved rather than returning nothing, since the registry
+  // relies on the event rather than the return value.
+  start() {
+    this.started = true;
+    this.emitter.emit('did-start');
+    return Promise.resolve();
   }
 
   dispose() {

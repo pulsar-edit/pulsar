@@ -283,8 +283,6 @@ An instance of this class is always available as the `atom` global.
             * [.beep()](#AtomEnvironment+beep)
     * _static_
         * [.preloadPackages](#AtomEnvironment.preloadPackages) ℗
-        * _Event Subscription_
-            * [.onDidBeep(callback)](#AtomEnvironment.onDidBeep) ⇒ <code>Disposable</code>
 
 <a name="AtomEnvironment+clipboard"></a>
 
@@ -373,19 +371,6 @@ Returns output of `preloadPackages()` for this Classes Instance of `Packages`.
 
 **Kind**: static property of [<code>AtomEnvironment</code>](#AtomEnvironment)  
 **Access**: private  
-<a name="AtomEnvironment.onDidBeep"></a>
-
-### AtomEnvironment.onDidBeep(callback) ⇒ <code>Disposable</code>
-Invoke the given callback whenever [::beep](::beep) is called.
-
-**Kind**: static method of [<code>AtomEnvironment</code>](#AtomEnvironment)  
-**Returns**: <code>Disposable</code> - on which `.dispose()` can be called to unsubscribe.  
-**Category**: Event Subscription  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| callback | <code>function</code> | Function to be called whenever [::beep](::beep) is called. |
-
 <a name="Clipboard"></a>
 
 ## Clipboard

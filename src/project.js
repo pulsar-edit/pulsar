@@ -54,9 +54,7 @@ module.exports = class Project extends Model {
       if (repository != null) repository.destroy();
     }
     for (let path in this.watcherPromisesByPath) {
-      this.watcherPromisesByPath[path].then(watcher => {
-        watcher.dispose();
-      });
+      this.disposeWatcherPromise(this.watcherPromisesByPath[path]);
     }
     this.rootDirectories = [];
     this.repositories = [];
@@ -235,7 +233,7 @@ module.exports = class Project extends Model {
   // disposable.dispose()
   // ```
   //
-  // To watch paths outside of open projects, use the `watchPaths` function instead; see {PathWatcher}.
+  // To watch paths outside of open projects, use the `watchPath` function instead; see {PathWatcher}.
   //
   // When writing tests against functionality that uses this method, be sure to wait for the
   // {Promise} returned by {::getWatcherPromise} before manipulating the filesystem to ensure that
@@ -375,9 +373,7 @@ module.exports = class Project extends Model {
     this.repositories = [];
 
     for (let path in this.watcherPromisesByPath) {
-      this.watcherPromisesByPath[path].then(watcher => {
-        watcher.dispose();
-      });
+      this.disposeWatcherPromise(this.watcherPromisesByPath[path]);
     }
     this.watcherPromisesByPath = {};
 
@@ -452,16 +448,20 @@ module.exports = class Project extends Model {
     // We'll use the directory's custom onDidChangeFiles callback, if available.
     // CustomDirectory::onDidChangeFiles should match the signature of
     // Project::onDidChangeFiles below (although it may resolve asynchronously)
-    this.watcherPromisesByPath[directory.getPath()] =
+    const watcherPromise =
       directory.onDidChangeFiles != null
         ? Promise.resolve(directory.onDidChangeFiles(didChangeCallback))
         : watchPath(directory.getPath(), {}, didChangeCallback);
 
+    // A watcher that can't start reports itself — to the console always, and to
+    // the user through a notification when the failure is fatal. We only have
+    // to keep the rejection from going unhandled.
+    watcherPromise.catch(() => {});
+    this.watcherPromisesByPath[directory.getPath()] = watcherPromise;
+
     for (let watchedPath in this.watcherPromisesByPath) {
       if (!this.rootDirectories.find(dir => dir.getPath() === watchedPath)) {
-        this.watcherPromisesByPath[watchedPath].then(watcher => {
-          watcher.dispose();
-        });
+        this.disposeWatcherPromise(this.watcherPromisesByPath[watchedPath]);
       }
     }
 
@@ -532,6 +532,20 @@ module.exports = class Project extends Model {
   // Returns a {Promise} that resolves with the {PathWatcher} associated with this project root
   // once it has initialized and is ready to start sending events. The Promise will reject with
   // an error instead if `projectPath` is not currently a root directory.
+  // Private: Dispose of the watcher a promise resolves to, once it resolves.
+  //
+  // A rejected promise means there was never a watcher to dispose of, and
+  // whatever went wrong has already been reported by the watcher layer — so
+  // there's nothing to do but keep the rejection from going unhandled.
+  disposeWatcherPromise(promise) {
+    promise.then(
+      watcher => {
+        watcher.dispose();
+      },
+      () => {}
+    );
+  }
+
   getWatcherPromise(projectPath) {
     return (
       this.watcherPromisesByPath[projectPath] ||
@@ -564,7 +578,7 @@ module.exports = class Project extends Model {
         if (removedRepository) removedRepository.destroy();
       }
       if (this.watcherPromisesByPath[projectPath] != null) {
-        this.watcherPromisesByPath[projectPath].then(w => w.dispose());
+        this.disposeWatcherPromise(this.watcherPromisesByPath[projectPath]);
       }
       delete this.watcherPromisesByPath[projectPath];
       this.emitter.emit('did-change-paths', this.getPaths());

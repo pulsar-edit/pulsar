@@ -53,6 +53,57 @@ describe("Renders Markdown", () => {
         { rootDomain: "https://github.com/pulsar-edit/pulsar" }
       )).toBe('<p><a href="https://github.com/pulsar-edit/pulsar/blob/HEAD/readme.md">Hello</a></p>\n');
     });
+    it("preserves in-page fragment links", () => {
+      expect(atom.ui.markdown.render(
+        "[Install](#install)",
+        { rootDomain: "https://github.com/pulsar-edit/pulsar" }
+      )).toBe('<p><a href="#install">Install</a></p>\n');
+    });
+    it("still rewrites relative links that contain a fragment", () => {
+      expect(atom.ui.markdown.render(
+        "[Install](./README.md#install)",
+        { rootDomain: "https://github.com/pulsar-edit/pulsar" }
+      )).toBe('<p><a href="https://github.com/pulsar-edit/pulsar/blob/HEAD/README.md#install">Install</a></p>\n');
+    });
+  });
+
+  describe("handles GitHub headings", () => {
+    it("does not add heading ids unless enabled", () => {
+      const output = atom.ui.markdown.render("## Install");
+      expect(output).not.toContain('id=');
+      expect(output).not.toContain('<a');
+    });
+    it("adds a safely prefixed id while preserving the fragment href", () => {
+      const output = atom.ui.markdown.render(
+        "## Install",
+        { useGitHubHeadings: true }
+      );
+      expect(output).toContain('id="user-content-install"');
+      expect(output).toContain('href="#install"');
+    });
+    it("does not inject heading link icons", () => {
+      const output = atom.ui.markdown.render(
+        "## Install",
+        { useGitHubHeadings: true }
+      );
+      expect(output).not.toContain('<svg');
+      expect(output).not.toContain('octicon');
+    });
+    it("keeps DOM-clobbering heading ids after sanitization", () => {
+      const output = atom.ui.markdown.render(
+        "## Title",
+        { useGitHubHeadings: true, sanitize: true }
+      );
+      expect(output).toContain('id="user-content-title"');
+    });
+    it("does not rewrite the heading's own fragment href when a rootDomain is set", () => {
+      const output = atom.ui.markdown.render(
+        "## Install",
+        { useGitHubHeadings: true, rootDomain: "https://github.com/pulsar-edit/pulsar" }
+      );
+      expect(output).toContain('href="#install"');
+      expect(output).not.toContain('blob/HEAD');
+    });
   });
 
   describe("transforms images correctly", () => {
