@@ -103,7 +103,24 @@ class PackageTranspilationRegistry {
         }
         for (let i = 0; i < config.specs.length; i++) {
           const spec = config.specs[i];
-          if (minimatch(filePath, path.join(config.path, spec.glob))) {
+          // The pattern we build here is an absolute path, so on Windows it is
+          // full of `\` separators. `minimatch` treats `\` within a pattern
+          // as an escape character, which would make this match nothing at
+          // all. `windowsPathsNoEscape` restores the separator interpretation.
+          //
+          // We must gate this on the platform ourselves: the option has no
+          // platform check of its own, so passing it unconditionally would
+          // also rewrite legitimate backslashes on macOS and Linux, where `\`
+          // is a valid character in a file name.
+          //
+          // NOTE: This option is in `minimatch` v5+. v3 used the inverse
+          // (`allowWindowsEscape`) and did this conversion by default. If we
+          // ever have a reason to downgrade `minimatch`, we must rework this.
+          if (
+            minimatch(filePath, path.join(config.path, spec.glob), {
+              windowsPathsNoEscape: path.sep !== '/'
+            })
+          ) {
             spec._config = config;
             this.specByFilePath[filePath] = spec;
             return spec;

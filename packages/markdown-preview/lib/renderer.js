@@ -4,6 +4,8 @@ const createDOMPurify = require('dompurify')
 const emoji = require('emoji-images')
 const fs = require('fs-plus')
 let marked = null // Defer until used
+let githubSlugger = null
+let innertext = null
 let renderer = null
 let cheerio = null
 let yamlFrontMatter = null
@@ -108,6 +110,7 @@ function chooseRender(text, filePath) {
       filePath: filePath,
       breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
       useDefaultEmoji: true,
+      useGitHubHeadings: true,
       sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
     })
     return atom.ui.markdown.convertToDOM(html)
@@ -171,17 +174,26 @@ exports.toHTML = async function (text, filePath, grammar) {
 function render(text, filePath) {
   if (marked == null || yamlFrontMatter == null || cheerio == null) {
     marked = require('marked')
+    const GithubSlugger = require('github-slugger')
+    innertext = require('innertext')
     yamlFrontMatter = require('yaml-front-matter')
     cheerio = require('cheerio')
 
     renderer = new marked.Renderer()
+    githubSlugger = new GithubSlugger()
     renderer.listitem = function (text, isTask) {
       const listAttributes = isTask ? ' class="task-list-item"' : ''
 
       return `<li ${listAttributes}>${text}</li>\n`
     }
+    renderer.heading = function (text, level) {
+      const headingText = innertext(text)
+      const id = `user-content-${githubSlugger.slug(headingText)}`
+      return `<h${level} id="${id}">${text}</h${level}>\n`
+    }
   }
 
+  githubSlugger.reset()
   marked.setOptions({
     breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
     renderer

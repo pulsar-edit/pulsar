@@ -61,6 +61,23 @@ let nextId = 0;
  *
  * An instance of this class is always available as the `atom` global.
  */
+// Error messages that should not cause the dev tools to open. These are
+// Chromium notifications that arrive through `window.onerror` despite not
+// indicating a fault; see `installUncaughtErrorHandler`.
+const IGNORED_ERROR_MESSAGES = [
+  // These errors mean that a `ResizeObserver` handler made a change that would
+  // ordinarily trigger a resize and recursively trigger the handler again;
+  // when this happens, Chromium reports it and defers the handler until the
+  // next frame.
+  //
+  // This is not actually an error! It's not unusual to have this happen during
+  // ordinary layout-heavy work. Ideally it would be a `console.warn`. At any
+  // rate, the presence of such an error in the console _definitely_ should not
+  // trigger dev tools opening!
+  /ResizeObserver loop completed with undelivered notifications/,
+  /ResizeObserver loop limit exceeded/
+];
+
 class AtomEnvironment {
 
   constructor(params = {}) {
@@ -488,35 +505,48 @@ class AtomEnvironment {
     // need other disposing objects to be able to check it. We won't need to
     // reset it because another environment will be created.
     this.isDestroying = true;
+    this.emitter.emit('will-destroy');
 
     this.disposables.dispose();
+
     if (this.workspace) this.workspace.destroy();
     this.workspace = null;
     this.themes.workspace = null;
+
     if (this.project) this.project.destroy();
     this.project = null;
+
     this.commands.clear();
+
     if (this.stylesElement) this.stylesElement.remove();
+
     this.uriHandlerRegistry.destroy();
 
     this.uninstallWindowEventHandler();
   }
 
-  /**
-   * @memberof AtomEnvironment
-   * @function onDidBeep
-   * @desc Invoke the given callback whenever {@link ::beep} is called.
-   * @listens ::beep
-   * @param {function} callback - Function to be called whenever {@link ::beep} is called.
-   * @returns {Disposable} on which `.dispose()` can be called to unsubscribe.
-   * @category Event Subscription
-   */
+  // Extend: Invoke the given callback when the environment is destroying, as
+  // happens during window close or reload.
+  //
+  // * `callback` {Function} to be called when the environment starts
+  //   destroying
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onWillDestroy (callback) {
+    return this.emitter.on('will-destroy', callback);
+  }
+
+  // Extended: Invoke the given callback whenever {::beep} is called.
+  //
+  // * `callback` {Function} to be called whenever {::beep} is called
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidBeep(callback) {
     return this.emitter.on('did-beep', callback);
   }
 
   // Extended: Invoke the given callback when there is an unhandled error, but
-  // before the devtools pop open
+  // before the devtools pop open.
   //
   // * `callback` {Function} to be called whenever there is an unhandled error
   //   * `event` {Object}
@@ -1222,7 +1252,12 @@ class AtomEnvironment {
 
       const eventObject = { message, url, line, column, originalError };
 
-      let openDevTools = true;
+      // Calling `preventDefault` will suppress the opening of the dev tools.
+      // But some errors are common enough that we should not let them open
+      // the dev tools under any circumstances.
+      let openDevTools = !IGNORED_ERROR_MESSAGES.some(pattern =>
+        pattern.test(message)
+      );
       eventObject.preventDefault = () => {
         openDevTools = false;
       };
@@ -1429,7 +1464,10 @@ class AtomEnvironment {
   }
 
   async addToProject(projectPaths) {
-    const state = await this.loadState(this.getStateKey(projectPaths));
+    let stateKeyForNewProjectPaths = await this.getStateKey(projectPaths, { pathsOnly: true });
+    const state = await this.loadState(stateKeyForNewProjectPaths);
+    // When this is an “empty” project, adding one or more paths could lead the
+    // window to offer to “adopt” any state that existed for those paths.
     if (state && this.project.getPaths().length === 0) {
       this.attemptRestoreProjectStateForPaths(state, projectPaths);
     } else {
@@ -1518,7 +1556,7 @@ or use Pane::saveItemAs for programmatic saving.`);
     if (this.enablePersistence && this.project) {
       const state = this.serialize(options);
       if (!storageKey)
-        storageKey = this.getStateKey(this.project && this.project.getPaths());
+        storageKey = await this.getStateKey(this.project && this.project.getPaths());
       if (storageKey) {
         await this.stateStore.save(storageKey, state);
       } else {
@@ -1527,17 +1565,17 @@ or use Pane::saveItemAs for programmatic saving.`);
     }
   }
 
-  loadState(stateKey) {
+  async loadState(stateKey) {
     if (this.enablePersistence) {
       if (!stateKey)
-        stateKey = this.getStateKey(this.getLoadSettings().initialProjectRoots);
+        stateKey = await this.getStateKey(this.getLoadSettings().initialProjectRoots);
       if (stateKey) {
-        return this.stateStore.load(stateKey);
+        return await this.stateStore.load(stateKey);
       } else {
-        return this.applicationDelegate.getTemporaryWindowState();
+        return await this.applicationDelegate.getTemporaryWindowState();
       }
     } else {
-      return Promise.resolve(null);
+      return null;
     }
   }
 
@@ -1604,21 +1642,8 @@ or use Pane::saveItemAs for programmatic saving.`);
     }
   }
 
-  getStateKey(paths) {
-    if (paths && paths.length > 0) {
-      const sha1 = crypto
-        .createHash('sha1')
-        .update(
-          paths
-            .slice()
-            .sort()
-            .join('\n')
-        )
-        .digest('hex');
-      return `editor-${sha1}`;
-    } else {
-      return null;
-    }
+  async getStateKey (paths, options = {}) {
+    return this.applicationDelegate.getStateKey(paths, options);
   }
 
   getConfigDirPath() {
@@ -1754,7 +1779,7 @@ or use Pane::saveItemAs for programmatic saving.`);
         missingFolders.map(location => location.pathToOpen)
       );
       const state = await this.loadState(
-        this.getStateKey(Array.from(foldersForStateKey))
+        await this.getStateKey(Array.from(foldersForStateKey), { pathsOnly: true })
       );
 
       // only restore state if this is the first path added to the project
