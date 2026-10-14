@@ -2273,6 +2273,55 @@ describe('TextEditor', () => {
       });
     });
 
+    describe('.selectSubwordsContainingCursors()', () => {
+      it('selects the subword under the cursor in a camelCase identifier', () => {
+        editor.setText('getPreviousWord\n');
+        editor.setCursorBufferPosition([0, 1]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('get');
+
+        editor.setCursorBufferPosition([0, 5]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('Previous');
+
+        editor.setCursorBufferPosition([0, 12]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('Word');
+      });
+
+      it('selects the subword under the cursor in a snake_case identifier', () => {
+        editor.setText('get_previous_word\n');
+        editor.setCursorBufferPosition([0, 1]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('get');
+
+        editor.setCursorBufferPosition([0, 6]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('_previous');
+
+        editor.setCursorBufferPosition([0, 14]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('_word');
+      });
+
+      it('selects the digit sequence under the cursor', () => {
+        editor.setText('version123end\n');
+        editor.setCursorBufferPosition([0, 8]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('123');
+      });
+
+      it('handles multiple cursors across different subwords', () => {
+        editor.setText('getPreviousWord\n');
+        editor.setCursorBufferPosition([0, 1]);
+        editor.addCursorAtBufferPosition([0, 5]);
+        editor.addCursorAtBufferPosition([0, 12]);
+        editor.selectSubwordsContainingCursors();
+        const texts = editor.getSelections().map(s => s.getText());
+        expect(texts).toEqual(['get', 'Previous', 'Word']);
+      });
+    });
+
     describe('.selectToFirstCharacterOfLine()', () => {
       it("moves to the first character of the current line or the beginning of the line if it's already on the first character", () => {
         editor.setCursorScreenPosition([0, 5]);

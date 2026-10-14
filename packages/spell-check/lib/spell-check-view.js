@@ -36,7 +36,8 @@ module.exports = SpellCheckView = class SpellCheckView {
                 let marker;
                 if (
                     (marker = this.markerLayer.findMarkers({
-                        containsBufferPosition: this.editor.getCursorBufferPosition(),
+                        containsBufferPosition:
+                            this.editor.getCursorBufferPosition(),
                     })[0])
                 ) {
                     if (CorrectionsView == null) {
@@ -139,7 +140,8 @@ module.exports = SpellCheckView = class SpellCheckView {
         this.unsubscribeFromBuffer();
 
         if (this.spellCheckCurrentGrammar()) {
-            this.scopesToSpellCheck = this.getSpellCheckScopesForCurrentGrammar();
+            this.scopesToSpellCheck =
+                this.getSpellCheckScopesForCurrentGrammar();
             this.buffer = this.editor.getBuffer();
             this.bufferDisposable = new CompositeDisposable(
                 this.buffer.onDidStopChanging(
@@ -289,9 +291,8 @@ module.exports = SpellCheckView = class SpellCheckView {
         const currentScreenPosition = atom.views
             .getView(this.editor)
             .component.screenPositionForMouseEvent(mouseEvent);
-        const currentBufferPosition = this.editor.bufferPositionForScreenPosition(
-            currentScreenPosition
-        );
+        const currentBufferPosition =
+            this.editor.bufferPositionForScreenPosition(currentScreenPosition);
 
         // Check to see if the selected word is incorrect.
         if (

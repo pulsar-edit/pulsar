@@ -37,17 +37,26 @@ describe("SearchSettingsPanel", () => {
       let obj = searchSettingsPanel.getScore("hello world", "hello");
       expect(typeof obj === "object").toBe(true);
       expect(typeof obj.score === "number").toBe(true);
-      expect(typeof obj.sequence === "string").toBe(true);
+      expect(Array.isArray(obj.matchIndexes)).toBe(true);
     });
 
-    it("Returns the expected sequence", () => {
+    it("Returns a positive score for a matching query", () => {
       let obj = searchSettingsPanel.getScore("hello world", "hello");
-      expect(obj.sequence).toBe("hello");
+      expect(obj.score).toBeGreaterThan(0);
+      expect(obj.matchIndexes.length).toBeGreaterThan(0);
     });
 
-    it("Returns the expected score", () => {
-      let obj = searchSettingsPanel.getScore("bank", "ba");
-      expect(obj.score).toBe(0.5)
+    it("Returns zero score for non-matching query", () => {
+      let obj = searchSettingsPanel.getScore("hello", "xyz");
+      expect(obj.score).toBe(0);
+      expect(obj.matchIndexes.length).toBe(0);
+    });
+
+    it("Returns zero score for empty inputs", () => {
+      let obj = searchSettingsPanel.getScore(null, "hello");
+      expect(obj.score).toBe(0);
+      obj = searchSettingsPanel.getScore("hello", null);
+      expect(obj.score).toBe(0);
     });
 
   });
@@ -68,19 +77,10 @@ describe("SearchSettingsPanel", () => {
         "tabSetting"
       );
 
-      expect(typeof obj.title === "object").toBe(true);
-      expect(typeof obj.title.score === "number").toBe(true);
-      expect(typeof obj.title.sequence === "string").toBe(true);
-      expect(typeof obj.description === "object").toBe(true);
-      expect(typeof obj.description.score === "number").toBe(true);
-      expect(typeof obj.description.sequence === "string").toBe(true);
-      expect(typeof obj.settingName === "object").toBe(true);
-      expect(typeof obj.settingName.score === "number").toBe(true);
-      expect(typeof obj.settingName.sequence === "string").toBe(true);
-      expect(typeof obj.settingItem === "object").toBe(true);
-      expect(typeof obj.settingItem.score === "number").toBe(true);
-      expect(typeof obj.settingItem.sequence === "string").toBe(true);
       expect(typeof obj.totalScore === "number").toBe(true);
+      expect(obj.totalScore).toBeGreaterThan(0);
+      expect(Array.isArray(obj.matchIndexes)).toBe(true);
+      expect(obj.matchIndexes.length).toBeGreaterThan(0);
     });
   });
 

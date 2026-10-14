@@ -3856,6 +3856,11 @@ module.exports = class TextEditor {
     return this.expandSelectionsForward(selection => selection.selectWord());
   }
 
+  // Extended: Select the subword surrounding each cursor.
+  selectSubwordsContainingCursors() {
+    return this.expandSelectionsForward(selection => selection.selectSubword());
+  }
+
   // Selection Extended
 
   // Extended: For each selection, move its cursor to the preceding word boundary
@@ -5806,7 +5811,7 @@ module.exports = class TextEditor {
     if (!languageMode.useAsyncParsing || !languageMode.useAsyncIndent) return;
 
     let promise = languageMode.atTransactionEnd().then(
-      ({ range, autoIndentRequests }) => {
+      ({ range, autoIndentRequests } = {}) => {
         if (!range || this.didAdjustIndent) return;
         // When `force` is not `true`, will only try to auto-indent this
         // transaction's range if the language mode reports that one of its

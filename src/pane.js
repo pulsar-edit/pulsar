@@ -1171,13 +1171,17 @@ module.exports = class Pane {
     return saveDialogPromise;
   }
 
-  // Public: Save all items.
-  saveItems() {
+  // Public: Save all modified items in this pane.
+  //
+  // Returns a {Promise} that resolves when all items have been saved.
+  async saveItems() {
+    let promises = [];
     for (let item of this.getItems()) {
       if (interpret(item, 'isModified')) {
-        this.saveItem(item);
+        promises.push(this.saveItem(item));
       }
     }
+    return await Promise.all(promises);
   }
 
   // Public: Return the first item that matches the given URI or undefined if

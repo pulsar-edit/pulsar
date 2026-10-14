@@ -6,7 +6,6 @@ const path = require('path');
 const temp = require('temp').track();
 const os = require('os');
 const remote = require('@electron/remote');
-const {shell} = remote;
 const Directory = require('../lib/directory');
 const eventHelpers = require("./event-helpers");
 const { setDebug } = require('../lib/helpers');
@@ -1642,17 +1641,36 @@ describe("TreeView", function () {
     describe("when the file exists outside of the project", () => {
       let tempDirOutsideProject, tempFileOutsideProject;
 
+      // These specs move a file into a `bar` directory inside the fixtures —
+      // which are tracked in git. Git can't track an empty directory, so a
+      // `bar` left behind by an earlier run is invisible to `git status` but
+      // very much visible to the specs that assert the contents of the fixture
+      // roots, which will fail on every subsequent run. Clean it up on both
+      // sides: before, in case a previous run left one behind; after, so this
+      // run doesn't.
+      const removeFixtureArtifacts = () => {
+        for (let projectPath of atom.project.getPaths()) {
+          let barPath = path.resolve(projectPath, 'bar');
+          let fooPath = path.resolve(barPath, 'foo.txt');
+          if (fs.existsSync(fooPath)) {
+            fs.unlinkSync(fooPath);
+          }
+          // Guard against `ENOTEMPTY`; if something else is in there, leave it
+          // alone rather than failing the spec run.
+          if (fs.isDirectorySync(barPath) && fs.readdirSync(barPath).length === 0) {
+            fs.rmdirSync(barPath);
+          }
+        }
+      };
+
       beforeEach(() => {
         tempDirOutsideProject = temp.mkdirSync('tree-view-external-path');
         tempFileOutsideProject = path.resolve(tempDirOutsideProject, 'foo.txt');
         fs.writeFileSync(tempFileOutsideProject, '');
-        for (let projectPath of atom.project.getPaths()) {
-          let possibleFixtureNeedingRemoval = path.resolve(projectPath, 'bar', 'foo.txt');
-          if (fs.existsSync(possibleFixtureNeedingRemoval)) {
-            fs.unlinkSync(possibleFixtureNeedingRemoval);
-          }
-        }
+        removeFixtureArtifacts();
       });
+
+      afterEach(() => removeFixtureArtifacts());
 
       describe("and its destination is within the project", () => {
         it("accepts a relative path for a destination when it is unambiguous", async () => {
@@ -3227,7 +3245,7 @@ describe("TreeView", function () {
         fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
         treeView.focus();
 
-        spyOn(shell, 'trashItem').andCallFake(() => {
+        spyOn(atom, 'trashItem').andCallFake(() => {
           return Promise.reject(false);
         });
 
@@ -4410,17 +4428,17 @@ describe("TreeView", function () {
   });
 
   describe("showSelectedEntryInFileManager()", function () {
-    beforeEach(() => spyOn(shell, 'showItemInFolder').andReturn(false));
+    beforeEach(() => spyOn(atom, 'showItemInFolder').andReturn(false));
 
     it("does nothing if no entry is selected", function () {
       treeView.deselect();
       treeView.showSelectedEntryInFileManager();
-      expect(shell.showItemInFolder).not.toHaveBeenCalled();
+      expect(atom.showItemInFolder).not.toHaveBeenCalled();
     });
 
     it("shows the selected entry in the OS's file manager", function () {
       treeView.showSelectedEntryInFileManager();
-      expect(shell.showItemInFolder).toHaveBeenCalled();
+      expect(atom.showItemInFolder).toHaveBeenCalled();
     });
 
     it("displays a notification if showing the file fails", function () {
@@ -4432,13 +4450,13 @@ describe("TreeView", function () {
   });
 
   describe("showCurrentFileInFileManager()", function () {
-    beforeEach(() => spyOn(shell, 'showItemInFolder').andReturn(false));
+    beforeEach(() => spyOn(atom, 'showItemInFolder').andReturn(false));
 
     it("does nothing when no file is opened", function () {
       expect(atom.workspace.getCenter().getPaneItems().length).toBe(0);
 
       treeView.showCurrentFileInFileManager();
-      expect(shell.showItemInFolder).not.toHaveBeenCalled();
+      expect(atom.showItemInFolder).not.toHaveBeenCalled();
     });
 
     it("does nothing when only an untitled tab is opened", function () {
@@ -4447,7 +4465,7 @@ describe("TreeView", function () {
       return runs(function () {
         workspaceElement.focus();
         treeView.showCurrentFileInFileManager();
-        expect(shell.showItemInFolder).not.toHaveBeenCalled();
+        expect(atom.showItemInFolder).not.toHaveBeenCalled();
       });
     });
 
@@ -4458,7 +4476,7 @@ describe("TreeView", function () {
 
       return runs(function () {
         treeView.showCurrentFileInFileManager();
-        expect(shell.showItemInFolder).toHaveBeenCalled();
+        expect(atom.showItemInFolder).toHaveBeenCalled();
       });
     });
 

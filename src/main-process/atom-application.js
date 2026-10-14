@@ -2,6 +2,7 @@ const AtomWindow = require('./atom-window');
 const ApplicationMenu = require('./application-menu');
 const AtomProtocolHandler = require('./atom-protocol-handler');
 const { onDidChangeScrollbarStyle, getScrollbarStyle } = require('./scrollbar-style');
+const { getStateKey, releaseStateKey, reserveStateKey } = require('./state-keys');
 const StorageFolder = require('../storage-folder');
 const Config = require('../config');
 const ConfigFile = require('../config-file');
@@ -134,6 +135,62 @@ ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
 
 ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
+});
+
+// Handle file deletion requests.
+//
+// Works around https://github.com/electron/electron/issues/29598, which seems
+// to be the cause of failed deletion attempts on Windows.
+ipcMain.handle('trashItem', async (_, filePath) => {
+  // We can't toss a promise over the wall, so we'll `await` it on our side and
+  // report the progress back to the renderer.
+  //
+  // If we return an `Error` object from this handler in the case of error,
+  // `ipcRenderer.invoke` will detect it and wrap it with its own explanation.
+  // We want to preserve the original error and hide the implementation
+  // details, so we instead return an object with an explicit `outcome`
+  // property to avoid this behavior.
+  try {
+    // `shell.trashItem` resolves with an empty value on success…
+    let result = await shell.trashItem(filePath);
+    return { outcome: 'success', result };
+  } catch (error) {
+    // …and rejects on failure.
+    return { outcome: 'failure', error };
+  }
+});
+
+ipcMain.handle('showItemInFolder', async (_, filePath) => {
+  try {
+    // Result will be `undefined`, but might as well return it in case of a
+    // future Electron API change.
+    //
+    // Unlike the others, this method does not return a promise; but we must go
+    // async anyway.
+    let result = shell.showItemInFolder(filePath);
+    return { outcome: 'success', result };
+  } catch (error) {
+    // Not sure whether this can even fail, but might as well handle it.
+    return { outcome: 'failure', error };
+  }
+});
+
+ipcMain.handle('openPath', async (_, filePath) => {
+  try {
+    let result = await shell.openPath(filePath);
+    return { outcome: 'success', result };
+  } catch (error) {
+    return { outcome: 'failure', error };
+  }
+});
+
+ipcMain.handle('openExternal', async (_, url) => {
+  try {
+    let result = await shell.openExternal(url);
+    return { outcome: 'success', result };
+  } catch (error) {
+    return { outcome: 'failure', error };
+  }
 });
 
 // The application's singleton class.
@@ -340,6 +397,7 @@ module.exports = class AtomApplication extends EventEmitter {
   openWithOptions(options) {
     const {
       pathsToOpen,
+      stateKey,
       executedFrom,
       foldersToOpen,
       urlsToOpen,
@@ -363,6 +421,7 @@ module.exports = class AtomApplication extends EventEmitter {
       return this.runTests({
         headless: true,
         devMode,
+        stateKey,
         resourcePath: this.resourcePath,
         executedFrom,
         pathsToOpen,
@@ -395,6 +454,7 @@ module.exports = class AtomApplication extends EventEmitter {
         clearWindowState,
         addToLastWindow,
         preserveFocus,
+        stateKey,
         env
       });
     } else if (urlsToOpen && urlsToOpen.length > 0) {
@@ -427,6 +487,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
   // Public: Removes the {AtomWindow} from the global window list.
   removeWindow(window) {
+    releaseStateKey(window);
     this.windowStack.removeWindow(window);
     if (this.getAllWindows().length === 0 && process.platform !== 'darwin') {
       app.quit();
@@ -1006,6 +1067,15 @@ module.exports = class AtomApplication extends EventEmitter {
         window => window.temporaryState
       )
     );
+    this.disposable.add(
+      ipcHelpers.respondTo(
+        'get-state-key',
+        (browserWindow, projectPaths, options) => {
+          const win = this.atomWindowForBrowserWindow(browserWindow);
+          return getStateKey(win, projectPaths, options);
+        }
+      )
+    );
 
     this.disposable.add(
       ipcHelpers.respondTo('set-temporary-window-state', (win, state) => {
@@ -1268,6 +1338,7 @@ module.exports = class AtomApplication extends EventEmitter {
   async openPaths({
     pathsToOpen,
     foldersToOpen,
+    stateKey,
     executedFrom,
     pidToKillWhenClosed,
     newWindow,
@@ -1427,6 +1498,9 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       openedWindow.preserveFocus = preserveFocus;
       this.addWindow(openedWindow);
+      if (stateKey) {
+        reserveStateKey(openedWindow, stateKey);
+      }
       openedWindow.focus();
     }
 
@@ -1505,7 +1579,10 @@ module.exports = class AtomApplication extends EventEmitter {
       version: APPLICATION_STATE_VERSION,
       windows: windows
         .filter(window => !window.isSpec)
-        .map(window => ({ projectRoots: window.projectRoots }))
+        .map(window => ({
+          projectRoots: window.projectRoots,
+          stateKey: getStateKey(window, window.projectRoots)
+        }))
     };
     state.windows.reverse();
 
@@ -1526,6 +1603,7 @@ module.exports = class AtomApplication extends EventEmitter {
       // Schema: {version: '1', windows: [{projectRoots: ['<root-dir>', ...]}, ...]}
       return state.windows.map(each => ({
         foldersToOpen: each.projectRoots,
+        stateKey: each.stateKey,
         devMode: this.devMode,
         safeMode: this.safeMode,
         newWindow: true
