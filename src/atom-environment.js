@@ -532,7 +532,7 @@ class AtomEnvironment {
   //   destroying
   //
   // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
-  onWillDestroy (callback) {
+  onWillDestroy(callback) {
     return this.emitter.on('will-destroy', callback);
   }
 
@@ -857,7 +857,7 @@ class AtomEnvironment {
   //
   // Returns a {Promise} that resolves when the operation has completed or
   // rejects in the event of failure.
-  openPath (filePath) {
+  openPath(filePath) {
     return this.applicationDelegate.openPath(filePath);
   }
 
@@ -870,7 +870,7 @@ class AtomEnvironment {
   //
   // Returns a {Promise} that resolves when the operation has completed or
   // rejects in the event of failure.
-  openExternal (url) {
+  openExternal(url) {
     return this.applicationDelegate.openExternalDirect(url);
   }
 
@@ -1200,6 +1200,7 @@ class AtomEnvironment {
   }
 
   async prepareToUnloadEditorWindow() {
+    await this.project.resurrectAllDeletedBuffers();
     try {
       await this.saveState({ isUnloading: true });
     } catch (error) {
@@ -1642,7 +1643,7 @@ or use Pane::saveItemAs for programmatic saving.`);
     }
   }
 
-  async getStateKey (paths, options = {}) {
+  async getStateKey(paths, options = {}) {
     return this.applicationDelegate.getStateKey(paths, options);
   }
 

@@ -1976,20 +1976,20 @@
   dependencies:
     node-addon-api "^8.8.0"
 
-"@pulsar-edit/superstring@^3.0.4", "@pulsar-edit/superstring@^3.0.7":
-  version "3.0.7"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/superstring/-/superstring-3.0.7.tgz#b12c2be6e1044d1de3c25470f9ea83c9a0721403"
-  integrity sha512-4vyvV3jfPubocIL+WfGMPQv9Q2kbxWjpdEU1Ar+CQdumv3Cyugv/gtg57N8s6s0mVhlBU45eE5rH0fItcNdFzA==
+"@pulsar-edit/superstring@^3.0.4", "@pulsar-edit/superstring@^3.0.8":
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/superstring/-/superstring-3.0.8.tgz#897b0f6c3af1911bf15e152e93b324c67c04fe2e"
+  integrity sha512-iGnodyvD9eHPD75xykgPy1d/wyx4tn/gPRZzm3bTQ3kBywBwhom6jVLtHeq8IBnL4APqoJ8WgAvU24G+tOT7RA==
   dependencies:
     node-addon-api "^8.5.0"
 
-"@pulsar-edit/text-buffer@^15.1.0":
-  version "15.1.0"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/text-buffer/-/text-buffer-15.1.0.tgz#dbb392666e27f5f445b4bb6a788bd055c5d1573b"
-  integrity sha512-Q7hfrKYEk1EpYdmrCKQBBjkJfqCKMv1DnyaOr49t10gWtCEoQXT0ive1KlFwvwAE5YtZm3DwnPiEXq1sw68Fkg==
+"@pulsar-edit/text-buffer@^15.1.1":
+  version "15.1.1"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/text-buffer/-/text-buffer-15.1.1.tgz#557af53a5e54d041f9a8fcf1a5e04f425e68d202"
+  integrity sha512-akvv+sqZIFg9cA+Owp30hyXBnPLEf9IH5p1Fs80rPLil8adKohDopTu/gAO1Jc6GjQCoDql7kBJNiVMZXht1oQ==
   dependencies:
     "@pulsar-edit/pathwatcher" "^9.0.4"
-    "@pulsar-edit/superstring" "^3.0.4"
+    "@pulsar-edit/superstring" "^3.0.8"
     delegato "^1.0.0"
     diff "^2.2.1"
     event-kit "^2.4.0"

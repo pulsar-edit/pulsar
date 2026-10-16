@@ -8,6 +8,7 @@ module.exports = class WindowEventHandler {
     this.handleDocumentKeyEvent = this.handleDocumentKeyEvent.bind(this);
     this.handleFocusNext = this.handleFocusNext.bind(this);
     this.handleFocusPrevious = this.handleFocusPrevious.bind(this);
+    this.handleWindowFocus = this.handleWindowFocus.bind(this);
     this.handleWindowBlur = this.handleWindowBlur.bind(this);
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleEnterFullScreen = this.handleEnterFullScreen.bind(this);
@@ -237,6 +238,15 @@ module.exports = class WindowEventHandler {
 
   handleWindowFocus() {
     this.document.body.classList.remove('is-blurred');
+
+    // The active editor's file may have been restored while the window was in
+    // the background. If it's within a project, the project's file watcher
+    // has probably noticed already; this covers files outside any project
+    // root.
+    let editor = this.atomEnvironment.workspace.getActiveTextEditor();
+    if (editor) {
+      this.atomEnvironment.project.resurrectBufferIfDeleted(editor.getBuffer());
+    }
   }
 
   handleWindowBlur() {

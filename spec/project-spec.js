@@ -6,6 +6,7 @@ const path = require('path');
 const { Directory } = require('@pulsar-edit/pathwatcher');
 const { stopAllWatchers } = require('../src/path-watcher');
 const GitRepository = require('../src/git-repository');
+const { conditionPromise } = require('./helpers/async-spec-helpers');
 
 describe('Project', () => {
   beforeEach(() => {
@@ -979,6 +980,104 @@ describe('Project', () => {
       fs.writeFileSync(fileOne, 'one\n');
       await waitForEvents([fileOne, fileTwo]);
       expect(events.some(event => event.path === fileThree)).toBeFalsy();
+    });
+  });
+
+  describe('when a deleted buffer’s file is recreated within a project path', () => {
+    let projectDir, filePath;
+
+    // Resolves with the next value the buffer reports for its deleted status.
+    const nextDeletedStatus = buffer =>
+      new Promise(resolve => {
+        const disposable = buffer.onDidChangeDeleted(status => {
+          disposable.dispose();
+          resolve(status);
+        });
+      });
+
+    beforeEach(async () => {
+      jasmine.useRealClock();
+      await stopAllWatchers();
+
+      // Deliberately not `realpath`ed; on macOS this lives under a symlink
+      // (`/var` → `/private/var`), and buffer paths should still match the
+      // paths reported by the project's watcher.
+      projectDir = temp.mkdirSync('atom-spec-project-resurrect');
+      filePath = path.join(projectDir, 'file.txt');
+      fs.writeFileSync(filePath, 'original\n');
+
+      atom.project.setPaths([projectDir]);
+      await atom.project.getWatcherPromise(projectDir);
+    });
+
+    it('resurrects the buffer and reloads its contents', async () => {
+      const buffer = await atom.project.bufferForPath(filePath);
+      expect(buffer.getText()).toBe('original\n');
+
+      let deleted = nextDeletedStatus(buffer);
+      fs.unlinkSync(filePath);
+      expect(await deleted).toBe(true);
+
+      deleted = nextDeletedStatus(buffer);
+      fs.writeFileSync(filePath, 'recreated\n');
+      expect(await deleted).toBe(false);
+
+      await conditionPromise(
+        () => buffer.getText() === 'recreated\n',
+        'buffer to reload recreated file'
+      );
+      expect(buffer.isDeleted()).toBe(false);
+      expect(buffer.isModified()).toBe(false);
+    });
+
+    it('preserves unsaved changes in a modified buffer', async () => {
+      const buffer = await atom.project.bufferForPath(filePath);
+      buffer.setText('unsaved\n');
+
+      let deleted = nextDeletedStatus(buffer);
+      fs.unlinkSync(filePath);
+      expect(await deleted).toBe(true);
+
+      deleted = nextDeletedStatus(buffer);
+      fs.writeFileSync(filePath, 'recreated\n');
+      expect(await deleted).toBe(false);
+
+      expect(buffer.getText()).toBe('unsaved\n');
+      expect(buffer.isDeleted()).toBe(false);
+    });
+
+    it('only resurrects deleted buffers whose own files reappear', async () => {
+      const buffer = await atom.project.bufferForPath(filePath);
+      spyOn(buffer, 'resurrect').and.callThrough();
+
+      // A second, deleted buffer ensures that `deletedBuffers` is non-empty, so
+      // the path-matching logic actually runs.
+      const otherFilePath = path.join(projectDir, 'other.txt');
+      fs.writeFileSync(otherFilePath, 'other\n');
+      const otherBuffer = await atom.project.bufferForPath(otherFilePath);
+      spyOn(otherBuffer, 'resurrect').and.callThrough();
+
+      const deleted = nextDeletedStatus(otherBuffer);
+      fs.unlinkSync(otherFilePath);
+      expect(await deleted).toBe(true);
+      expect(atom.project.deletedBuffers.has(otherBuffer)).toBe(true);
+
+      // The project's watcher reports real paths.
+      const realFilePath = fs.realpathSync(filePath);
+      const sawEvent = new Promise(resolve => {
+        const disposable = atom.project.onDidChangeFiles(events => {
+          if (events.some(event => event.path === realFilePath)) {
+            disposable.dispose();
+            resolve();
+          }
+        });
+      });
+      fs.writeFileSync(filePath, 'changed\n');
+      await sawEvent;
+
+      expect(buffer.resurrect).not.toHaveBeenCalled();
+      expect(otherBuffer.resurrect).not.toHaveBeenCalled();
+      expect(otherBuffer.isDeleted()).toBe(true);
     });
   });
 

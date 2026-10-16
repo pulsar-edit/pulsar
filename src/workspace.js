@@ -695,6 +695,13 @@ module.exports = class Workspace extends Model {
   }
 
   didChangeActivePaneItem(item) {
+    // An editor's file may have been restored while the editor was in the
+    // background. This is a last resort for files that no project watcher has
+    // seen restored.
+    if (this.isTextEditor(item)) {
+      this.project.resurrectBufferIfDeleted(item.getBuffer());
+    }
+
     this.updateWindowTitle();
     this.updateDocumentEdited();
     if (this.activeItemSubscriptions) this.activeItemSubscriptions.dispose();

@@ -1762,6 +1762,63 @@ describe('Workspace', () => {
     });
   });
 
+  describe('when an editor becomes active', () => {
+    let filePath;
+
+    // Resolves with the next value the buffer reports for its deleted status.
+    const nextDeletedStatus = buffer =>
+      new Promise(resolve => {
+        const disposable = buffer.onDidChangeDeleted(status => {
+          disposable.dispose();
+          resolve(status);
+        });
+      });
+
+    beforeEach(() => {
+      // Outside of any project root, so that no project watcher will notice
+      // when the file is restored.
+      const dir = temp.mkdirSync('atom-spec-workspace-resurrect');
+      filePath = path.join(dir, 'restored.txt');
+      fs.writeFileSync(filePath, 'original\n');
+    });
+
+    it('resurrects its buffer if the buffer’s file was deleted and has been restored', async () => {
+      const editor = await workspace.open(filePath);
+      const buffer = editor.getBuffer();
+      await workspace.open('a');
+      expect(workspace.getActiveTextEditor()).not.toBe(editor);
+
+      let deleted = nextDeletedStatus(buffer);
+      fs.unlinkSync(filePath);
+      expect(await deleted).toBe(true);
+
+      // Nothing else should notice the file's return.
+      fs.writeFileSync(filePath, 'restored\n');
+      await timeoutPromise(500);
+      expect(atom.project.deletedBuffers.has(buffer)).toBe(true);
+
+      deleted = nextDeletedStatus(buffer);
+      workspace.getActivePane().activateItem(editor);
+      expect(await deleted).toBe(false);
+
+      await conditionPromise(
+        () => buffer.getText() === 'restored\n',
+        'buffer to reload restored file'
+      );
+      expect(buffer.isDeleted()).toBe(false);
+    });
+
+    it('does not resurrect its buffer if the buffer was never deleted', async () => {
+      const editor = await workspace.open(filePath);
+      spyOn(editor.getBuffer(), 'resurrect').and.callThrough();
+      await workspace.open('a');
+
+      workspace.getActivePane().activateItem(editor);
+      expect(workspace.getActiveTextEditor()).toBe(editor);
+      expect(editor.getBuffer().resurrect).not.toHaveBeenCalled();
+    });
+  });
+
   describe('when an editor is copied because its pane is split', () => {
     it('sets up the new editor to be configured by the text editor registry', async () => {
       await atom.packages.activatePackage('language-javascript');
