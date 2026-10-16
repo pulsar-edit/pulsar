@@ -1048,36 +1048,42 @@ describe('Project', () => {
 
     it('only resurrects deleted buffers whose own files reappear', async () => {
       const buffer = await atom.project.bufferForPath(filePath);
-      spyOn(buffer, 'resurrect').and.callThrough();
 
       // A second, deleted buffer ensures that `deletedBuffers` is non-empty, so
       // the path-matching logic actually runs.
       const otherFilePath = path.join(projectDir, 'other.txt');
       fs.writeFileSync(otherFilePath, 'other\n');
       const otherBuffer = await atom.project.bufferForPath(otherFilePath);
-      spyOn(otherBuffer, 'resurrect').and.callThrough();
 
       const deleted = nextDeletedStatus(otherBuffer);
       fs.unlinkSync(otherFilePath);
       expect(await deleted).toBe(true);
       expect(atom.project.deletedBuffers.has(otherBuffer)).toBe(true);
 
-      // The project's watcher reports real paths.
-      const realFilePath = fs.realpathSync(filePath);
-      const sawEvent = new Promise(resolve => {
-        const disposable = atom.project.onDidChangeFiles(events => {
-          if (events.some(event => event.path === realFilePath)) {
-            disposable.dispose();
-            resolve();
-          }
-        });
-      });
-      fs.writeFileSync(filePath, 'changed\n');
-      await sawEvent;
+      // Feed events directly rather than waiting on the watcher. How a real
+      // watcher batches events varies by platform; on Windows, stray events
+      // from creating `other.txt` can arrive after its deletion. (The specs
+      // above cover resurrection via the watcher end-to-end.)
+      spyOn(buffer, 'resurrect').and.returnValue(Promise.resolve());
+      spyOn(otherBuffer, 'resurrect').and.returnValue(Promise.resolve());
 
+      // The project's watcher reports real paths.
+      const realDir = fs.realpathSync(projectDir);
+
+      atom.project.resurrectDeletedBuffers([
+        { action: 'modified', path: path.join(realDir, 'file.txt') }
+      ]);
       expect(buffer.resurrect).not.toHaveBeenCalled();
       expect(otherBuffer.resurrect).not.toHaveBeenCalled();
-      expect(otherBuffer.isDeleted()).toBe(true);
+
+      // A real `created` event implies that the file exists, which matters
+      // when matching via realpath.
+      fs.writeFileSync(otherFilePath, 'other\n');
+      atom.project.resurrectDeletedBuffers([
+        { action: 'created', path: path.join(realDir, 'other.txt') }
+      ]);
+      expect(buffer.resurrect).not.toHaveBeenCalled();
+      expect(otherBuffer.resurrect).toHaveBeenCalled();
     });
   });
 
