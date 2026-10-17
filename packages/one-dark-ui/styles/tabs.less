@@ -47,12 +47,6 @@
         --tab-color: @tab-text-color-active;
       }
     }
-    &.deleted {
-      --tab-color: @text-color-error;
-    }
-    &.conflicted:not(.deleted) {
-      --tab-color: @text-color-warning;
-    }
     &:first-of-type {
       border-left-color: transparent;
     }
@@ -140,6 +134,16 @@
 
     &:not(.active) {
       --tab-color: @tab-inactive-status-deleted;
+    }
+  }
+
+  // Deleted state ----------------------
+
+  .tab.conflicted:not(.deleted) {
+    --tab-color: @text-color-warning;
+
+    &:not(.active) {
+      --tab-color: @tab-inactive-status-modified;
     }
   }
 
