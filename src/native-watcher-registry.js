@@ -8,39 +8,45 @@ function absolute(...parts) {
     : path.join(path.sep, candidate);
 }
 
-// Private: Map userland filesystem watcher subscriptions efficiently to deliver filesystem change notifications to
-// each watcher with the most efficient coverage of native watchers.
+// Private: Map userland filesystem watcher subscriptions efficiently to
+// deliver filesystem change notifications to each watcher with the most
+// efficient coverage of native watchers.
 //
-// * If two watchers subscribe to the same directory, use a single native watcher for each.
-// * Re-use a native watcher watching a parent directory for a watcher on a child directory. If the parent directory
-//   watcher is removed, it will be split into child watchers.
-// * If any child directories already being watched, stop and replace them with a watcher on the parent directory.
+// * If two watchers subscribe to the same directory, use a single native
+//   watcher for each.
+// * Re-use a native watcher watching a parent directory for a watcher on a
+//   child directory. If the parent directory watcher is removed, it will be
+//   split into child watchers.
+// * If any child directories already being watched, stop and replace them with
+//   a watcher on the parent directory.
 //
 // Uses a trie whose structure mirrors the directory structure.
 class RegistryTree {
   // Private: Construct a tree with no native watchers.
   //
-  // * `basePathSegments` the position of this tree's root relative to the filesystem's root as an {Array} of directory
-  //   names.
-  // * `createNative` {Function} used to construct new native watchers. It should accept an absolute path as an argument
-  //   and return a new {NativeWatcher}.
+  // * `basePathSegments` the position of this tree's root relative to the
+  //   filesystem's root as an {Array} of directory names.
+  // * `createNative` {Function} used to construct new native watchers. It
+  //   should accept an absolute path as an argument and return a new
+  //   {NativeWatcher}.
   constructor(basePathSegments, createNative) {
     this.basePathSegments = basePathSegments;
     this.root = new RegistryNode();
     this.createNative = createNative;
   }
 
-  // Private: Identify the native watcher that should be used to produce events at a watched path, creating a new one
-  // if necessary.
+  // Private: Identify the native watcher that should be used to produce events
+  // at a watched path, creating a new one if necessary.
   //
-  // * `pathSegments` the path to watch represented as an {Array} of directory names relative to this {RegistryTree}'s
-  //   root.
-  // * `attachToNative` {Function} invoked with the appropriate native watcher and the absolute path to its watch root.
+  // * `pathSegments` the path to watch represented as an {Array} of directory
+  //   names relative to this {RegistryTree}'s root.
+  // * `attachToNative` {Function} invoked with the appropriate native watcher
+  //   and the absolute path to its watch root.
   add(pathSegments, attachToNative) {
     const absolutePathSegments = this.basePathSegments.concat(pathSegments);
     const absolutePath = absolute(...absolutePathSegments);
 
-    const attachToNew = childPaths => {
+    const attachToNew = (childPaths, beforeAttach = null) => {
       const native = this.createNative(absolutePath);
       const leaf = new RegistryWatcherNode(
         native,
@@ -55,6 +61,12 @@ class RegistryTree {
           this.root.remove(pathSegments, this.createNative) ||
           new RegistryNode();
       });
+
+      // Anything the caller needs to observe on this native has to be wired up
+      // before the requesting watcher attaches, because emitter handlers run in
+      // registration order and the watcher's own `did-start` handler is what
+      // resolves its start promise.
+      if (beforeAttach) beforeAttach(native);
 
       attachToNative(native, absolutePath);
       return native;
@@ -71,15 +83,41 @@ class RegistryTree {
       children: children => {
         // One or more NativeWatchers exist on child directories of the requested path. Create a new native watcher
         // on the parent directory, note the subscribed child paths, and cleanly stop the child native watchers.
-        const newNative = attachToNew(children.map(child => child.path));
+        //
+        // The handover has to wait until the replacement is really watching.
+        // Reattaching a child moves its event subscriptions onto the replacement
+        // and disposes the ones pointing at its own native, so in between those
+        // two moments a change under that child reaches nobody: its old native
+        // is no longer listened to, and the replacement isn't watching yet. The
+        // first child is the most exposed, since the replacement has had the
+        // least time to come up. Overlapping instead means a duplicate event at
+        // worst, where a dropped one is invisible and permanent.
+        //
+        // It also has to be finished before the requesting watcher's start
+        // promise resolves, because `watchPath` resolving is the point at which
+        // callers expect the sharing to have taken effect. So this hangs off
+        // `did-start`, registered ahead of the watcher's own handler.
+        const handOverChildren = () => {
+          for (let i = 0; i < children.length; i++) {
+            const childNode = children[i].node;
+            const childNative = childNode.getNativeWatcher();
+            childNative.reattachTo(newNative, absolutePath);
+            childNative.dispose();
+            childNative.stop();
+          }
+        };
 
-        for (let i = 0; i < children.length; i++) {
-          const childNode = children[i].node;
-          const childNative = childNode.getNativeWatcher();
-          childNative.reattachTo(newNative, absolutePath);
-          childNative.dispose();
-          childNative.stop();
-        }
+        const newNative = attachToNew(children.map(child => child.path), native => {
+          const sub = native.onDidStart(() => {
+            sub.dispose();
+            handOverChildren();
+          });
+        });
+
+        // Nothing else will start it now: previously the first child's
+        // reattachment did, and that no longer happens until we're running. A
+        // failed start leaves the children watching, which is the safe outcome.
+        newNative.start();
       },
       missing: () => attachToNew([])
     });
@@ -411,6 +449,7 @@ class NativeWatcherRegistry {
   // * `createNative` {Function} that will be called with a normalized filesystem path to create a new native
   //   filesystem watcher.
   constructor(createNative) {
+    this.createNative = createNative;
     this.tree = new RegistryTree([], createNative);
   }
 
@@ -426,6 +465,7 @@ class NativeWatcherRegistry {
   // * `watcher` an unattached {Watcher}.
   async attach(watcher) {
     const normalizedDirectory = await watcher.getNormalizedPathPromise();
+
     const pathSegments = normalizedDirectory
       .split(path.sep)
       .filter(segment => segment.length > 0);

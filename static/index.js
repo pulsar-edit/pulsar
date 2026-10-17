@@ -1,9 +1,10 @@
-(function() {
+(function () {
   // Define the window start time before the requires so we get a more accurate
   // window:start marker.
   const startWindowTime = Date.now();
 
   const electron = require('electron');
+  const remote = require('@electron/remote');
   const path = require('path');
   const Module = require('module');
   const getWindowLoadSettings = require('../src/get-window-load-settings');
@@ -12,20 +13,20 @@
   const entryPointDirPath = __dirname;
   let blobStore = null;
 
-  const startupMarkers = electron.remote.getCurrentWindow().startupMarkers;
+  const startupMarkers = remote.getCurrentWindow().startupMarkers;
 
   if (startupMarkers) {
     StartupTime.importData(startupMarkers);
   }
   StartupTime.addMarker('window:start', startWindowTime);
 
-  window.onload = async function() {
+  window.onload = async function () {
     try {
       StartupTime.addMarker('window:onload:start');
       const startTime = Date.now();
-      await require('second-mate').ready
+      await require('second-mate').ready;
 
-      process.on('unhandledRejection', function(error, promise) {
+      process.on('unhandledRejection', function (error, promise) {
         console.error(
           'Unhandled promise rejection %o with error: %o',
           promise,
@@ -75,7 +76,7 @@
   }
 
   function handleSetupError(error) {
-    const currentWindow = electron.remote.getCurrentWindow();
+    const currentWindow = remote.getCurrentWindow();
     currentWindow.setSize(800, 600);
     currentWindow.center();
     currentWindow.show();
@@ -117,7 +118,7 @@
 
     StartupTime.addMarker('window:initialize:start');
 
-    return initialize({ blobStore: blobStore }).then(function() {
+    return initialize({ blobStore: blobStore }).then(function () {
       StartupTime.addMarker('window:initialize:end');
       electron.ipcRenderer.send('window-command', 'window:loaded');
     });
@@ -127,7 +128,7 @@
     function profile() {
       console.profile('startup');
       const startTime = Date.now();
-      setupWindow().then(function() {
+      setupWindow().then(function () {
         setLoadTime(Date.now() - startTime + initialTime);
         console.profileEnd('startup');
         console.log(
@@ -136,7 +137,7 @@
       });
     }
 
-    const webContents = electron.remote.getCurrentWindow().webContents;
+    const webContents = remote.getCurrentWindow().webContents;
     if (webContents.devToolsWebContents) {
       profile();
     } else {

@@ -9,8 +9,8 @@
     "atom": "*"
   },
   "devDependencies": {
-    "fs-plus": "2.x",
-    "temp": "~0.8.1"
+    "fs-plus": "3.x",
+    "temp": "~0.9.0"
   },
   "configSchema": {
     "removeTrailingWhitespace": {

@@ -64,7 +64,7 @@
   (#set! capture.final true))
 
 
-; CLASSES
+; CONSTANTS
 ; =======
 
 ((identifier) @constant.other.python
@@ -87,6 +87,11 @@
   superclasses: (argument_list
     (identifier) @entity.other.inherited-class.python))
 
+; TYPES
+; =====
+
+(generic_type (identifier) @support.storage.type.generic.python)
+(type (identifier) @support.storage.type.python)
 
 ; FUNCTIONS
 ; =========
@@ -202,7 +207,7 @@
   (#match? @string.quoted.double.single-line.python "^[bBrRuU]*\"(?!\")"))
 
 ((string) @string.quoted.single.single-line.format.python
-  (#match? @string.quoted.single.single-line.format.python "^[fFrR]+?\'")
+  (#match? @string.quoted.single.single-line.format.python "^[tTfFrR]+?\'")
   (#set! capture.final))
 
 ((string) @string.quoted.single.single-line.python
@@ -223,8 +228,8 @@
   (#is? test.last true))
 
 (string (string_start) @storage.type.string.python
-  (#match? @storage.type.string.python "^[bBfFrRuU]+")
-  (#set! adjust.endAfterFirstMatchOf "^[bBfFrRuU]+"))
+  (#match? @storage.type.string.python "^[bBfFrRuUTt]+")
+  (#set! adjust.endAfterFirstMatchOf "^[bBfFrRuUTt]+"))
 
 
 ; CONSTANTS
@@ -267,6 +272,9 @@
 
 "import" @keyword.control.import.python
 "from" @keyword.control.import.from.python
+
+("except" @keyword.control.exception.except.group-clause.python "*"
+  (#set! capture.final))
 
 [
   "except"
@@ -311,6 +319,10 @@
   (dictionary_splat_pattern
     (identifier) @variable.parameter.function.python))
 
+
+; The "foo" in `except TypeError as foo:`.
+(as_pattern_target
+  (identifier) @variable.other.exception.python)
 
 ; `self` and `cls` are just conventions, but they are _strong_ conventions.
 ((identifier) @variable.language.self.python
@@ -434,6 +446,9 @@
   "[" @punctuation.definition.list.begin.bracket.square.python
   "]" @punctuation.definition.list.end.bracket.square.python)
 
+(type_parameter
+  "[" @punctuation.definition.list.begin.bracket.square.python
+  "]" @punctuation.definition.list.end.bracket.square.python)
 
 (slice ":" @punctuation.separator.slice.colon.python)
 

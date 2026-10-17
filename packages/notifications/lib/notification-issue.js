@@ -69,7 +69,7 @@ module.exports = class NotificationIssue {
     return this.getIssueBody().then(issueBody => {
       let repoUrl = this.getRepoUrl();
       if (repoUrl == null) {
-        repoUrl = 'https://github.com/pulsar-edit/pulsar'; 
+        repoUrl = 'https://github.com/pulsar-edit/pulsar';
       }
       return `${repoUrl}/issues/new?title=${this.encodeURI(this.getIssueTitle())}&body=${this.encodeURI(issueBody)}`;
     });
@@ -129,38 +129,62 @@ module.exports = class NotificationIssue {
         }
 
         this.issueBody = `\
-<!--
-Have you read Pulsar's Code of Conduct? By filing an Issue, you are expected to comply with it, including treating everyone with respect: https://github.com/atom/.github/blob/master/CODE_OF_CONDUCT.md
+### Thanks in advance for your bug report!
 
-Do you want to ask a question? Are you looking for support? The Pulsar message board is the best place for getting support: https://discuss.atom.io
+Please make sure you have done the following (place an X in the following boxes):
+  * [ ] Checked your issue is not in our list of common issues: <https://docs.pulsar-edit.dev/troubleshooting-pulsar/common-issues>
+  * [ ] Reproduced issue in safe mode: <https://docs.pulsar-edit.dev/troubleshooting-pulsar/using-safe-mode>
+  * [ ] Used the debugging guide to try to resolve the issue?: <https://docs.pulsar-edit.dev/troubleshooting-pulsar>
+  * [ ] Checked to make sure your issue does not already exist?: <https://github.com/issues?q=${encodeURIComponent("sort:updated-desc is:issue user:pulsar-edit")}>
+  * [ ] Checked you are on the latest release?: <https://pulsar-edit.dev/download/#latest-version)>
+
+### What happened?
+
+<!-- Tell us what happened! -->
+
+### Pulsar version
+
+${atom.getVersion()}
+
+### Which OS does this happen on?
+
+<!-- Copy one of the below options:
+- 🐧 Debian based (Linux Mint, Ubuntu, etc.)
+- 🐧 Arch based (Manjaro, Garuda, etc.)
+- 🐧 Red Hat based (Fedora, Alma, RockyLinux, CentOS Stream, etc.)
+- 🐧 OpenSUSE based
+- 🍎 macOS
+- 🪟 Windows
+- ❓ Other(Please specify in the OS details field below)
 -->
 
-### Prerequisites
+### OS details
 
-* [ ] Put an X between the brackets on this line if you have done all of the following:
-    * Reproduced the problem in Safe Mode: <https://flight-manual.atom.io/hacking-atom/sections/debugging/#using-safe-mode>
-    * Followed all applicable steps in the debugging guide: <https://flight-manual.atom.io/hacking-atom/sections/debugging/>
-    * Checked the FAQs on the message board for common solutions: <https://discuss.atom.io/c/faq>
-    * Checked that your issue isn't already filed: <https://github.com/issues?q=is%3Aissue+user%3Aatom>
-    * Checked that there is not already an Pulsar package that provides the described functionality: <https://atom.io/packages>
+<!-- OS version, distribution etc. -->
 
-### Description
+### How did you install Pulsar?
 
-<!-- Description of the issue -->
+<!-- Website download (deb, rpm, appimage etc.), package repository etc. -->
 
-### Steps to Reproduce
+### Which CPU architecture are you running this on?
 
-1. <!-- First Step -->
-2. <!-- Second Step -->
-3. <!-- and so on… -->
+${process.arch}
 
-**Expected behavior:**
+### What steps are needed to reproduce this?
 
-<!-- What you expect to happen -->
+<!--
+1. In this environment...
+2. With this config...
+3. Run '...'
+4. See error...
+-->
 
-**Actual behavior:**
+### What other details can you provide?
 
-<!-- What actually happens -->
+<!--
+Add any other information or screenshots relating to the bug here.
+If building from source please provide the commit hash here.
+-->
 
 ### Versions
 

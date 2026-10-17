@@ -5,6 +5,7 @@ import {
   waitForAutocomplete,
   triggerAutocompletion,
   conditionPromise,
+  timeoutPromise,
   waitForAutocompleteToDisappear
 } from './spec-helper'
 import path from 'path'
@@ -251,7 +252,7 @@ describe('Provider API', () => {
             return [
               {text: 'ohai'},
               {text: 'hai'},
-              {text: 'okwow', replacementPrefix: 'k'},
+              {text: 'okwow', replacementPrefix: 'z'},
               {text: 'ok', replacementPrefix: 'nope'},
               {text: '::cats', replacementPrefix: '::c'},
               {text: 'something', replacementPrefix: 'sm'}
@@ -266,7 +267,8 @@ describe('Provider API', () => {
         expect(getSuggestions()).toEqual([
           {text: '::cats'},
           {text: 'hai'},
-          {text: 'something'}
+          {text: 'something'},
+          {text: 'ohai'}
         ])
       })
 
@@ -337,14 +339,51 @@ describe('Provider API', () => {
       expect(editor.getText()).toEqual("ohai, ohai\n")
     })
 
-    it('ignores `prefix` if `range` is present', async () => {
+    describe('when `firstCharacterMustMatch` is `true`', () => {
+      beforeEach(() => {
+        atom.config.set('autocomplete-plus.firstCharacterMustMatch', true);
+      });
+
+      it('ignores `prefix` if `ranges` is present', async () => {
+        testProvider = {
+          scopeSelector: '.source.js',
+          filterSuggestions: true,
+          getSuggestions (options) {
+            return [
+              {
+                text: 'notmatch/foololohairange',
+                ranges: [
+                  [[0, 0], [0, 5]]
+                ]
+              },
+              {text: 'notmatch/foololohaiprefix'},
+              {text: 'foololohaiprefix2'}
+            ]
+          }
+        }
+        registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.0.0', testProvider)
+        editor.insertText('foololohai')
+        await triggerAutocompletion()
+
+        // Because we're pruning results whose first characters do not match
+        // the first character of the prefix, both `notmatch/` options would
+        // ordinarily be removed — except one of them has `ranges` defined, so
+        // it's wrong to prune it because it is operating on an arbitrary
+        // buffer range.
+        expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/notmatch\/foololohairange/)
+        expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/foololohaiprefix2/)
+        expect(document.querySelector('autocomplete-suggestion-list').innerText).toNotMatch(/notmatch\/foololohaiprefix/)
+      })
+    });
+
+    it('does not remove a non-matching suggestion if `ranges` is present', async () => {
       testProvider = {
         scopeSelector: '.source.js',
         filterSuggestions: true,
         getSuggestions (options) {
           return [
             {
-              text: 'notmatch/foololohairange',
+              text: 'notmatch/anything',
               ranges: [
                 [[0, 0], [0, 5]]
               ]
@@ -357,9 +396,16 @@ describe('Provider API', () => {
       registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.0.0', testProvider)
       editor.insertText('foololohai')
       await triggerAutocompletion()
-      expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/notmatch\/foololohairange/)
+
+      // Because we are applying true fuzzy search to all suggestions, only
+      // those that score 0 will be removed. Hence `notmatch/foololohaiprefix`
+      // remains even though the matching prefix does not start the string.
+      //
+      // `notmatch/anything` also remains because it specifies `ranges`,
+      // meaning that it operates on an arbitrary buffer range.
+      expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/notmatch\/anything/)
       expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/foololohaiprefix2/)
-      expect(document.querySelector('autocomplete-suggestion-list').innerText).toNotMatch(/notmatch\/foololohaiprefix/)
+      expect(document.querySelector('autocomplete-suggestion-list').innerText).toMatch(/notmatch\/foololohaiprefix/)
     })
   })
 
@@ -465,6 +511,35 @@ describe('Provider API', () => {
       expect(editor.getText()).toEqual("kb${1:yyy}ye, world\n")
     })
 
+    it('applies the textEdit if it is present', async () => {
+      testProvider = {
+        scopeSelector: '.source.js',
+        filterSuggestions: true,
+        getSuggestions () {
+          return [
+            {
+              text: 'ohai',
+              textEdit: {
+                range: [[2, 0], [2, 5]],
+                // Our new text will insert a newline, thereby changing the
+                // buffer range of one of our `additionalTextEdits`.
+                newText: 'kbye\n'
+              }
+            },
+            { text: 'ca.ts' },
+            { text: '::dogs'}
+          ]
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
+      editor.insertText('\nlorem\nhello, world\ndolor\n')
+
+      await triggerAutocompletion()
+      await confirmChoice(0)
+
+      expect(editor.getText()).toEqual("\nlorem\nkbye\n, world\ndolor\n")
+    })
+
     it('applies additional text edits if they are specified on the suggestion, even if their original buffer ranges are invalidated', async () => {
       testProvider = {
         scopeSelector: '.source.js',
@@ -489,7 +564,7 @@ describe('Provider API', () => {
           ]
         }
       }
-      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.0.0', testProvider)
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
       editor.insertText('\nlorem\nhello, world\ndolor\n')
 
       await triggerAutocompletion()
@@ -534,6 +609,139 @@ describe('Provider API', () => {
       await confirmChoice(0)
 
       expect(editor.getText()).toEqual("\nips$0um\nkbye\n, world\name$0t\n")
+    })
+  })
+
+  describe('when a lone suggestion is confirmed automatically', () => {
+    function activate () {
+      atom.commands.dispatch(atom.views.getView(editor), 'autocomplete-plus:activate')
+    }
+
+    beforeEach(async () => {
+      // Auto-confirmation of a single suggestion only happens when the user
+      // asks for suggestions explicitly.
+      atom.config.set('autocomplete-plus.enableAutoActivation', false)
+      atom.config.set('autocomplete-plus.enableAutoConfirmSingleSuggestion', true)
+      await atom.packages.activatePackage('snippets')
+      editor.setText('lorem\nhello, world\n')
+      editor.setCursorBufferPosition([1, 5])
+      // Moving the cursor queues a request to hide the suggestion list; let it
+      // resolve before the specs start, lest it hide a list we mean to show.
+      await timeoutPromise(0)
+    })
+
+    it('resolves the suggestion before inserting it', async () => {
+      let insertedSuggestion = null
+      testProvider = {
+        scopeSelector: '.source.js',
+        inclusionPriority: 2,
+        excludeLowerPriority: true,
+        getSuggestions () {
+          return [{ text: 'ohai', replacementPrefix: 'hello' }]
+        },
+        getSuggestionDetailsOnSelect (suggestion) {
+          return {
+            ...suggestion,
+            additionalTextEdits: [
+              { range: [[0, 0], [0, 5]], newText: 'ipsum' }
+            ]
+          }
+        },
+        onDidInsertSuggestion ({ suggestion }) {
+          insertedSuggestion = suggestion
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
+
+      activate()
+      await conditionPromise(() => insertedSuggestion != null)
+
+      expect(insertedSuggestion.additionalTextEdits).toBeDefined()
+      expect(editor.getText()).toEqual('ipsum\nohai, world\n')
+    })
+
+    it('waits for asynchronous resolution before inserting the suggestion', async () => {
+      let insertedSuggestion = null
+      testProvider = {
+        scopeSelector: '.source.js',
+        inclusionPriority: 2,
+        excludeLowerPriority: true,
+        getSuggestions () {
+          return [{ text: 'ohai', replacementPrefix: 'hello' }]
+        },
+        async getSuggestionDetailsOnSelect (suggestion) {
+          await timeoutPromise(50)
+          return {
+            ...suggestion,
+            additionalTextEdits: [
+              { range: [[0, 0], [0, 5]], newText: 'ipsum' }
+            ]
+          }
+        },
+        onDidInsertSuggestion ({ suggestion }) {
+          insertedSuggestion = suggestion
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
+
+      activate()
+
+      // Nothing should have been inserted while the provider was still
+      // resolving the suggestion.
+      await timeoutPromise(25)
+      expect(insertedSuggestion).toBe(null)
+      expect(editor.getText()).toEqual('lorem\nhello, world\n')
+
+      await conditionPromise(() => insertedSuggestion != null)
+
+      expect(insertedSuggestion.additionalTextEdits).toBeDefined()
+      expect(editor.getText()).toEqual('ipsum\nohai, world\n')
+    })
+
+    it('inserts the suggestion when the provider cannot resolve suggestions', async () => {
+      let insertedSuggestion = null
+      testProvider = {
+        scopeSelector: '.source.js',
+        inclusionPriority: 2,
+        excludeLowerPriority: true,
+        getSuggestions () {
+          return [{ text: 'ohai', replacementPrefix: 'hello' }]
+        },
+        onDidInsertSuggestion ({ suggestion }) {
+          insertedSuggestion = suggestion
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
+
+      activate()
+      await conditionPromise(() => insertedSuggestion != null)
+
+      expect(editor.getText()).toEqual('lorem\nohai, world\n')
+    })
+
+    it('does not confirm anything when more than one suggestion is present', async () => {
+      testProvider = {
+        scopeSelector: '.source.js',
+        inclusionPriority: 2,
+        excludeLowerPriority: true,
+        getSuggestions () {
+          return [
+            { text: 'ohai', replacementPrefix: 'hello' },
+            { text: 'ohno', replacementPrefix: 'hello' }
+          ]
+        },
+        getSuggestionDetailsOnSelect (suggestion) {
+          return suggestion
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
+
+      activate()
+      await waitForAutocomplete(editor)
+
+      // The list is shown instead of anything being auto-confirmed.
+      expect(autocompleteManager.suggestionList.items.length).toBe(2)
+      expect(editor.getText()).toEqual('lorem\nhello, world\n')
     })
   })
 })

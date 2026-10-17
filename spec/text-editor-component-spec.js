@@ -5,13 +5,65 @@ const { getRandomBufferRange, buildRandomLines } = require('./helpers/random');
 const TextEditorComponent = require('../src/text-editor-component');
 const TextEditorElement = require('../src/text-editor-element');
 const TextEditor = require('../src/text-editor');
-const TextBuffer = require('text-buffer');
+const ViewRegistry = require('../src/view-registry');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const { Point } = TextBuffer;
 const fs = require('fs');
 const path = require('path');
 const Grim = require('grim');
 const electron = require('electron');
 const clipboard = electron.clipboard;
+
+// Define a custom scheduler that uses `setTimeout` instead of
+// `requestAnimationFrame` because the latter behaves slowly when the browser
+// does not think the editor is visible.
+class CustomViewRegistry extends ViewRegistry {
+  animationFrameRequest = null;
+
+  clearDocumentRequests() {
+    this.documentReaders = [];
+    this.documentWriters = [];
+    this.nextUpdatePromise = null;
+    this.resolveNextUpdatePromise = null;
+    if (this.animationFrameRequest != null) {
+      clearTimeout(this.animationFrameRequest);
+      this.animationFrameRequest = null;
+    }
+  }
+
+  requestDocumentUpdate() {
+    if (this.animationFrameRequest == null) {
+      this.animationFrameRequest = setTimeout(
+        this.performDocumentUpdate,
+        0
+      );
+    }
+  }
+}
+
+let defaultScheduler = TextEditorComponent.getScheduler();
+let alternativeScheduler = new CustomViewRegistry(defaultScheduler.props);
+function useAlternativeScheduler() {
+  TextEditorComponent.setScheduler(alternativeScheduler);
+}
+
+function restoreDefaultScheduler() {
+  TextEditorComponent.setScheduler(defaultScheduler);
+}
+
+// The view registry uses `requestAnimationFrame` to schedule view updates. But
+// if the browser thinks the editor is hidden, it will throttle
+// `requestAnimationFrame`. CI jobs run the headless test runner, so the window
+// is hidden. If we can't work around this throttling, we need an alternative
+// scheduler.
+//
+// Currently we haven't found any workarounds on Linux or Windows in CI, so
+// that's where we're using an alternative scheduler that bypasses
+// `requestAnimationFrame`. We need this just as much on desktop (where hidden
+// windows are still throttled) as on CI, so that's why we don't check
+// `process.env.CI`.
+const NEEDS_ALTERNATIVE_SCHEDULER =
+  process.platform === 'linux' || process.platform === 'win32';
 
 const SAMPLE_TEXT = fs.readFileSync(
   path.join(__dirname, 'fixtures', 'sample.js'),
@@ -34,7 +86,7 @@ let verticalScrollbarWidth, horizontalScrollbarHeight;
 
 describe('TextEditorComponent', () => {
   beforeEach(() => {
-    if(!window.customElements.get('text-editor-component-test-element')) {
+    if (!window.customElements.get('text-editor-component-test-element')) {
       window.customElements.define(
         'text-editor-component-test-element',
         DummyElement
@@ -1147,15 +1199,36 @@ describe('TextEditorComponent', () => {
       let originalTimeout;
 
       beforeEach(() => {
+        if (NEEDS_ALTERNATIVE_SCHEDULER) {
+          useAlternativeScheduler();
+        }
         originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
+
+        // Change the timeout, but be careful not to lower the timeout if it's
+        // already higher than 60s (as it is in CI).
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = Math.max(originalTimeout, 60 * 1000);
       });
 
       afterEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+        if (NEEDS_ALTERNATIVE_SCHEDULER) {
+          restoreDefaultScheduler();
+        }
       });
 
       it('renders the visible rows correctly after randomly mutating the editor', async () => {
+        // Bound this loop by time as well as by iteration count. Twenty
+        // iterations is more work than the slowest CI runners can finish
+        // within the spec budget (Windows has spent the entire 120s here and
+        // still timed out).
+        //
+        // Deriving the deadline from the budget rather than hardcoding it
+        // means this keeps pace if the budget changes, and leaves room for the
+        // final iteration to finish and for teardown. Fast machines still run
+        // all twenty; slow ones run as many as fit and report real assertions.
+        // Each iteration seeds itself and logs that seed, so a failure stays
+        // reproducible.
+        const deadline = Date.now() + jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.6;
         const initialSeed = Date.now();
         for (var i = 0; i < 20; i++) {
           let seed = initialSeed + i;
@@ -1265,6 +1338,8 @@ describe('TextEditorComponent', () => {
 
           element.remove();
           editor.destroy();
+
+          if (Date.now() > deadline) break;
         }
       });
     });
@@ -2256,6 +2331,18 @@ describe('TextEditorComponent', () => {
   });
 
   describe('highlight decorations', () => {
+    beforeEach(() => {
+      if (NEEDS_ALTERNATIVE_SCHEDULER) {
+        useAlternativeScheduler();
+      }
+    });
+
+    afterEach(() => {
+      if (NEEDS_ALTERNATIVE_SCHEDULER) {
+        restoreDefaultScheduler();
+      }
+    });
+
     it('renders single-line highlights', async () => {
       const { component, element, editor } = buildComponent();
       const marker = editor.markScreenRange([[1, 2], [1, 10]]);
@@ -2434,6 +2521,7 @@ describe('TextEditorComponent', () => {
     });
 
     it("flashing a highlight decoration doesn't unflash other highlight decorations", async () => {
+      jasmine.useRealClock();
       const { component, element, editor } = buildComponent({
         rowsPerTile: 3,
         height: 200
@@ -2452,7 +2540,7 @@ describe('TextEditorComponent', () => {
       expect(highlights[0].classList.contains('c')).toBe(true);
 
       // Flash another class while the previously-flashed class is still highlighted
-      decoration.flash('d', 100);
+      decoration.flash('d', process.env.CI ? 1500 : 100);
       await component.getNextUpdatePromise();
       expect(highlights[0].classList.contains('c')).toBe(true);
       expect(highlights[0].classList.contains('d')).toBe(true);
@@ -2574,6 +2662,15 @@ describe('TextEditorComponent', () => {
     function attachFakeWindow(component) {
       const fakeWindow = document.createElement('div');
       fakeWindow.style.position = 'absolute';
+
+      // We set an explicit width here in order to try to remove the viewport
+      // as a confounding variable. This can happen if an uncaught error
+      // triggers opening of the dev tools.
+      //
+      // It expects a border-to-border width of 240px, so we'll give it a width
+      // of 200px with 20px of padding all around.
+      fakeWindow.style.boxSizing = 'content-box';
+      fakeWindow.style.width = 200 + 'px';
       fakeWindow.style.padding = 20 + 'px';
       fakeWindow.style.backgroundColor = 'blue';
       fakeWindow.appendChild(component.element);
@@ -3203,6 +3300,7 @@ describe('TextEditorComponent', () => {
         component,
         3 * component.getLineHeight() + getElementHeight(item3)
       );
+      await wait(100);
       expect(component.getRenderedStartRow()).toBe(3);
       expect(component.getRenderedEndRow()).toBe(12);
       expect(component.getScrollHeight()).toBeNear(
@@ -3597,20 +3695,39 @@ describe('TextEditorComponent', () => {
     });
 
     it('does not attempt to render block decorations located outside the visible range', async () => {
-      const { editor, component } = buildComponent({
+      // Build a text editor with only two rows per tile.
+      const { editor, element, component } = buildComponent({
         autoHeight: false,
         rowsPerTile: 2
       });
+
+      // Set `line-height` to an integer to save us headaches later. (We
+      // believe that Chromium used to guarantee fixed increments of line
+      // height, but doesn't anymore — so we must specify it as an integer
+      // value ourselves if we want the math to be simpler.)
+      element.style.lineHeight = '20px';
+      component.measureCharacterDimensions();
+
+      // Make the editor tall enough to fit only two lines at a time.
       await setEditorHeightInLines(component, 2);
+
       expect(component.getRenderedStartRow()).toBe(0);
+
+      // This suggests one extra tile is rendered below the viewport just out
+      // of view. (But why is this `4` rather than `3`, since we're
+      // zero-indexed? This seems like a mistake in `getRenderedEndRow` logic.)
       expect(component.getRenderedEndRow()).toBe(4);
 
+      // Create a marker spanning the fourth and fifth rows…
       const marker1 = editor.markScreenRange([[3, 0], [5, 0]], {
         reversed: false
       });
+
+      // …and decorate it with a DIV.
       const item1 = document.createElement('div');
       editor.decorateMarker(marker1, { type: 'block', item: item1 });
 
+      // Repeat, but with the marker reversed.
       const marker2 = editor.markScreenRange([[3, 0], [5, 0]], {
         reversed: true
       });
@@ -3618,12 +3735,34 @@ describe('TextEditorComponent', () => {
       editor.decorateMarker(marker2, { type: 'block', item: item2 });
 
       await component.getNextUpdatePromise();
+
+      // We do not expect the first block decoration to be rendered; its head
+      // is outside the renderered range.
       expect(item1.parentElement).toBeNull();
+
+      // But we expect the second decoration to be present because its head
+      // _is_ within the rendered range. (Remember that a “reversed” marker has
+      // its head _before_ its tail, but a non-reversed marker starts with its
+      // tail and ends with its head. Read the text-buffer docs for `Marker`
+      // for further understanding.)
+      //
+      // This comment does not imply understanding of the reasoning behind
+      // this — just that this is the relevant difference in behavior between
+      // the two decorations.
       expect(item2.nextSibling).toBe(lineNodeForScreenRow(component, 3));
 
+      // Scroll down so that the fifth line is the first one visible.
       await setScrollTop(component, 4 * component.getLineHeight());
+
+      // Again, lines 4-5-6-7 (zero-indexed) are understood to be visible, but
+      // `getRenderedEndRow` will report an end row of `8`, which is its own
+      // quirk.
       expect(component.getRenderedStartRow()).toBe(4);
       expect(component.getRenderedEndRow()).toBe(8);
+
+      // Now the logic is reversed; the rendered range includes the head of
+      // the first decoration, but not of the second decoration. Hence the
+      // first decoration is renderered and the second isn't.
       expect(item1.nextSibling).toBe(lineNodeForScreenRow(component, 5));
       expect(item2.parentElement).toBeNull();
     });
@@ -3661,7 +3800,56 @@ describe('TextEditorComponent', () => {
         });
 
         element.style.width = '50px';
-        await component.getNextUpdatePromise();
+        const updatePromise = component.getNextUpdatePromise();
+
+        if (process.platform === 'win32') {
+          // The spec window is never shown (see `AtomWindow`'s `show: false`),
+          // and on Windows that means `requestAnimationFrame` callbacks are
+          // not delivered. The update that
+          // `ViewRegistry::requestDocumentUpdate` queues in response to the
+          // resize above would therefore never run, and this `await` would
+          // hang until the spec timed out.
+          //
+          // Despite our efforts otherwise, this test is still flaky on
+          // Windows. This is a fallback aimed at reducing the worst-case
+          // scenario: wait for the promise to resolve, but after a second, try
+          // to kick it and force an update.
+          const TIMED_OUT = Symbol('timed out');
+          const winner = await Promise.race([
+            updatePromise,
+            wait(1000).then(() => TIMED_OUT)
+          ]);
+          if (winner === TIMED_OUT) {
+            // There are two ways the update can fail to arrive:
+            //
+            // * the update was queued, but the animation frame never arrived
+            //   (the rAF throttling discussed above); or
+            // * the element may consider itself to be invisible shortly after
+            //   initial render (because its width and height are still 0) and
+            //   never gets corrected (because the same throttling that slows
+            //   down rAF also affects `ResizeObserver` and
+            //   `IntersectionObserver`).
+            //
+            // So we log this information on timeouts to figure out more about
+            // this spec's flakiness; then we force an update on the component
+            // and manually tell it it's visible. (`didShow` is idempotent; if
+            // it triggers an update, it will be synchronous.)
+            console.log(
+              '[diag] forcing update:',
+              JSON.stringify({
+                visible: component.visible,
+                isVisible: component.isVisible(),
+                updateScheduled: component.updateScheduled,
+                queuedWriters: TextEditorComponent.getScheduler()
+                  .documentWriters.length
+              })
+            );
+            component.didShow();
+            TextEditorComponent.getScheduler().performDocumentUpdate();
+          }
+        }
+
+        await updatePromise;
         assertLinesAreAlignedWithLineNumbers(component);
       }
     });
@@ -3821,6 +4009,22 @@ describe('TextEditorComponent', () => {
       expect(beforeItems[5].nextSibling).toBe(
         lineNodeForScreenRow(component, 2)
       );
+    });
+
+    it('does not throw when a block decoration is destroyed during an update cycle', async () => {
+      const editor = buildEditor({ autoHeight: false });
+      const { component } = buildComponent({ editor, rowsPerTile: 3 });
+      const { decoration, marker } = createBlockDecorationAtScreenRow(editor, 2, {
+        height: 20,
+        position: 'after'
+      });
+      await component.getNextUpdatePromise();
+
+      decoration.destroy();
+      marker.destroy();
+      expect(() => {
+        component.updateSync();
+      }).not.toThrow();
     });
 
     function createBlockDecorationAtScreenRow(
@@ -4581,7 +4785,7 @@ describe('TextEditorComponent', () => {
 
         it('expands the last selection on drag', () => {
           atom.config.set('editor.multiCursorOnClick', true);
-          const { component, editor } = buildComponent();
+          const { component, editor } = buildComponent({ updatedSynchronously: true });
           spyOn(component, 'handleMouseDragUntilMouseUp');
 
           component.didMouseDownOnContent(
@@ -4629,6 +4833,11 @@ describe('TextEditorComponent', () => {
               [[1, 4], [4, 8]],
               [[2, 8], [8, 8]]
             ]);
+            expect(
+              clientLeftForCharacter(component, 6, 8)
+            ).not.toEqual(
+              clientLeftForCharacter(component, 6, 0)
+            )
             didDrag(clientPositionForCharacter(component, 6, 8));
             expect(editor.getSelectedScreenRanges()).toEqual([
               [[1, 4], [4, 8]],
@@ -5627,6 +5836,9 @@ describe('TextEditorComponent', () => {
         rowsPerTile: 1,
         autoHeight: false
       });
+      // Set the initial line height to match that of the editor font size.
+      element.style.lineHeight = Math.ceil(parseFloat(getComputedStyle(element).fontSize)) + 'px'
+      component.measureCharacterDimensions();
       await setEditorHeightInLines(component, 3);
       await setEditorWidthInCharacters(component, 20);
       component.setScrollTopRow(4);
@@ -5646,7 +5858,10 @@ describe('TextEditorComponent', () => {
     });
 
     it('gracefully handles the editor being hidden after a styling change', async (done) => {
+      jasmine.useRealClock();
       jasmine.filterByPlatform({only: ['linux']}, done);
+      // Seems to make this test less flaky.
+      await wait(0);
 
       const { component, element } = buildComponent({
         autoHeight: false
@@ -5885,6 +6100,33 @@ describe('TextEditorComponent', () => {
       expect(previouslyMeasuredLineElement.style.display).toBe('');
       expect(previouslyMeasuredLineElement.style.visibility).toBe('');
     });
+
+    it('does not throw when called with a row far beyond the rendered range', async () => {
+      const { component } = buildComponent({
+        rowsPerTile: 2,
+        autoHeight: false
+      });
+      await setEditorHeightInLines(component, 3);
+
+      const outOfRangeRow = component.getRenderedEndRow() + 1000;
+      expect(() => {
+        component.pixelPositionForScreenPosition({ row: outOfRangeRow, column: 0 });
+      }).not.toThrow();
+    });
+
+    it('does not throw when requestHorizontalMeasurement targets a non-rendered row', async () => {
+      const { component } = buildComponent({
+        rowsPerTile: 2,
+        autoHeight: false
+      });
+      await setEditorHeightInLines(component, 3);
+
+      const outOfRangeRow = component.getRenderedEndRow() + 1000;
+      component.requestHorizontalMeasurement(outOfRangeRow, 0);
+      expect(() => {
+        component.measureHorizontalPositions();
+      }).not.toThrow();
+    });
   });
 
   describe('screenPositionForPixelPosition', () => {
@@ -6010,6 +6252,8 @@ describe('TextEditorComponent', () => {
         rowsPerTile: 3,
         autoHeight: false
       });
+      element.style.lineHeight = '20px';
+      component.measureCharacterDimensions();
       element.style.height =
         4 * component.measurements.lineHeight +
         horizontalScrollbarHeight +

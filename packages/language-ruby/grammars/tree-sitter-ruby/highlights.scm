@@ -74,8 +74,8 @@
   (#match? @keyword.other.special-method.ruby "^(loop|include|extend|prepend|raise|fail|attr_reader|attr_writer|attr_accessor|attr|catch|throw|private_class_method|public_class_method|module_function|refine|using)$")
   (#set! capture.final true))
 
-((identifier) @keyword.other.special-method
-  (#match? @keyword.other.special-method "^(private|protected|public)$"))
+((identifier) @keyword.other.special-method._TEXT_.ruby
+  (#match? @keyword.other.special-method._TEXT_.ruby "^(private|protected|public)$"))
 
 (call
   method: [(identifier) (constant)] @keyword.other.special-method

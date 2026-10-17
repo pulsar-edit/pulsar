@@ -34,8 +34,7 @@ describe('TreeSitterProvider', () => {
   let directory, editor;
 
   beforeEach(async () => {
-    jasmine.unspy(global, 'setTimeout');
-    jasmine.unspy(Date, 'now');
+    jasmine.useRealClock();
 
     atom.config.set('core.useTreeSitterParsers', true);
     atom.config.set('core.useExperimentalModernTreeSitter', true);
@@ -128,7 +127,7 @@ describe('TreeSitterProvider', () => {
       beforeEach(async () => {
         let text = fs.readFileSync(
           path.join(__dirname, 'fixtures', 'js', 'sample.js')
-        );
+        ).toString();
         editor.setText(text);
         await editor.getBuffer().getLanguageMode().atTransactionEnd();
       });

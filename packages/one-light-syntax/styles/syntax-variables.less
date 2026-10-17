@@ -44,6 +44,41 @@
 @syntax-color-import:     @hue-3;
 @syntax-color-snippet:    @hue-4;
 
+// Terminal Variables ----------------------------------------
+
+// The ordinary text color of the terminal.
+@terminal-text-color: @syntax-text-color;
+// The background color of the terminal.
+@terminal-background-color: @syntax-background-color;
+// The background color of a selected text block.
+@terminal-selection-background-color: @syntax-selection-color;
+// The text color of selected text.
+@terminal-selection-text-color: @syntax-text-color;
+// The color of the cursor.
+@terminal-cursor-color: @syntax-cursor-color;
+
+// The color of the outline around a “find” result when it is inactive.
+@terminal-result-marker-color: @syntax-result-marker-color;
+// The color of the outline around a “find” result when it is active.
+@terminal-result-marker-color-selected: @syntax-result-marker-color-selected;
+
+@terminal-color-black: @syntax-fg;
+@terminal-color-red: @hue-5;
+@terminal-color-green: @hue-4;
+@terminal-color-yellow: @hue-6; // Orange substituting for yellow
+@terminal-color-blue: @hue-2;
+@terminal-color-magenta: @hue-3; // Purple substituting for magenta
+@terminal-color-cyan: @hue-1;
+@terminal-color-white: darken(@syntax-bg, 20%);
+
+@terminal-color-bright-black: lighten(@terminal-color-black, 10%);
+@terminal-color-bright-red: lighten(@terminal-color-red, 10%);
+@terminal-color-bright-green: lighten(@terminal-color-green, 10%);
+@terminal-color-bright-yellow: lighten(@terminal-color-yellow, 10%);
+@terminal-color-bright-blue: lighten(@terminal-color-blue, 10%);
+@terminal-color-bright-magenta: lighten(@terminal-color-magenta, 10%);
+@terminal-color-bright-cyan: lighten(@terminal-color-cyan, 10%);
+@terminal-color-bright-white: lighten(@terminal-color-white, 10%);
 
 // Custom Syntax Variables -----------------------------------
 // Don't use in packages

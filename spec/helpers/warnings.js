@@ -1,8 +1,8 @@
-const pathwatcher = require("pathwatcher");
+const pathwatcher = require("@pulsar-edit/pathwatcher");
 const _ = require("underscore-plus");
 const Grim = require("grim");
 
-exports.warnIfLeakingPathSubscriptions = function() {
+exports.warnIfLeakingPathSubscriptions = function () {
   const watchedPaths = pathwatcher.getWatchedPaths();
   if (watchedPaths.length > 0) {
     console.error("WARNING: Leaking subscriptions for paths: " + watchedPaths.join(", "));
@@ -10,12 +10,12 @@ exports.warnIfLeakingPathSubscriptions = function() {
   return pathwatcher.closeAllWatchers();
 };
 
-exports.ensureNoDeprecatedFunctionCalls = function() {
+exports.ensureNoDeprecatedFunctionCalls = function () {
   const deprecations = _.clone(Grim.getDeprecations());
   Grim.clearDeprecations();
   if (deprecations.length > 0) {
     const originalPrepareStackTrace = Error.prepareStackTrace;
-    Error.prepareStackTrace = function(error, stack) {
+    Error.prepareStackTrace = function (error, stack) {
       const output = [];
       for (let deprecation of Array.from(deprecations)) {
         output.push(`${deprecation.originName} is deprecated. ${deprecation.message}`);
@@ -37,7 +37,7 @@ exports.ensureNoDeprecatedFunctionCalls = function() {
   }
 };
 
-exports.ensureNoDeprecatedStylesheets = function() {
+exports.ensureNoDeprecatedStylesheets = function () {
   const deprecations = _.clone(atom.styles.getDeprecations());
   atom.styles.clearDeprecations();
   return (() => {

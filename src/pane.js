@@ -6,7 +6,17 @@ const { createPaneElement } = require('./pane-element');
 
 let nextInstanceId = 1;
 
-class SaveCancelledError extends Error {}
+// Thrown when a user cancels a save operation.
+class SaveCancelledError extends Error {
+  name = 'SaveCancelledError';
+}
+
+// Thrown when a user cancels a save operation because of a buffer conflict.
+class SaveConflictedError extends Error {
+  name = 'SaveConflictedError';
+}
+
+
 
 // Extended: A container for presenting content in the center of the workspace.
 // Panes can contain multiple items, one of which is *active* at a given time.
@@ -886,6 +896,47 @@ module.exports = class Pane {
     );
   }
 
+  // Prompt the user about an item's conflicted state during an attempt to
+  // save. The user must decide whether to cancel the attempted save… or force
+  // it and overwrite what's on disk.
+  //
+  // Resolves with boolean `true` when a save can proceed… or rejects with an
+  // error when the save is aborted.
+  promptOnConflict(item) {
+    return new Promise((resolve, reject) => {
+      // Don't prompt if the user hasn't opted into it.
+      if (!atom.config.get('core.promptOnConflict')) return resolve(true);
+
+      // Ensure the item implements an `isInConflict` method, and that it
+      // returns `true`.
+      if (!item.isInConflict?.()) {
+        return resolve(true);
+      }
+      // Figure out how to describe the buffer in the dialog.
+      const uri = item.getURI?.() ?? item.getUri?.() ?? null;
+      const title =
+        (typeof item.getTitle === 'function' && item.getTitle()) || uri;
+
+      this.applicationDelegate.confirm({
+        message: `'${title}' has changed on disk. Do you want to overwrite this file with your changes?`,
+        detail: 'The contents of the buffer may be stale.',
+
+        // TODO: Individual pane items may have additional strategies to
+        // contribute (e.g., conflict resolution view). Implement a way for
+        // them to contribute buttons to this dialog — and to handle them in
+        // the callback below.
+        buttons: ['Overwrite', 'Cancel']
+      }, (response) => {
+        switch (response) {
+          case 0:
+            return resolve(true);
+          case 1:
+            return reject(new SaveConflictedError('Save cancelled due to conflict'));
+        }
+      });
+    });
+  }
+
   promptToSaveItem(item, options = {}) {
     return new Promise((resolve, reject) => {
       if (
@@ -971,10 +1022,11 @@ module.exports = class Pane {
   // * `item` The item to save.
   // * `nextAction` (optional) {Function} which will be called with no argument
   //   after the item is successfully saved, or with the error if it failed.
-  //   The return value will be that of `nextAction` or `undefined` if it was not
-  //   provided
+  //   The return value will be that of `nextAction` or `undefined` if it was
+  //   not provided.
   //
-  // Returns a {Promise} that resolves when the save is complete
+  // Returns a {Promise} that resolves when the save is complete, or rejects if
+  // the save could not be completed.
   saveItem(item, nextAction) {
     if (!item) return Promise.resolve();
 
@@ -987,22 +1039,46 @@ module.exports = class Pane {
 
     if (itemURI != null) {
       if (typeof item.save === 'function') {
-        return promisify(() => item.save())
+        // If `isInConflict` is implemented, we call it first to figure out if
+        // it's safe to attempt to save.
+        let conflicted = item.isInConflict?.();
+
+        // If the item is conflicted, we'll show a dialog in order to decide
+        // how to proceed. The user may choose to overwrite (force the save) or
+        // cancel.
+        let preface = () => promisify(() => item.save());
+        if (conflicted && atom.config.get('core.promptOnConflict')) {
+          preface = () => {
+            return this.promptOnConflict(item)
+              .then(() => item.save());
+          };
+        }
+
+        return preface()
           .then(() => {
             if (nextAction) nextAction();
-          })
-          .catch(error => {
+          }).catch(error => {
             if (nextAction) {
               nextAction(error);
             } else {
               this.handleSaveError(error, item);
             }
+            // Re-propagate cancellation errors so callers know the save was
+            // aborted. Other errors are already handled by
+            // handleSaveError/nextAction above.
+            if (error instanceof SaveCancelledError || error instanceof SaveConflictedError) {
+              return Promise.reject(error);
+            }
           });
       } else if (nextAction) {
+        // Don't check if this item is in conflict; if it can't be saved,
+        // there's no hazard.
         nextAction();
         return Promise.resolve();
       }
     } else {
+      // The file has not been committed to disk, so there's no conflict
+      // hazard.
       return this.saveItemAs(item, nextAction);
     }
   }
@@ -1013,8 +1089,8 @@ module.exports = class Pane {
   // * `item` The item to save.
   // * `nextAction` (optional) {Function} which will be called with no argument
   //   after the item is successfully saved, or with the error if it failed.
-  //   The return value will be that of `nextAction` or `undefined` if it was not
-  //   provided
+  //   The return value will be that of `nextAction` or `undefined` if it was
+  //   not provided.
   async saveItemAs(item, nextAction) {
     if (!item) return;
     if (typeof item.saveAs !== 'function') return;
@@ -1062,13 +1138,17 @@ module.exports = class Pane {
     return saveDialogPromise;
   }
 
-  // Public: Save all items.
-  saveItems() {
+  // Public: Save all modified items in this pane.
+  //
+  // Returns a {Promise} that resolves when all items have been saved.
+  async saveItems() {
+    let promises = [];
     for (let item of this.getItems()) {
       if (typeof item.isModified === 'function' && item.isModified()) {
-        this.saveItem(item);
+        promises.push(this.saveItem(item));
       }
     }
+    return await Promise.all(promises);
   }
 
   // Public: Return the first item that matches the given URI or undefined if
@@ -1173,6 +1253,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitLeft(params) {
@@ -1184,6 +1265,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitRight(params) {
@@ -1195,6 +1277,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitUp(params) {
@@ -1206,6 +1289,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitDown(params) {
@@ -1259,7 +1343,9 @@ module.exports = class Pane {
     if (params && params.moveActiveItem && this.activeItem)
       this.moveItemToPane(this.activeItem, newPane);
 
-    newPane.activate();
+    if (!params || params.activate !== false) {
+      newPane.activate();
+    }
     return newPane;
   }
 
@@ -1295,10 +1381,10 @@ module.exports = class Pane {
 
   // If the parent is a horizontal axis, returns its last child if it is a pane;
   // otherwise returns a new pane created by splitting this pane rightward.
-  findOrCreateRightmostSibling() {
+  findOrCreateRightmostSibling(params) {
     const rightmostSibling = this.findRightmostSibling();
     if (rightmostSibling === this) {
-      return this.splitRight();
+      return this.splitRight(params);
     } else {
       return rightmostSibling;
     }
@@ -1336,10 +1422,10 @@ module.exports = class Pane {
 
   // If the parent is a vertical axis, returns its last child if it is a pane;
   // otherwise returns a new pane created by splitting this pane bottomward.
-  findOrCreateBottommostSibling() {
+  findOrCreateBottommostSibling(params) {
     const bottommostSibling = this.findBottommostSibling();
     if (bottommostSibling === this) {
-      return this.splitDown();
+      return this.splitDown(params);
     } else {
       return bottommostSibling;
     }

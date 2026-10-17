@@ -35,9 +35,14 @@ module.exports = {
   autosavePaneItem (paneItem, create = false) {
     if (!atom.config.get('autosave.enabled')) return
     if (!paneItem) return
-    if (typeof paneItem.getURI !== 'function' || !paneItem.getURI()) return
-    if (typeof paneItem.isModified !== 'function' || !paneItem.isModified()) return
-    if (typeof paneItem.getPath !== 'function' || !paneItem.getPath()) return
+    if (!paneItem.getURI?.()) return
+    if (!paneItem.isModified?.()) return
+    if (!paneItem.getPath?.()) return
+    // When conflicted files trigger a prompt, we don't want to attempt to save
+    // them automatically.
+    if (atom.config.get('core.promptOnConflict') && paneItem.isInConflict?.()) {
+      return
+    }
     if (!shouldSave(paneItem)) return
 
     try {

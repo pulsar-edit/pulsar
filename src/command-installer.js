@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs-plus');
+const { getReleaseChannel } = require('./get-app-details.js');
 
 module.exports = class CommandInstaller {
   constructor(applicationDelegate) {
@@ -18,7 +19,28 @@ module.exports = class CommandInstaller {
     return process.resourcesPath;
   }
 
-  installShellCommandsInteractively() {
+  getReleaseChannel() {
+    return getReleaseChannel(this.appVersion);
+  }
+
+  getScriptBaseName() {
+    if (this.scriptBaseName) {
+      return this.scriptBaseName;
+    } else if (process.env.ATOM_BASE_NAME) {
+      // If we launched via shell script, this environment variable will tell
+      // us the right name.
+      return process.env.ATOM_BASE_NAME;
+    }
+
+    // Otherwise we can make an educated guess from the name of the release
+    // channel.
+    let releaseChannel = this.getReleaseChannel();
+    this.scriptBaseName = releaseChannel === 'next' ? 'pulsar-next' : 'pulsar';
+
+    return this.scriptBaseName;
+  }
+
+  async installShellCommandsInteractively() {
     const showErrorDialog = error => {
       this.applicationDelegate.confirm(
         {
@@ -59,24 +81,27 @@ module.exports = class CommandInstaller {
   }
 
   installAtomCommand(askForPrivilege, callback) {
+    let scriptName = this.getScriptBaseName();
     this.installCommand(
-      path.join(this.getResourcesDirectory(), 'pulsar.sh'),
-      'pulsar',
+      path.join(this.getResourcesDirectory(), `${scriptName}.sh`),
+      scriptName,
       askForPrivilege,
       callback
     );
   }
 
   installApmCommand(askForPrivilege, callback) {
+    let isNextReleaseChannel = this.getScriptBaseName().endsWith('-next');
+    let ppmName = isNextReleaseChannel ? 'ppm-next' : 'ppm';
     this.installCommand(
       path.join(
         this.getResourcesDirectory(),
         'app',
         'ppm',
         'bin',
-        'apm'
+        ppmName
       ),
-      'ppm',
+      ppmName,
       askForPrivilege,
       callback
     );

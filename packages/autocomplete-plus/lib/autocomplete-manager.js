@@ -247,7 +247,7 @@ class AutocompleteManager {
         let descriptionContainer = suggestionListView.querySelector('.suggestion-description')
         if (descriptionContainer !== null && descriptionContainer.style.display === 'block') {
           let descriptionMoreLink = descriptionContainer.querySelector('.suggestion-description-more-link')
-          require('electron').shell.openExternal(descriptionMoreLink.href)
+          atom.openExternal(descriptionMoreLink.href)
         }
       }
     }))
@@ -270,12 +270,12 @@ class AutocompleteManager {
     return this.getSuggestionsFromProviders({editor: this.editor, bufferPosition, scopeDescriptor, prefix, legacyPrefix, activatedManually})
   }
 
-  getSuggestionsFromProviders(options) {
+  async getSuggestionsFromProviders(options) {
     let suggestionsPromise
     const providers = this.providerManager.applicableProviders(this.editorLabels, options.scopeDescriptor)
 
     const providerPromises = []
-    providers.forEach(provider => {
+    for (let provider of providers) {
       const apiVersion = this.providerManager.apiVersionForProvider(provider)
 
       let getSuggestions
@@ -304,7 +304,7 @@ class AutocompleteManager {
         }
       }
 
-      return providerPromises.push(Promise.resolve(getSuggestions(upgradedOptions)).then(providerSuggestions => {
+      providerPromises.push(Promise.resolve(getSuggestions(upgradedOptions)).then(providerSuggestions => {
         if (providerSuggestions == null) { return }
 
         // TODO API: remove upgrading when 1.0 support is removed
@@ -361,7 +361,7 @@ class AutocompleteManager {
         }
         return providerSuggestions
       }))
-    })
+    }
 
     if (!providerPromises || !providerPromises.length) {
       return
@@ -369,13 +369,19 @@ class AutocompleteManager {
 
     suggestionsPromise = Promise.all(providerPromises)
     this.currentSuggestionsPromise = suggestionsPromise
+
     return this.currentSuggestionsPromise
       .then(this.mergeSuggestionsFromProviders)
       .then(suggestions => {
         if (this.currentSuggestionsPromise !== suggestionsPromise) { return }
         if (options.activatedManually && this.shouldDisplaySuggestions && this.autoConfirmSingleSuggestionEnabled && suggestions.length === 1) {
-          // When there is one suggestion in manual mode, just confirm it
-          return this.confirm(suggestions[0])
+          // When there is one suggestion in manual mode, just confirm it. But
+          // it might have extra metadata like `additionalTextEdits`, so we
+          // need to resolve that data first.
+          let [suggestion] = suggestions
+          return this.getDetailsOnSelect(suggestion).then(detailedSuggestion => {
+            return this.confirm(detailedSuggestion)
+          })
         } else {
           return this.displaySuggestions(suggestions, options)
         }
@@ -385,10 +391,25 @@ class AutocompleteManager {
 
   filterSuggestions(suggestions, {prefix}) {
     const results = []
+
+    // Legacy behavior: filtering used to include a "sanity check" that ensured
+    // the first character of the suggestion matched the first character of the
+    // input.
+    //
+    // The original intent of this decision is not known, but it aged poorly,
+    // especially as autocompletion suggestions got more sophisticated and grew
+    // the ability to trigger arbitrary text edits instead of just adding
+    // characters to what had been typed.
+    //
+    // We envision this will eventually go away altogether, but as an
+    // intermediate step, we've turned it into an option that is `false` by
+    // default.
+    let firstCharacterMustMatch = atom.config.get('autocomplete-plus.firstCharacterMustMatch')
+
     for (let i = 0; i < suggestions.length; i++) {
-      // sortScore mostly preserves in the original sorting. The function is
-      // chosen such that suggestions with a very high match score can break out.
-      let score
+      // `sortScore` mostly preserves in the original sorting. The function is
+      // chosen such that suggestions with a very high match score can break
+      // out.
       const suggestion = suggestions[i]
       suggestion.sortScore = Math.max((-i / 10) + 3, 0) + 1
       suggestion.score = null
@@ -400,8 +421,22 @@ class AutocompleteManager {
       if (prefixIsEmpty) {
         results.push(suggestion)
       } else {
-        const keepMatching = suggestion.ranges || suggestionPrefix[0].toLowerCase() === text[0].toLowerCase()
-        if (keepMatching && (score = atom.ui.fuzzyMatcher.score(text, suggestionPrefix)) > 0) {
+        const keepMatching = firstCharacterMustMatch ?
+          suggestionPrefix[0].toLowerCase() === text[0].toLowerCase() :
+          true
+        let score = atom.ui.fuzzyMatcher.score(text, suggestionPrefix)
+
+        // Suggestions are removed from the list if their fuzzy-matching score
+        // is `0` — unless they have `ranges` or `textEdit`. Both of these
+        // properties imply that the suggestion operates on an arbitrary buffer
+        // range, meaning that traditional filter heuristics are unlikely to be
+        // accurate.
+        //
+        // In situations where such suggestions fail fuzzy matching, they will
+        // have their scores reduced to `0`. This may deprioritize them
+        // relative to other options. Hence, though they remain in the result
+        // set, they may be deprioritized relative to other suggestions.
+        if ((!!suggestion.ranges || !!suggestion.textEdit) || (keepMatching && score > 0)) {
           suggestion.score = score * suggestion.sortScore
           results.push(suggestion)
         }
@@ -591,11 +626,18 @@ See https://github.com/atom/autocomplete-plus/wiki/Provider-API`
   }
 
   getDetailsOnSelect(suggestion) {
-    if (suggestion != null && suggestion.provider && suggestion.provider.getSuggestionDetailsOnSelect) {
-      Promise.resolve(suggestion.provider.getSuggestionDetailsOnSelect(suggestion))
+    if (typeof suggestion?.provider?.getSuggestionDetailsOnSelect === 'function') {
+      return Promise.resolve(suggestion.provider.getSuggestionDetailsOnSelect(suggestion))
         .then(detailedSuggestion => {
+          if (detailedSuggestion == null) { return suggestion }
+          // The provider may have given us a brand-new object; make sure it
+          // can still be traced back to its provider on insertion.
+          detailedSuggestion.provider = detailedSuggestion.provider ?? suggestion.provider
           this.suggestionList.replaceItem(suggestion, detailedSuggestion)
+          return detailedSuggestion
         })
+    } else {
+      return Promise.resolve(suggestion)
     }
   }
 

@@ -9,6 +9,7 @@ const sandbox = require('sinon').createSandbox();
 
 const AtomApplication = require('../../src/main-process/atom-application');
 const parseCommandLine = require('../../src/main-process/parse-command-line');
+const { releaseStateKey } = require('../../src/main-process/state-keys');
 const {
   emitterEventPromise,
   conditionPromise
@@ -1064,12 +1065,16 @@ describe('AtomApplication', function() {
           .storageFolder.store.calledWith('application.json', {
             version: '1',
             windows: [
-              { projectRoots: [scenario.convertRootPath('a')] },
+              {
+                projectRoots: [scenario.convertRootPath('a')],
+                stateKey: sinon.match(/^editor-/)
+              },
               {
                 projectRoots: [
                   scenario.convertRootPath('b'),
                   scenario.convertRootPath('c')
-                ]
+                ],
+                stateKey: sinon.match(/^editor-/)
               }
             ]
           })
@@ -1092,7 +1097,12 @@ describe('AtomApplication', function() {
           .getApplication(0)
           .storageFolder.store.calledWith('application.json', {
             version: '1',
-            windows: [{ projectRoots: [scenario.convertRootPath('a')] }]
+            windows: [
+              {
+                projectRoots: [scenario.convertRootPath('a')],
+                stateKey: sinon.match(/^editor-/)
+              }
+            ]
           })
       );
     });
@@ -1106,6 +1116,102 @@ describe('AtomApplication', function() {
       w.browserWindow.emit('blur');
       await promise;
     });
+
+    it('assigns unique state keys to two windows sharing the same project root', async function() {
+      await scenario.launch(parseCommandLine(['a']));
+
+      const statePromise = emitterEventPromise(
+        scenario.getApplication(0),
+        'application:did-save-state'
+      );
+      await scenario.open(parseCommandLine(['--new-window', 'a']));
+      await statePromise;
+
+      const { windows } = scenario.getApplication(0).storageFolder.store.lastCall.args[1];
+      assert.lengthOf(windows, 2);
+      assert.isDefined(windows[0].stateKey);
+      assert.isDefined(windows[1].stateKey);
+      assert.notStrictEqual(windows[0].stateKey, windows[1].stateKey);
+    });
+
+    it('preserves a window\'s state key across sessions', async function() {
+      // First session: capture the saved stateKey
+      const [w] = await scenario.launch(parseCommandLine(['a']));
+
+      const statePromise1 = emitterEventPromise(
+        scenario.getApplication(0),
+        'application:did-save-state'
+      );
+      w.browserWindow.emit('blur');
+      await statePromise1;
+
+      const { stateKey: savedStateKey } = scenario
+        .getApplication(0)
+        .storageFolder.store.lastCall.args[1].windows[0];
+      assert.isDefined(savedStateKey);
+      await scenario.destroy();
+
+      // Second session: restore with the saved stateKey
+      const app2 = scenario.addApplication({
+        applicationJson: {
+          version: '1',
+          windows: [{ projectRoots: [scenario.convertRootPath('a')], stateKey: savedStateKey }]
+        }
+      });
+      app2.config.set('core.restorePreviousWindowsOnStart', 'always');
+      const [w2] = await scenario.launch({ app: app2 });
+
+      const statePromise2 = emitterEventPromise(app2, 'application:did-save-state');
+      w2.browserWindow.emit('blur');
+      await statePromise2;
+
+      const { stateKey: restoredStateKey } = app2.storageFolder.store.lastCall.args[1].windows[0];
+      assert.strictEqual(restoredStateKey, savedStateKey);
+    });
+
+    it('assigns a hash-based state key when restoring a window saved without one', async function() {
+      // Simulate a session saved by an older version of Pulsar (no `stateKey`
+      // field).
+      const app = scenario.addApplication({
+        applicationJson: {
+          version: '1',
+          windows: [{ projectRoots: [scenario.convertRootPath('a')] }]
+        }
+      });
+      app.config.set('core.restorePreviousWindowsOnStart', 'always');
+      const [w] = await scenario.launch({ app });
+
+      const statePromise = emitterEventPromise(app, 'application:did-save-state');
+      w.browserWindow.emit('blur');
+      await statePromise;
+
+      const { stateKey } = app.storageFolder.store.lastCall.args[1].windows[0];
+      assert.match(stateKey, /^editor-[0-9a-f]{40}$/);
+    });
+
+    it('resolves a state key collision when two windows were saved with the same legacy key', async function() {
+      const legacyKey = 'editor-' + 'a'.repeat(40);
+      const app = scenario.addApplication({
+        applicationJson: {
+          version: '1',
+          windows: [
+            { projectRoots: [scenario.convertRootPath('a')], stateKey: legacyKey },
+            { projectRoots: [scenario.convertRootPath('b')], stateKey: legacyKey }
+          ]
+        }
+      });
+      app.config.set('core.restorePreviousWindowsOnStart', 'always');
+      await scenario.launch({ app });
+
+      const statePromise = emitterEventPromise(app, 'application:did-save-state');
+      app.getAllWindows()[0].browserWindow.emit('blur');
+      await statePromise;
+
+      const { windows } = app.storageFolder.store.lastCall.args[1];
+      assert.lengthOf(windows, 2);
+      assert.notStrictEqual(windows[0].stateKey, windows[1].stateKey);
+    });
+
   });
 
   describe('when closing the last window', function() {
@@ -1613,6 +1719,12 @@ class LaunchScenario {
   }
 
   async destroy() {
+    // app.destroy() closes windows without going through removeWindow(), so
+    // releaseStateKey() is never called. Do it explicitly here to prevent
+    // USED_KEYS from leaking between tests.
+    for (const window of this.windows) {
+      releaseStateKey(window);
+    }
     await Promise.all(Array.from(this.applications, app => app.destroy()));
 
     if (this.originalAtomHome) {
@@ -1635,6 +1747,8 @@ class LaunchScenario {
       this.windows.add(newWindow);
       return newWindow;
     });
+    this.sinon.stub(app, 'resolveTestRunnerPath').returns('/stubbed/test-runner');
+    this.sinon.stub(app, 'resolveLegacyTestRunnerPath').returns('/stubbed/legacy-test-runner');
     this.sinon
       .stub(app.storageFolder, 'load')
       .callsFake(() =>

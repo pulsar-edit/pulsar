@@ -76,6 +76,28 @@ describe("PackageCard", function() {
     expect(card.refs.updateButton.textContent).toContain('Update to 1.2.0');
   });
 
+  it("shows a badge", function () {
+    const pack = {
+      badges: [{
+        link: 'https://example.com',
+        title: 'Archived',
+        text: 'Source code has been archived',
+        type: 'warn'
+      }],
+      name: 'something',
+      version: '1.0.0',
+      latestVersion: '1.0.0'
+    };
+    card = new PackageCard(pack, new SettingsView(), packageManager);
+
+    spyOn(atom, 'openExternal');
+    jasmine.attachToDOM(card.element);
+    let badge = card.element.querySelector('.badge');
+    expect(badge).toExist();
+    badge?.click();
+    expect(atom.openExternal).toHaveBeenCalled();
+  })
+
   it("shows the author details", function() {
     const authorName = "authorName";
     const pack = {

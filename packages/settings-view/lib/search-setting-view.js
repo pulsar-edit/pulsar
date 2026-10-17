@@ -18,7 +18,7 @@ export default class SearchSettingView {
   }
 
   render () {
-    const title = this.setting.title ?? getSettingTitle(this.setting.path, this.setting.path.split(".")[1]);
+    const title = getSettingTitle(this.setting.path, this.setting.path.split(".")[1]);
     const path = atom.config.get("settings-view.searchSettingsMetadata") ? this.setting.path + ": " : "";
     const description = this.setting.description ?? "";
     const packageName = this.setting.path.split(".")[0];

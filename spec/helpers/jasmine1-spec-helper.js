@@ -15,14 +15,13 @@ const path = require('path');
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const Grim = require('grim');
-const pathwatcher = require('pathwatcher');
+const pathwatcher = require('@pulsar-edit/pathwatcher');
 const FindParentDir = require('find-parent-dir');
 const {CompositeDisposable} = require('event-kit');
 
 const TextEditor = require('../../src/text-editor');
 const TextEditorElement = require('../../src/text-editor-element');
 const TextMateLanguageMode = require('../../src/text-mate-language-mode');
-const TreeSitterLanguageMode = require('../../src/tree-sitter-language-mode');
 const {clipboard} = require('electron');
 const {mockDebounce} = require("./mock-debounce.js");
 
@@ -36,10 +35,10 @@ atom.packages.packageDirPaths.unshift(fixturePackagesPath);
 document.querySelector('html').style.overflow = 'auto';
 document.body.style.overflow = 'auto';
 
-Set.prototype.jasmineToString = function() {
+Set.prototype.jasmineToString = function () {
   let result = "Set {";
   let first = true;
-  this.forEach(function(element) {
+  this.forEach(function (element) {
     if (!first) { result += ", "; }
     return result += element.toString();
   });
@@ -47,7 +46,7 @@ Set.prototype.jasmineToString = function() {
   return result + "}";
 };
 
-Set.prototype.isEqual = function(other) {
+Set.prototype.isEqual = function (other) {
   if (other instanceof Set) {
     let next;
     if (this.size !== other.size) { return false; }
@@ -61,7 +60,7 @@ Set.prototype.isEqual = function(other) {
   }
 };
 
-jasmine.getEnv().addEqualityTester(function(a, b) {
+jasmine.getEnv().addEqualityTester(function (a, b) {
   // Match jasmine.any's equality matching logic
   if ((a != null ? a.jasmineMatches : undefined) != null) { return a.jasmineMatches(b); }
   if ((b != null ? b.jasmineMatches : undefined) != null) { return b.jasmineMatches(a); }
@@ -89,7 +88,7 @@ if ((specDirectory = FindParentDir.sync(testPaths[0], 'fixtures'))) {
   specProjectPath = require('os').tmpdir();
 }
 
-beforeEach(function() {
+beforeEach(function () {
   // Do not clobber recent project history
   spyOn(Object.getPrototypeOf(atom.history), 'saveState').andReturn(Promise.resolve());
 
@@ -102,7 +101,7 @@ beforeEach(function() {
   spyOn(window, "clearTimeout").andCallFake(window.fakeClearTimeout);
   spyOn(_, "debounce").andCallFake(mockDebounce);
 
-  const spy = spyOn(atom.packages, 'resolvePackagePath').andCallFake(function(packageName) {
+  const spy = spyOn(atom.packages, 'resolvePackagePath').andCallFake(function (packageName) {
     if (specPackageName && (packageName === specPackageName)) {
       return resolvePackagePath(specPackagePath);
     } else {
@@ -127,19 +126,18 @@ beforeEach(function() {
   // make editor display updates synchronous
   TextEditorElement.prototype.setUpdatedSynchronously(true);
 
-  spyOn(pathwatcher.File.prototype, "detectResurrectionAfterDelay").andCallFake(function() { return this.detectResurrection(); });
+  spyOn(pathwatcher.File.prototype, "detectResurrectionAfterDelay").andCallFake(function () { return this.detectResurrection(); });
   spyOn(TextEditor.prototype, "shouldPromptToSave").andReturn(false);
 
   // make tokenization synchronous
   TextMateLanguageMode.prototype.chunkSize = Infinity;
-  TreeSitterLanguageMode.prototype.syncTimeoutMicros = Infinity;
-  spyOn(TextMateLanguageMode.prototype, "tokenizeInBackground").andCallFake(function() { return this.tokenizeNextChunk(); });
+  spyOn(TextMateLanguageMode.prototype, "tokenizeInBackground").andCallFake(function () { return this.tokenizeNextChunk(); });
 
   // Without this spy, TextEditor.onDidTokenize callbacks would not be called
   // after the buffer's language mode changed, because by the time the editor
   // called its new language mode's onDidTokenize method, the language mode
   // would already be fully tokenized.
-  spyOn(TextEditor.prototype, "onDidTokenize").andCallFake(function(callback) {
+  spyOn(TextEditor.prototype, "onDidTokenize").andCallFake(function (callback) {
     return new CompositeDisposable(
       this.emitter.on("did-tokenize", callback),
       this.onDidChangeGrammar(() => {
@@ -158,20 +156,20 @@ beforeEach(function() {
   return addCustomMatchers(this);
 });
 
-afterEach(function() {
+afterEach(function () {
   ensureNoDeprecatedFunctionCalls();
   ensureNoDeprecatedStylesheets();
 
   waitsForPromise(() => atom.reset());
 
-  return runs(function() {
+  return runs(function () {
     if (!window.debugContent) { document.getElementById('jasmine-content').innerHTML = ''; }
     warnIfLeakingPathSubscriptions();
     return waits(0);
   });
 }); // yield to ui thread to make screen update more frequently
 
-var warnIfLeakingPathSubscriptions = function() {
+var warnIfLeakingPathSubscriptions = function () {
   const watchedPaths = pathwatcher.getWatchedPaths();
   if (watchedPaths.length > 0) {
     console.error("WARNING: Leaking subscriptions for paths: " + watchedPaths.join(", "));
@@ -179,12 +177,12 @@ var warnIfLeakingPathSubscriptions = function() {
   return pathwatcher.closeAllWatchers();
 };
 
-var ensureNoDeprecatedFunctionCalls = function() {
+var ensureNoDeprecatedFunctionCalls = function () {
   const deprecations = _.clone(Grim.getDeprecations());
   Grim.clearDeprecations();
   if (deprecations.length > 0) {
     const originalPrepareStackTrace = Error.prepareStackTrace;
-    Error.prepareStackTrace = function(error, stack) {
+    Error.prepareStackTrace = function (error, stack) {
       const output = [];
       for (let deprecation of Array.from(deprecations)) {
         output.push(`${deprecation.originName} is deprecated. ${deprecation.message}`);
@@ -206,7 +204,7 @@ var ensureNoDeprecatedFunctionCalls = function() {
   }
 };
 
-var ensureNoDeprecatedStylesheets = function() {
+var ensureNoDeprecatedStylesheets = function () {
   const deprecations = _.clone(atom.styles.getDeprecations());
   atom.styles.clearDeprecations();
   return (() => {
@@ -227,7 +225,7 @@ var ensureNoDeprecatedStylesheets = function() {
 const {
   emitObject
 } = jasmine.StringPrettyPrinter.prototype;
-jasmine.StringPrettyPrinter.prototype.emitObject = function(obj) {
+jasmine.StringPrettyPrinter.prototype.emitObject = function (obj) {
   if (obj.inspect) {
     return this.append(obj.inspect());
   } else {
@@ -235,44 +233,56 @@ jasmine.StringPrettyPrinter.prototype.emitObject = function(obj) {
   }
 };
 
-jasmine.unspy = function(object, methodName) {
-  if (!object[methodName].hasOwnProperty('originalValue')) { throw new Error("Not a spy"); }
+jasmine.unspy = function (object, methodName) {
+  if (!object[methodName].hasOwnProperty('originalValue')) { throw new Error(`Not a spy: ${methodName}`); }
   return object[methodName] = object[methodName].originalValue;
 };
 
-jasmine.attachToDOM = function(element) {
+jasmine.attachToDOM = function (element) {
   const jasmineContent = document.querySelector('#jasmine-content');
   if (!jasmineContent.contains(element)) { return jasmineContent.appendChild(element); }
 };
 
 let grimDeprecationsSnapshot = null;
 let stylesDeprecationsSnapshot = null;
-jasmine.snapshotDeprecations = function() {
+jasmine.snapshotDeprecations = function () {
   grimDeprecationsSnapshot = _.clone(Grim.deprecations);
   return stylesDeprecationsSnapshot = _.clone(atom.styles.deprecationsBySourcePath);
 };
 
-jasmine.restoreDeprecationsSnapshot = function() {
+jasmine.restoreDeprecationsSnapshot = function () {
   Grim.deprecations = grimDeprecationsSnapshot;
   return atom.styles.deprecationsBySourcePath = stylesDeprecationsSnapshot;
 };
 
-jasmine.useRealClock = function() {
-  jasmine.unspy(window, 'setTimeout');
-  jasmine.unspy(window, 'clearTimeout');
-  jasmine.unspy(_._, 'now');
-  return jasmine.unspy(Date, 'now');
+function isSpied(object, methodName) {
+  return object[methodName].hasOwnProperty('originalValue');
+}
+
+jasmine.useRealClock = function () {
+  if (isSpied(window, 'setTimeout')) {
+    jasmine.unspy(window, 'setTimeout');
+  }
+  if (isSpied(window, 'clearTimeout')) {
+    jasmine.unspy(window, 'clearTimeout');
+  }
+  if (isSpied(_._, 'now')) {
+    jasmine.unspy(_._, 'now');
+  }
+  if (isSpied(Date, 'now')) {
+    jasmine.unspy(Date, 'now');
+  }
 };
 
 // The clock is halfway mocked now in a sad and terrible way... only setTimeout
 // and clearTimeout are included. This method will also include setInterval. We
 // would do this everywhere if didn't cause us to break a bunch of package tests.
-jasmine.useMockClock = function() {
+jasmine.useMockClock = function () {
   spyOn(window, 'setInterval').andCallFake(fakeSetInterval);
   return spyOn(window, 'clearInterval').andCallFake(fakeClearInterval);
 };
 
-var addCustomMatchers = function(spec) {
+var addCustomMatchers = function (spec) {
   return spec.addMatchers({
     toBeInstanceOf(expected) {
       const beOrNotBe = this.isNot ? "not be" : "be";
@@ -293,7 +303,7 @@ var addCustomMatchers = function(spec) {
 
     toExistOnDisk(expected) {
       const toOrNotTo = (this.isNot && "not to") || "to";
-      this.message = function() { return `Expected path '${this.actual}' ${toOrNotTo} exist.`; };
+      this.message = function () { return `Expected path '${this.actual}' ${toOrNotTo} exist.`; };
       return fs.existsSync(this.actual);
     },
 
@@ -303,7 +313,7 @@ var addCustomMatchers = function(spec) {
         console.error("Specs will fail because the Dev Tools have focus. To fix this close the Dev Tools or click the spec runner.");
       }
 
-      this.message = function() { return `Expected element '${this.actual}' or its descendants ${toOrNotTo} have focus.`; };
+      this.message = function () { return `Expected element '${this.actual}' or its descendants ${toOrNotTo} have focus.`; };
       let element = this.actual;
       if (element.jquery) { element = element.get(0); }
       return (element === document.activeElement) || element.contains(document.activeElement);
@@ -339,7 +349,7 @@ var addCustomMatchers = function(spec) {
   });
 };
 
-window.waitsForPromise = function(...args) {
+window.waitsForPromise = function (...args) {
   let shouldReject, timeout;
   let label = null;
   if (args.length > 1) {
@@ -350,17 +360,17 @@ window.waitsForPromise = function(...args) {
   if (label == null) { label = 'promise to be resolved or rejected'; }
   const fn = _.last(args);
 
-  return window.waitsFor(label, timeout, function(moveOn) {
+  return window.waitsFor(label, timeout, function (moveOn) {
     const promise = fn();
     if (shouldReject) {
       promise.catch.call(promise, moveOn);
-      return promise.then(function() {
+      return promise.then(function () {
         jasmine.getEnv().currentSpec.fail("Expected promise to be rejected, but it was resolved");
         return moveOn();
       });
     } else {
       promise.then(moveOn);
-      return promise.catch.call(promise, function(error) {
+      return promise.catch.call(promise, function (error) {
         jasmine.getEnv().currentSpec.fail(`Expected promise to be resolved, but it was rejected with: ${(error != null ? error.message : undefined)} ${jasmine.pp(error)}`);
         return moveOn();
       });
@@ -368,7 +378,7 @@ window.waitsForPromise = function(...args) {
   });
 };
 
-window.resetTimeouts = function() {
+window.resetTimeouts = function () {
   window.now = 0;
   window.timeoutCount = 0;
   window.intervalCount = 0;
@@ -376,18 +386,18 @@ window.resetTimeouts = function() {
   return window.intervalTimeouts = {};
 };
 
-window.fakeSetTimeout = function(callback, ms) {
+window.fakeSetTimeout = function (callback, ms) {
   if (ms == null) { ms = 0; }
   const id = ++window.timeoutCount;
   window.timeouts.push([id, window.now + ms, callback]);
   return id;
 };
 
-window.fakeClearTimeout = idToClear => window.timeouts = window.timeouts.filter(function(...args) { const [id] = Array.from(args[0]); return id !== idToClear; });
+window.fakeClearTimeout = idToClear => window.timeouts = window.timeouts.filter(function (...args) { const [id] = Array.from(args[0]); return id !== idToClear; });
 
-window.fakeSetInterval = function(callback, ms) {
+window.fakeSetInterval = function (callback, ms) {
   const id = ++window.intervalCount;
-  var action = function() {
+  var action = function () {
     callback();
     return window.intervalTimeouts[id] = window.fakeSetTimeout(action, ms);
   };
@@ -395,16 +405,16 @@ window.fakeSetInterval = function(callback, ms) {
   return id;
 };
 
-window.fakeClearInterval = function(idToClear) {
+window.fakeClearInterval = function (idToClear) {
   return window.fakeClearTimeout(this.intervalTimeouts[idToClear]);
 };
 
-window.advanceClock = function(delta) {
+window.advanceClock = function (delta) {
   if (delta == null) { delta = 1; }
   window.now += delta;
   const callbacks = [];
 
-  window.timeouts = window.timeouts.filter(function(...args) {
+  window.timeouts = window.timeouts.filter(function (...args) {
     let id, strikeTime;
     let callback;
     [id, strikeTime, callback] = Array.from(args[0]);
@@ -424,9 +434,9 @@ window.advanceClock = function(delta) {
   })();
 };
 
-exports.mockLocalStorage = function() {
+exports.mockLocalStorage = function () {
   const items = {};
-  spyOn(global.localStorage, 'setItem').andCallFake(function(key, item) { items[key] = item.toString(); return undefined; });
+  spyOn(global.localStorage, 'setItem').andCallFake(function (key, item) { items[key] = item.toString(); return undefined; });
   spyOn(global.localStorage, 'getItem').andCallFake(key => items[key] != null ? items[key] : null);
-  return spyOn(global.localStorage, 'removeItem').andCallFake(function(key) { delete items[key]; return undefined; });
+  return spyOn(global.localStorage, 'removeItem').andCallFake(function (key) { delete items[key]; return undefined; });
 };

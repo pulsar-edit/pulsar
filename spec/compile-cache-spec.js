@@ -9,8 +9,8 @@ const path = require('path');
 const temp = require('temp').track();
 const babelCompiler = require('../src/babel');
 const CoffeeScript = require('coffeescript');
-const {TypeScriptSimple} = require('typescript-simple');
 const CSON = require('season');
+const TypeScriptTranspiler = require('../src/typescript');
 const CompileCache = require('../src/compile-cache');
 
 describe('CompileCache', () => {
@@ -25,7 +25,7 @@ describe('CompileCache', () => {
 
     spyOn(babelCompiler, 'compile');
     spyOn(CoffeeScript, 'compile').and.returnValue('the-coffee-code');
-    spyOn(TypeScriptSimple.prototype, 'compile').and.returnValue('the-typescript-code');
+    spyOn(TypeScriptTranspiler, 'compile').and.returnValue('the-typescript-code');
   });
 
   afterEach(() => {
@@ -76,11 +76,11 @@ describe('CompileCache', () => {
       it('compiles the file with typescript and caches it', function () {
         CompileCache.addPathToCache(path.join(fixtures, 'typescript', 'valid.ts'), atomHome);
         expect(CompileCache.getCacheStats()['.ts']).toEqual({hits: 0, misses: 1});
-        expect(TypeScriptSimple.prototype.compile.calls.count()).toBe(1);
+        expect(TypeScriptTranspiler.compile.calls.count()).toBe(1);
 
         CompileCache.addPathToCache(path.join(fixtures, 'typescript', 'valid.ts'), atomHome);
         expect(CompileCache.getCacheStats()['.ts']).toEqual({hits: 1, misses: 1});
-        expect(TypeScriptSimple.prototype.compile.calls.count()).toBe(1);
+        expect(TypeScriptTranspiler.compile.calls.count()).toBe(1);
       })
     });
 
@@ -102,8 +102,8 @@ describe('CompileCache', () => {
     });
   });
 
-  describe('overriding Error.prepareStackTrace', function() {
-    it('removes the override on the next tick, and always assigns the raw stack', async function(done) {
+  describe('overriding Error.prepareStackTrace', function () {
+    it('removes the override on the next tick, and always assigns the raw stack', async function (done) {
       jasmine.filterByPlatform({except: ['win32']}, done); // Flakey Error.stack contents on Win32
 
       Error.prepareStackTrace = () => 'a-stack-trace';
@@ -124,7 +124,7 @@ describe('CompileCache', () => {
       done();
     });
 
-    it('does not infinitely loop when the original prepareStackTrace value is reassigned', function() {
+    it('does not infinitely loop when the original prepareStackTrace value is reassigned', function () {
       const originalPrepareStackTrace = Error.prepareStackTrace;
 
       Error.prepareStackTrace = () => 'a-stack-trace';
@@ -135,10 +135,10 @@ describe('CompileCache', () => {
       expect(Array.isArray(error.getRawStack())).toBe(true);
     });
 
-    it('does not infinitely loop when the assigned prepareStackTrace calls the original prepareStackTrace', function() {
+    it('does not infinitely loop when the assigned prepareStackTrace calls the original prepareStackTrace', function () {
       const originalPrepareStackTrace = Error.prepareStackTrace;
 
-      Error.prepareStackTrace = function(error, stack) {
+      Error.prepareStackTrace = function (error, stack) {
         error.foo = 'bar';
         return originalPrepareStackTrace(error, stack);
       };

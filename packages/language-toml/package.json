@@ -9,9 +9,6 @@
     "atom": "*",
     "node": ">=14"
   },
-  "devDependencies": {
-    "tree-sitter-toml": "^0.5.1"
-  },
   "consumedServices": {
     "hyperlink.injection": {
       "versions": {
