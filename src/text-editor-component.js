@@ -3753,13 +3753,30 @@ class DummyScrollbarComponent {
     );
   }
 
+  // This element can be wider (or taller) than the scrollbar that the browser
+  // draws inside it, so a mousedown here isn't necessarily on the scrollbar.
+  // If it isn't, it's meant for the text beneath, so we pass it along to the
+  // editor.
   didMouseDown(event) {
-    let { bottom, right } = this.element.getBoundingClientRect();
-    const clickedOnScrollbar =
-      this.props.orientation === 'horizontal'
-        ? event.clientY >= bottom - this.getRealScrollbarHeight()
-        : event.clientX >= right - this.getRealScrollbarWidth();
+    // The browser reports a mousedown on a scrollbar as targeting the
+    // scrolling element itself; a mousedown anywhere else in this element
+    // lands on its child. This works even for overlay scrollbars (the default
+    // on macOS), which take up no layout space and so can't be detected by
+    // measurement: a click where an overlay scrollbar would be targets this
+    // element only while the scrollbar is visible.
+    const clickedOnScrollbar = event.target
+      ? event.target === this.element
+      : this.isWithinRealScrollbar(event);
     if (!clickedOnScrollbar) this.props.didMouseDown(event);
+  }
+
+  // Fallback for events with no target: compare the click position with the
+  // measured size of the real scrollbar.
+  isWithinRealScrollbar(event) {
+    let { bottom, right } = this.element.getBoundingClientRect();
+    return this.props.orientation === 'horizontal'
+      ? event.clientY >= bottom - this.getRealScrollbarHeight()
+      : event.clientX >= right - this.getRealScrollbarWidth();
   }
 
   getRealScrollbarWidth() {
