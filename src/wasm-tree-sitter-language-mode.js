@@ -177,7 +177,7 @@ function isBetweenPoints(point, a, b) {
 }
 
 // Make a function suitable for passing to `Parser::parse` as a progress callback.
-function makeProgressCallback (syncTimeoutMicros = PARSE_JOB_LIMIT_MICROS) {
+function makeProgressCallback(syncTimeoutMicros = PARSE_JOB_LIMIT_MICROS) {
   let start = performance.now() * 1000;
   return () => {
     let now = performance.now() * 1000;
@@ -2249,7 +2249,7 @@ class HighlightIterator {
         // cover shallower scopes, so we need to re-assess our list of already
         // open scopes to see if any of them _would've_ been covered at the
         // point when they were opened.
-        let ranges = iterator.languageLayer.getCurrentRanges();
+        let ranges = iterator.languageLayer.getCurrentRanges() ?? [];
         for (let [earlierIterator, earlierOpenScopes] of openScopesByLayer) {
           // It's possible, though uncommon, for injections to overlap, because
           // there's no mechanism that prevents it. Since we sorted the layers

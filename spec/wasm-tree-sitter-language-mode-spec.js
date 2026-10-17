@@ -56,6 +56,9 @@ let cConfig = CSON.readFileSync(cGrammarPath);
 let rubyConfig = CSON.readFileSync(rubyGrammarPath);
 let htmlConfig = CSON.readFileSync(htmlGrammarPath);
 
+// Grammars created by `prepareTSLanguageMode`, disposed of after each spec.
+const preparedGrammars = [];
+
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -73,6 +76,10 @@ describe('WASMTreeSitterLanguageMode', () => {
 
   afterEach(() => {
     if (grammar) { grammar?.subscriptions?.dispose(); }
+    for (let preparedGrammar of preparedGrammars) {
+      preparedGrammar.subscriptions?.dispose();
+    }
+    preparedGrammars.length = 0;
   });
 
   describe('highlighting', () => {
@@ -2989,6 +2996,8 @@ describe('WASMTreeSitterLanguageMode', () => {
         let foo = /patt.lor?em.ern/;
       `);
       const languageMode = await prepareTSLanguageMode(buffer, {
+        includeChildren: true,
+        coverShallowerScopes: true,
         regexQuery: `
           (pattern) @string.regexp
           (optional "?" @keyword.operator.optional)
@@ -3015,13 +3024,15 @@ describe('WASMTreeSitterLanguageMode', () => {
 
     it('ignores an empty scope map from an earlier layer without a tree', async () => {
       const languageMode = await prepareTSLanguageMode(buffer, {
+        includeChildren: true,
+        coverShallowerScopes: true,
         regexQuery: ` (pattern) @string.regexp `,
         jsQuery: ` (regex) @regex-outer (regex_pattern) @regex-inner `
       })
 
       buffer.setText('let foo = /pattern/;');
-      // Wait for the injection layer to be populated.
-      await wait(100);
+      // Wait for all trees to be clean, including the injection layer's.
+      await languageMode.atTransactionEnd();
 
       const rootLayer = languageMode.rootLanguageLayer;
       const rootTree = rootLayer.tree;
@@ -3033,9 +3044,13 @@ describe('WASMTreeSitterLanguageMode', () => {
         expect(hasBoundaries).toBe(false);
         expect(openScopes.size).toBe(0);
 
-        expect(() => {
-          languageMode.scopeDescriptorForPosition(new Point(0, 15));
-        }).not.toThrow();
+        let scopes = languageMode
+          .scopeDescriptorForPosition(new Point(0, 15))
+          .getScopesArray();
+        // With the root tree gone, only the injection layer contributes
+        // scopes; this fails if the injection layer was never built.
+        expect(scopes).toContain('string.regexp');
+        expect(scopes).not.toContain('regex-outer');
       } finally {
         rootLayer.tree = rootTree;
       }
@@ -3047,7 +3062,7 @@ describe('WASMTreeSitterLanguageMode', () => {
       `);
 
       const languageMode = await prepareTSLanguageMode(buffer, {
-        coverShallowerScopes: false,
+        includeChildren: true,
         regexQuery: `
           (pattern) @string.regexp
         `,
@@ -3358,7 +3373,7 @@ describe('WASMTreeSitterLanguageMode', () => {
         `);
 
         const languageMode = await prepareTSLanguageMode(buffer, {
-          includeChildren: false,
+          coverShallowerScopes: true,
           regexQuery: `
             (pattern) @string.regexp
           `,
@@ -4907,40 +4922,49 @@ function stringFragmentsOfTemplateString(templateStringNode) {
   );
 }
 
+// Builds a JavaScript language mode for `buffer` with the given highlights
+// query. If `regexQuery` is given, also registers a regex grammar with that
+// query, plus an injection point for `regex_pattern` nodes configured with
+// `includeChildren` and `coverShallowerScopes`.
 async function prepareTSLanguageMode(buffer, {
-  regexQuery = '',
   jsQuery,
-  includeChildren = true,
-  coverShallowerScopes = true
+  regexQuery,
+  includeChildren = false,
+  coverShallowerScopes = false
 }) {
+  if (regexQuery === undefined && (includeChildren || coverShallowerScopes)) {
+    throw new Error(`includeChildren and coverShallowerScopes only apply when regexQuery is given`);
+  }
+
   jasmine.useRealClock();
   const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+  preparedGrammars.push(jsGrammar);
 
-  let tempJsRegexConfig = {
-    ...jsRegexConfig,
-    injectionRegex: '^(js-regex-for-test)$'
-  };
+  if (regexQuery !== undefined) {
+    let tempJsRegexConfig = {
+      ...jsRegexConfig,
+      injectionRegex: '^(js-regex-for-test)$'
+    };
+    const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
+    preparedGrammars.push(regexGrammar);
+    await regexGrammar.setQueryForTest('highlightsQuery', regexQuery);
 
-  const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
-
-  await regexGrammar.setQueryForTest('highlightsQuery', regexQuery);
-
-  jsGrammar.addInjectionPoint({
-    type: 'regex_pattern',
-    language(regex) {
-      return 'js-regex-for-test';
-    },
-    content(regex) {
-      return regex;
-    },
-    includeChildren,
-    languageScope: null,
-    coverShallowerScopes
-  });
+    jsGrammar.addInjectionPoint({
+      type: 'regex_pattern',
+      language(regex) {
+        return 'js-regex-for-test';
+      },
+      content(regex) {
+        return regex;
+      },
+      includeChildren,
+      languageScope: null,
+      coverShallowerScopes
+    });
+    atom.grammars.addGrammar(regexGrammar);
+  }
 
   await jsGrammar.setQueryForTest('highlightsQuery', jsQuery);
-
-  atom.grammars.addGrammar(regexGrammar);
   atom.grammars.addGrammar(jsGrammar);
 
   const languageMode = new WASMTreeSitterLanguageMode({
