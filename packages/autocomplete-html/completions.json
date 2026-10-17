@@ -1,5 +1,262 @@
 {
   "tags": {
+    "svg": {
+      "description": "The svg element is a container that defines a new coordinate system and viewport. It is used as the outermost element of SVG documents, but it can also be used to embed an SVG fragment inside an SVG or HTML document."
+    },
+    "g": {
+      "description": "The <g> SVG element is a container used to group other SVG elements."
+    },
+    "defs": {
+      "description": "The <defs> element is used to store graphical objects that will be used at a later time. Objects created inside a <defs> element are not rendered directly. To display them you have to reference them (with a use element for example)."
+    },
+    "desc": {
+      "description": "The <desc> element provides an accessible, long-text description of any SVG container element or graphics element."
+    },
+    "title": {
+      "attributes": [
+        "text",
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": "The <title> HTML element defines the document's title that is shown in a glossary(Browser, browser)'s title bar or a page's tab. It only contains text; tags within the element are ignored."
+    },
+    "symbol": {
+      "description": "The <symbol> element is used to define graphical template objects which can be instantiated by a use element."
+    },
+    "use": {
+      "description": "The <use> element takes nodes from within the SVG document, and duplicates them somewhere else."
+    },
+    "image": {
+      "description": "The <image> HTML element is an ancient and poorly supported precursor to the img element."
+    },
+    "switch": {
+      "description": "The <switch> SVG element evaluates any requiredFeatures, requiredExtensions and systemLanguage attributes on its direct child elements in order, and then renders the first child where these attributes evaluate to true."
+    },
+    "style": {
+      "attributes": [
+        "disabled",
+        "media",
+        "blocking",
+        "type",
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "sheet",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": "The <style> HTML element contains style information for a document, or part of a document. It contains CSS, which is applied to the contents of the document containing the <style> element."
+    },
+    "path": {
+      "description": "The <path> SVG element is the generic element to define a shape. All the basic shapes can be created with a path element."
+    },
+    "rect": {
+      "description": "The <rect> element is a basic SVG shape that draws rectangles, defined by their position, width, and height. The rectangles may have their corners rounded."
+    },
+    "circle": {
+      "description": "The <circle> SVG element is an SVG basic shape, used to draw circles based on a center point and a radius."
+    },
+    "ellipse": {
+      "description": "The <ellipse> element is an SVG basic shape, used to create ellipses based on a center coordinate, and both their x and y radius."
+    },
+    "line": {
+      "description": "The <line> element is an SVG basic shape used to create a line connecting two points."
+    },
+    "polyline": {
+      "description": "The <polyline> SVG element is an SVG basic shape that creates straight lines connecting several points. Typically a polyline is used to create open shapes as the last point doesn't have to be connected to the first point. For closed shapes see the polygon element."
+    },
+    "polygon": {
+      "description": "The <polygon> element defines a closed shape consisting of a set of connected straight line segments. The last point is connected to the first point."
+    },
+    "text": {
+      "description": "The SVG <text> element draws a graphics element consisting of text. It's possible to apply a gradient, pattern, clipping path, mask, or filter to <text>, like any other SVG graphics element."
+    },
+    "tspan": {
+      "description": "The SVG <tspan> element defines a subtext within a SVGElement('text') element or another <tspan> element. It allows for adjustment of the style and/or position of that subtext as needed."
+    },
+    "textPath": {
+      "description": "To render text along the shape of a path, enclose the text in a <textPath> element that has an href attribute with a reference to the path element."
+    },
+    "marker": {
+      "description": "The <marker> element defines a graphic used for drawing arrowheads or polymarkers on a given path, line, polyline or polygon element."
+    },
+    "linearGradient": {
+      "description": "The <linearGradient> element lets authors define linear gradients to apply to other SVG elements."
+    },
+    "radialGradient": {
+      "description": "The <radialGradient> element lets authors define radial gradients that can be applied to fill or stroke of graphical elements."
+    },
+    "stop": {
+      "description": "The SVG <stop> element defines a color and its position to use on a gradient. This element is always a child of a linearGradient or radialGradient element."
+    },
+    "pattern": {
+      "description": "The <pattern> element defines a graphics object which can be redrawn at repeated x- and y-coordinate intervals (tiled) to cover an area."
+    },
     "clipPath": {
       "description": "The <clipPath> SVG element defines a clipping path, to be used by the clip-path property."
     },
@@ -8,6 +265,15 @@
     },
     "filter": {
       "description": "The <filter> SVG element defines a custom filter effect by grouping atomic filter primitives. It is never rendered itself, but must be used by the filter attribute on SVG elements, or the filter CSS property for SVG/HTML elements."
+    },
+    "feDistantLight": {
+      "description": "The <feDistantLight> filter primitive defines a distant light source that can be used within a lighting filter primitive: feDiffuseLighting or feSpecularLighting."
+    },
+    "fePointLight": {
+      "description": "The <fePointLight> filter primitive defines a light source which allows to create a point light effect. It that can be used within a lighting filter primitive: feDiffuseLighting or feSpecularLighting."
+    },
+    "feSpotLight": {
+      "description": "The <feSpotLight> SVG filter primitive defines a light source that can be used to create a spotlight effect."
     },
     "feBlend": {
       "description": "The <feBlend> SVG filter primitive composes two objects together ruled by a certain blending mode. This is similar to what is known from image editing software when blending two layers. The mode is defined by the mode attribute."
@@ -42,9 +308,6 @@
     "feDisplacementMap": {
       "description": "The <feDisplacementMap> SVG filter primitive uses the pixel values from the image from in2 to spatially displace the image from in."
     },
-    "feDropShadow": {
-      "description": "The SVG <feDropShadow> filter primitive creates a drop shadow of the input image. It can only be used inside a SVGElement('filter') element."
-    },
     "feFlood": {
       "description": "The <feFlood> SVG filter primitive fills the filter subregion with the color and opacity defined by flood-color and flood-opacity."
     },
@@ -75,14 +338,255 @@
     "feTurbulence": {
       "description": "The <feTurbulence> SVG filter primitive creates an image using the Perlin turbulence function. It allows the synthesis of artificial textures like clouds or marble. The resulting image will fill the entire filter primitive subregion."
     },
-    "feDistantLight": {
-      "description": "The <feDistantLight> filter primitive defines a distant light source that can be used within a lighting filter primitive: feDiffuseLighting or feSpecularLighting."
+    "a": {
+      "attributes": [
+        "target",
+        "download",
+        "ping",
+        "rel",
+        "relList",
+        "hreflang",
+        "type",
+        "text",
+        "referrerPolicy",
+        "coords",
+        "charset",
+        "name",
+        "rev",
+        "shape",
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "href",
+        "origin",
+        "protocol",
+        "username",
+        "password",
+        "host",
+        "hostname",
+        "port",
+        "pathname",
+        "search",
+        "hash",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": "The <a> HTML element (or _anchor_ element), with its href attribute, creates a hyperlink to web pages, files, email addresses, locations in the same page, or anything else a URL can address."
     },
-    "fePointLight": {
-      "description": "The <fePointLight> filter primitive defines a light source which allows to create a point light effect. It that can be used within a lighting filter primitive: feDiffuseLighting or feSpecularLighting."
+    "view": {
+      "description": "A view is a defined way to view the image, like a zoom level or a detail view."
     },
-    "feSpotLight": {
-      "description": "The <feSpotLight> SVG filter primitive defines a light source that can be used to create a spotlight effect."
+    "script": {
+      "attributes": [
+        "src",
+        "type",
+        "noModule",
+        "async",
+        "defer",
+        "crossOrigin",
+        "text",
+        "integrity",
+        "referrerPolicy",
+        "blocking",
+        "charset",
+        "event",
+        "htmlFor",
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": "The <script> HTML element is used to embed executable code or data; this is typically used to embed or refer to JavaScript code. The <script> element can also be used with other languages, such as WebGL's GLSL shader programming language and JSON."
+    },
+    "animate": {
+      "description": "The SVG <animate> element provides a way to animate an attribute of an element over time."
+    },
+    "set": {
+      "description": "The SVG <set> element provides a simple means of just setting the value of an attribute for a specified duration."
+    },
+    "animateMotion": {
+      "description": "The SVG <animateMotion> element provides a way to define how an element moves along a motion path."
+    },
+    "mpath": {
+      "description": "The <mpath> sub-element for the animateMotion element provides the ability to reference an external path element as the definition of a motion path."
+    },
+    "animateTransform": {
+      "description": "The animateTransform element animates a transformation attribute on its target element, thereby allowing animations to control translation, scaling, rotation, and/or skewing."
+    },
+    "metadata": {
+      "description": "The <metadata> SVG element adds metadata to SVG content. Metadata is structured information about data. The contents of <metadata> should be elements from other XML Glossary(namespace, namespaces) such as RDF, FOAF, etc."
+    },
+    "foreignObject": {
+      "description": "The <foreignObject> SVG element includes elements from a different XML namespace. In the context of a browser, it is most likely (X)HTML."
+    },
+    "fencedframe": {
+      "description": ""
+    },
+    "feDropShadow": {
+      "description": "The SVG <feDropShadow> filter primitive creates a drop shadow of the input image. It can only be used inside a SVGElement('filter') element."
     },
     "html": {
       "attributes": [
@@ -266,9 +770,6 @@
         "ariaValueText"
       ],
       "description": "The <head> HTML element contains machine-readable information (metadata) about the document, like its title, scripts, and style sheets."
-    },
-    "title": {
-      "description": "The <title> HTML element defines the document's title that is shown in a glossary(Browser, browser)'s title bar or a page's tab. It only contains text; tags within the element are ignored."
     },
     "base": {
       "attributes": [
@@ -568,9 +1069,6 @@
         "ariaValueText"
       ],
       "description": "The <meta> HTML element represents Metadata,metadata that cannot be represented by other HTML meta-related elements, like base, link, script, style or title."
-    },
-    "style": {
-      "description": "The <style> HTML element contains style information for a document, or part of a document. It contains CSS, which is applied to the contents of the document containing the <style> element."
     },
     "body": {
       "attributes": [
@@ -3257,6 +3755,97 @@
       ],
       "description": "The <main> HTML element represents the dominant content of the body of a document. The main content area consists of content that is directly related to or expands upon the central topic of a document, or the central functionality of an application."
     },
+    "search": {
+      "attributes": [
+        "inert",
+        "accessKey",
+        "accessKeyLabel",
+        "innerText",
+        "outerText",
+        "namespaceURI",
+        "prefix",
+        "localName",
+        "tagName",
+        "id",
+        "className",
+        "classList",
+        "slot",
+        "attributes",
+        "shadowRoot",
+        "oncopy",
+        "oncut",
+        "onpaste",
+        "contentEditable",
+        "enterKeyHint",
+        "isContentEditable",
+        "inputMode",
+        "dataset",
+        "tabIndex",
+        "nodeType",
+        "nodeName",
+        "baseURI",
+        "isConnected",
+        "ownerDocument",
+        "parentNode",
+        "parentElement",
+        "childNodes",
+        "firstChild",
+        "lastChild",
+        "previousSibling",
+        "nextSibling",
+        "nodeValue",
+        "textContent",
+        "children",
+        "firstElementChild",
+        "lastElementChild",
+        "childElementCount",
+        "previousElementSibling",
+        "nextElementSibling",
+        "assignedSlot",
+        "role",
+        "ariaAtomic",
+        "ariaAutoComplete",
+        "ariaBusy",
+        "ariaChecked",
+        "ariaColCount",
+        "ariaColIndex",
+        "ariaColIndexText",
+        "ariaColSpan",
+        "ariaCurrent",
+        "ariaDescription",
+        "ariaDisabled",
+        "ariaExpanded",
+        "ariaHasPopup",
+        "ariaHidden",
+        "ariaInvalid",
+        "ariaKeyShortcuts",
+        "ariaLabel",
+        "ariaLevel",
+        "ariaLive",
+        "ariaModal",
+        "ariaMultiLine",
+        "ariaMultiSelectable",
+        "ariaOrientation",
+        "ariaPlaceholder",
+        "ariaPosInSet",
+        "ariaPressed",
+        "ariaReadOnly",
+        "ariaRequired",
+        "ariaRoleDescription",
+        "ariaRowCount",
+        "ariaRowIndex",
+        "ariaRowIndexText",
+        "ariaRowSpan",
+        "ariaSelected",
+        "ariaSetSize",
+        "ariaSort",
+        "ariaValueMax",
+        "ariaValueMin",
+        "ariaValueNow",
+        "ariaValueText"
+      ],
+      "description": ""
+    },
     "div": {
       "attributes": [
         "align",
@@ -3348,9 +3937,6 @@
         "ariaValueText"
       ],
       "description": "The <div> HTML element is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g. styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element)."
-    },
-    "a": {
-      "description": "The <a> HTML element (or _anchor_ element), with its href attribute, creates a hyperlink to web pages, files, email addresses, locations in the same page, or anything else a URL can address."
     },
     "em": {
       "attributes": [
@@ -9957,9 +10543,6 @@
       ],
       "description": "The <dialog> HTML element represents a dialog box or other interactive component, such as a dismissible alert, inspector, or subwindow."
     },
-    "script": {
-      "description": "The <script> HTML element is used to embed executable code or data; this is typically used to embed or refer to JavaScript code. The <script> element can also be used with other languages, such as WebGL's GLSL shader programming language and JSON."
-    },
     "noscript": {
       "attributes": [
         "inert",
@@ -13112,101 +13695,8 @@
     "portal": {
       "description": "The <portal> HTML element enables the embedding of another HTML page into the current one for the purposes of allowing smoother navigation into new pages."
     },
-    "animate": {
-      "description": "The SVG <animate> element provides a way to animate an attribute of an element over time."
-    },
-    "set": {
-      "description": "The SVG <set> element provides a simple means of just setting the value of an attribute for a specified duration."
-    },
     "discard": {
       "description": "The <discard> SVG element allows authors to specify the time at which particular elements are to be discarded, thereby reducing the resources required by an SVG user agent. This is particularly useful to help SVG viewers conserve memory while displaying long-running documents."
-    },
-    "animateMotion": {
-      "description": "The SVG <animateMotion> element provides a way to define how an element moves along a motion path."
-    },
-    "mpath": {
-      "description": "The <mpath> sub-element for the animateMotion element provides the ability to reference an external path element as the definition of a motion path."
-    },
-    "animateTransform": {
-      "description": "The animateTransform element animates a transformation attribute on its target element, thereby allowing animations to control translation, scaling, rotation, and/or skewing."
-    },
-    "svg": {
-      "description": "The svg element is a container that defines a new coordinate system and viewport. It is used as the outermost element of SVG documents, but it can also be used to embed an SVG fragment inside an SVG or HTML document."
-    },
-    "g": {
-      "description": "The <g> SVG element is a container used to group other SVG elements."
-    },
-    "defs": {
-      "description": "The <defs> element is used to store graphical objects that will be used at a later time. Objects created inside a <defs> element are not rendered directly. To display them you have to reference them (with a use element for example)."
-    },
-    "desc": {
-      "description": "The <desc> element provides an accessible, long-text description of any SVG container element or graphics element."
-    },
-    "symbol": {
-      "description": "The <symbol> element is used to define graphical template objects which can be instantiated by a use element."
-    },
-    "use": {
-      "description": "The <use> element takes nodes from within the SVG document, and duplicates them somewhere else."
-    },
-    "image": {
-      "description": "The <image> HTML element is an ancient and poorly supported precursor to the img element."
-    },
-    "switch": {
-      "description": "The <switch> SVG element evaluates any requiredFeatures, requiredExtensions and systemLanguage attributes on its direct child elements in order, and then renders the first child where these attributes evaluate to true."
-    },
-    "path": {
-      "description": "The <path> SVG element is the generic element to define a shape. All the basic shapes can be created with a path element."
-    },
-    "rect": {
-      "description": "The <rect> element is a basic SVG shape that draws rectangles, defined by their position, width, and height. The rectangles may have their corners rounded."
-    },
-    "circle": {
-      "description": "The <circle> SVG element is an SVG basic shape, used to draw circles based on a center point and a radius."
-    },
-    "ellipse": {
-      "description": "The <ellipse> element is an SVG basic shape, used to create ellipses based on a center coordinate, and both their x and y radius."
-    },
-    "line": {
-      "description": "The <line> element is an SVG basic shape used to create a line connecting two points."
-    },
-    "polyline": {
-      "description": "The <polyline> SVG element is an SVG basic shape that creates straight lines connecting several points. Typically a polyline is used to create open shapes as the last point doesn't have to be connected to the first point. For closed shapes see the polygon element."
-    },
-    "polygon": {
-      "description": "The <polygon> element defines a closed shape consisting of a set of connected straight line segments. The last point is connected to the first point."
-    },
-    "text": {
-      "description": "The SVG <text> element draws a graphics element consisting of text. It's possible to apply a gradient, pattern, clipping path, mask, or filter to <text>, like any other SVG graphics element."
-    },
-    "tspan": {
-      "description": "The SVG <tspan> element defines a subtext within a SVGElement('text') element or another <tspan> element. It allows for adjustment of the style and/or position of that subtext as needed."
-    },
-    "textPath": {
-      "description": "To render text along the shape of a path, enclose the text in a <textPath> element that has an href attribute with a reference to the path element."
-    },
-    "marker": {
-      "description": "The <marker> element defines a graphic used for drawing arrowheads or polymarkers on a given path, line, polyline or polygon element."
-    },
-    "linearGradient": {
-      "description": "The <linearGradient> element lets authors define linear gradients to apply to other SVG elements."
-    },
-    "radialGradient": {
-      "description": "The <radialGradient> element lets authors define radial gradients that can be applied to fill or stroke of graphical elements."
-    },
-    "stop": {
-      "description": "The SVG <stop> element defines a color and its position to use on a gradient. This element is always a child of a linearGradient or radialGradient element."
-    },
-    "pattern": {
-      "description": "The <pattern> element defines a graphics object which can be redrawn at repeated x- and y-coordinate intervals (tiled) to cover an area."
-    },
-    "view": {
-      "description": "A view is a defined way to view the image, like a zoom level or a detail view."
-    },
-    "metadata": {
-      "description": "The <metadata> SVG element adds metadata to SVG content. Metadata is structured information about data. The contents of <metadata> should be elements from other XML Glossary(namespace, namespaces) such as RDF, FOAF, etc."
-    },
-    "foreignObject": {
-      "description": "The <foreignObject> SVG element includes elements from a different XML namespace. In the context of a browser, it is most likely (X)HTML."
     }
   },
   "attributes": {
@@ -14327,34 +14817,47 @@
         "alternate",
         "author",
         "bookmark",
+        "external",
         "help",
         "license",
+        "me",
         "next",
         "nofollow",
+        "noopener",
         "noreferrer",
-        "prefetch",
+        "opener",
         "prev",
+        "privacy-policy",
         "search",
-        "sidebar",
         "tag",
-        "external"
+        "terms-of-service"
       ]
     },
     "link/rel": {
       "attribOption": [
         "alternate",
         "author",
+        "canonical",
+        "compression-dictionary",
+        "dns-prefetch",
+        "expect",
         "help",
         "icon",
         "license",
+        "manifest",
+        "me",
+        "modulepreload",
         "next",
         "pingback",
+        "preconnect",
         "prefetch",
+        "preload",
+        "prerender",
         "prev",
+        "privacy-policy",
         "search",
-        "sidebar",
         "stylesheet",
-        "tag"
+        "terms-of-service"
       ]
     },
     "readonly": {

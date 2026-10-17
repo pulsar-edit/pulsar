@@ -1,7 +1,7 @@
 describe('HTML autocompletions', () => {
   let editor, provider, languageMode
 
-  function getCompletions () {
+  function getCompletions() {
     const cursor = editor.getLastCursor()
     const bufferPosition = cursor.getBufferPosition()
     const scopeDescriptor = cursor.getScopeDescriptor()
@@ -504,7 +504,7 @@ describe('HTML autocompletions', () => {
     await languageMode.atTransactionEnd()
 
     completions = getCompletions()
-    expect(completions.length).toBe(13)
+    expect(completions.length).toBe(23)
     expect(completions.map(_ => _.text)).toContain('stylesheet')
 
     expect(completions[0].text).toBe('alternate')
