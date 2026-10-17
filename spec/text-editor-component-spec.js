@@ -5447,6 +5447,64 @@ describe('TextEditorComponent', () => {
         });
         expect(editor.getCursorScreenPosition()).toEqual([4, 0]);
       });
+
+      it('uses the target of the mousedown event to decide whether the mousedown was on the actual scrollbar', async () => {
+        const { component, editor } = buildComponent({ height: 100 });
+        await setEditorWidthInCharacters(component, 6);
+
+        const verticalScrollbar = component.refs.verticalScrollbar;
+        const horizontalScrollbar = component.refs.horizontalScrollbar;
+
+        // Overlay scrollbars take up no layout space, so their size measures
+        // as zero; the event's target has to decide instead.
+        spyOn(verticalScrollbar, 'getRealScrollbarWidth').and.returnValue(0);
+        spyOn(horizontalScrollbar, 'getRealScrollbarHeight').and.returnValue(0);
+
+        const verticalRect = verticalScrollbar.element.getBoundingClientRect();
+        const horizontalRect = horizontalScrollbar.element.getBoundingClientRect();
+        const verticalClientX = (verticalRect.left + verticalRect.right) / 2;
+        const horizontalClientY = (horizontalRect.top + horizontalRect.bottom) / 2;
+
+        // A mousedown on the scrollbar itself targets the scrolling element,
+        // so it isn't delegated and the selection survives.
+        editor.setSelectedBufferRange([[1, 0], [2, 3]]);
+        verticalScrollbar.didMouseDown({
+          button: 0,
+          detail: 1,
+          target: verticalScrollbar.element,
+          clientY: clientTopForLine(component, 4),
+          clientX: verticalClientX
+        });
+        horizontalScrollbar.didMouseDown({
+          button: 0,
+          detail: 1,
+          target: horizontalScrollbar.element,
+          clientY: horizontalClientY,
+          clientX: component.refs.content.getBoundingClientRect().left
+        });
+        expect(editor.getSelectedBufferRange()).toEqual([[1, 0], [2, 3]]);
+
+        // A mousedown at the same spot when no scrollbar is there lands on
+        // the element's child, so it's delegated to the parent component.
+        verticalScrollbar.didMouseDown({
+          button: 0,
+          detail: 1,
+          target: verticalScrollbar.element.firstChild,
+          clientY: clientTopForLine(component, 4),
+          clientX: verticalClientX
+        });
+        expect(editor.getSelectedBufferRange().isEmpty()).toBe(true);
+        expect(editor.getCursorScreenPosition().row).toBe(4);
+
+        horizontalScrollbar.didMouseDown({
+          button: 0,
+          detail: 1,
+          target: horizontalScrollbar.element.firstChild,
+          clientY: horizontalClientY,
+          clientX: component.refs.content.getBoundingClientRect().left
+        });
+        expect(editor.getCursorScreenPosition().column).toBe(0);
+      });
     });
   });
 
