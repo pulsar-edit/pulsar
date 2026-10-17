@@ -146,8 +146,14 @@ describe("Renders Markdown", () => {
         expect(render("![a](./image.png)")).toContain(`src="${imagePath}"`);
       });
 
-      it("leaves an absolute path to an existing file alone", () => {
+      it("leaves an absolute path to an existing file alone", (done) => {
+        // A Windows path isn't a valid Markdown link destination: its
+        // backslashes are treated as escapes or percent-encoded. This spec is
+        // about POSIX-style absolute paths, which start with `/`.
+        jasmine.filterByPlatform({ except: ['win32'] }, done);
+
         expect(render(`![a](${imagePath})`)).toContain(`src="${imagePath}"`);
+        done();
       });
 
       it("leaves paths to missing files alone instead of throwing", () => {
