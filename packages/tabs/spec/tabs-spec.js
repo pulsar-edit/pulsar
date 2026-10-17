@@ -34,10 +34,16 @@ class SamplePaneItem {
     return this.emitter.on('did-change-path', cb);
   }
   onDidDelete (cb) {
+    return this.emitter.on('did-delete', cb);
+  }
+  onDidChangeDeleted (cb) {
     return this.emitter.on('did-change-deleted', cb);
   }
   onDidConflict (cb) {
     return this.emitter.on('did-conflict', cb);
+  }
+  onDidChangeConflicted (cb) {
+    return this.emitter.on('did-change-conflicted', cb);
   }
 
   save() {
@@ -68,26 +74,36 @@ class SamplePaneItem {
     }
   }
 
+  // Like `TextBuffer`: `did-change-conflicted` fires on any change, but
+  // `did-conflict` fires only upon entering the conflicted state.
   _setIsConflicted (isConflicted) {
     let wasConflicted = this._isConflicted;
     this._isConflicted = isConflicted;
-    if (isConflicted && !wasConflicted) {
-      this._trigger('did-conflict', isConflicted);
-    }
+    if (isConflicted === wasConflicted) return;
+    this._trigger('did-change-conflicted', isConflicted);
+    if (isConflicted) this._trigger('did-conflict');
   }
 
+  // Like `TextBuffer`: `did-change-deleted` fires on any change, but
+  // `did-delete` fires only upon entering the deleted state.
   _setIsDeleted (isDeleted) {
     let wasDeleted = this._isDeleted;
     this._isDeleted = isDeleted;
-    if (isDeleted && !wasDeleted) {
-      console.log('Triggering deletion change!');
-      this._trigger('did-change-deleted', isDeleted);
-    }
+    if (isDeleted === wasDeleted) return;
+    this._trigger('did-change-deleted', isDeleted);
+    if (isDeleted) this._trigger('did-delete');
   }
 
   _trigger (eventName, ...args) {
     this.emitter.emit(eventName, ...args);
   }
+}
+
+// A pane item that predates `onDidChangeDeleted` and `onDidChangeConflicted`,
+// and can only report entering those states.
+class LegacySamplePaneItem extends SamplePaneItem {
+  onDidChangeDeleted = undefined;
+  onDidChangeConflicted = undefined;
 }
 
 
@@ -389,6 +405,52 @@ describe("TabBarView", () => {
       // added to the tab.
       atom.config.set('tabs.enableItemStatusColoring', false);
       paneItem._setIsConflicted(true);
+      expect(tab.element).not.toHaveClass('conflicted');
+    });
+
+    it("removes the 'deleted' class if the item leaves the 'deleted' state without being saved", () => {
+      // For instance, when a deleted file is restored on disk.
+      paneItem = new SamplePaneItem('test-1');
+      pane.addItem(paneItem);
+
+      let tabBar = new TabBarView(pane, 'center');
+      let tab = tabBar.tabs.find(t => t.item === paneItem);
+
+      paneItem._setIsDeleted(true);
+      expect(tab.element).toHaveClass('deleted');
+
+      paneItem._setIsDeleted(false);
+      expect(tab.element).not.toHaveClass('deleted');
+    });
+
+    it("removes the 'conflicted' class if the item leaves the 'conflicted' state without being saved", () => {
+      paneItem = new SamplePaneItem('test-1');
+      pane.addItem(paneItem);
+
+      let tabBar = new TabBarView(pane, 'center');
+      let tab = tabBar.tabs.find(t => t.item === paneItem);
+
+      paneItem._setIsConflicted(true);
+      expect(tab.element).toHaveClass('conflicted');
+
+      paneItem._setIsConflicted(false);
+      expect(tab.element).not.toHaveClass('conflicted');
+    });
+
+    it("falls back to `onDidDelete` and `onDidConflict` for items that lack the status-change methods", () => {
+      paneItem = new LegacySamplePaneItem('test-1');
+      pane.addItem(paneItem);
+
+      let tabBar = new TabBarView(pane, 'center');
+      let tab = tabBar.tabs.find(t => t.item === paneItem);
+
+      paneItem._setIsDeleted(true);
+      expect(tab.element).toHaveClass('deleted');
+      paneItem._setIsConflicted(true);
+      expect(tab.element).toHaveClass('conflicted');
+
+      paneItem.save();
+      expect(tab.element).not.toHaveClass('deleted');
       expect(tab.element).not.toHaveClass('conflicted');
     });
 

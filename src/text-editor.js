@@ -1047,6 +1047,28 @@ module.exports = class TextEditor {
     return this.getBuffer().onDidDelete(callback);
   }
 
+  // Extended: Calls your `callback` when the result of {::isInConflict}
+  // changes.
+  //
+  // * `callback` {Function}
+  //   * `isConflicted` {Boolean}
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidChangeConflicted(callback) {
+    return this.getBuffer().onDidChangeConflicted(callback);
+  }
+
+  // Extended: Calls your `callback` when the result of {::isDeleted} changes.
+  // Unlike {::onDidDelete}, this also fires when a deleted file is restored.
+  //
+  // * `callback` {Function}
+  //   * `isDeleted` {Boolean}
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidChangeDeleted(callback) {
+    return this.getBuffer().onDidChangeDeleted(callback);
+  }
+
   // Extended: Calls your `callback` before text has been inserted.
   //
   // * `callback` {Function}

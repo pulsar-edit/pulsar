@@ -164,17 +164,34 @@ class TabView {
       );
     }
 
-    // Subscribe to changes in "conflicted" status on this pane item.
-    if (typeof this.item.onDidConflict === 'function') {
+    // Subscribe to changes in "conflicted" status on this pane item. Prefer
+    // `onDidChangeConflicted`, since `onDidConflict` doesn't tell us when a
+    // conflict is resolved.
+    if (typeof this.item.onDidChangeConflicted === 'function') {
+      const onDidChangeConflictedDisposable = this.item.onDidChangeConflicted(() => {
+        this.updateConflictedStatus();
+      });
+      this.addItemDisposable(onDidChangeConflictedDisposable, 'onDidChangeConflicted');
+    } else if (typeof this.item.onDidConflict === 'function') {
       const onDidConflictDisposable = this.item.onDidConflict(() => {
         this.updateConflictedStatus();
       });
       this.addItemDisposable(onDidConflictDisposable, 'onDidConflict');
     }
 
-    // Subscribe to changes in "deleted" status on this pane item.
-    if (typeof this.item.onDidDelete === 'function') {
-      let onDidDeleteDisposable = this.item.onDidDelete(() => {
+    // Subscribe to changes in "deleted" status on this pane item. Prefer
+    // `onDidChangeDeleted`, since `onDidDelete` doesn't tell us when a deleted
+    // file is restored.
+    if (typeof this.item.onDidChangeDeleted === 'function') {
+      const onDidChangeDeletedDisposable = this.item.onDidChangeDeleted(isDeleted => {
+        // Deletion ends a tab's pending state; restoration shouldn't affect
+        // it.
+        if (isDeleted) this.terminatePendingState();
+        this.updateDeletedStatus();
+      });
+      this.addItemDisposable(onDidChangeDeletedDisposable, 'onDidChangeDeleted');
+    } else if (typeof this.item.onDidDelete === 'function') {
+      const onDidDeleteDisposable = this.item.onDidDelete(() => {
         this.terminatePendingState();
         this.updateDeletedStatus();
       });
