@@ -23,6 +23,18 @@ describe('MarkdownPreviewView', function () {
     jasmine.useRealClock()
 
     jasmine.unspy(TextMateLanguageMode.prototype, 'tokenizeInBackground')
+
+    // Activate packages before creating the preview. The preview starts
+    // rendering as soon as it's constructed, and `markdown-preview`'s config
+    // schema doesn't exist until the package is loaded; a render that starts
+    // too early would see `undefined` for every setting — including
+    // `useOriginalParser`, which decides which parser is used.
+    await atom.packages.activatePackage('language-ruby')
+    await atom.packages.activatePackage('language-javascript')
+    await atom.packages.activatePackage('markdown-preview')
+
+    // Specs never go through startup, so the preview would otherwise wait
+    // forever for initial packages to activate before rendering.
     spyOn(atom.packages, 'hasActivatedInitialPackages').andReturn(true)
 
     const filePath = atom.project
@@ -31,10 +43,6 @@ describe('MarkdownPreviewView', function () {
 
     preview = new MarkdownPreviewView({ filePath })
     jasmine.attachToDOM(preview.element)
-
-    await atom.packages.activatePackage('language-ruby')
-    await atom.packages.activatePackage('language-javascript')
-    await atom.packages.activatePackage('markdown-preview')
   })
 
   afterEach(() => preview.destroy())
@@ -415,6 +423,52 @@ end\
     })
   })
 
+  describe('with the built-in Markdown parser', function () {
+    // The specs above use the original parser, since it's the default. These
+    // exercise the `atom.ui.markdown` code path instead. (Unlike the original
+    // parser, it resolves relative image paths only when the file exists.)
+    beforeEach(async () => {
+      atom.config.set('markdown-preview.useOriginalParser', false)
+      await preview.renderMarkdown()
+    })
+
+    it('renders the document', function () {
+      expect(preview.element.textContent).not.toMatch('Previewing Markdown Failed')
+      expect(preview.element.querySelector('p')).not.toBeNull()
+    })
+
+    it('resolves images that exist and leaves the rest alone', async () => {
+      preview.destroy()
+
+      const dir = temp.mkdirSync('atom')
+      const filePath = path.join(dir, 'images.md')
+      const imagePath = path.join(dir, 'exists.png')
+      fs.writeFileSync(imagePath, '')
+      fs.writeFileSync(
+        filePath,
+        [
+          '![Relative](exists.png)',
+          '![DotRelative](./exists.png)',
+          '![Missing](missing.png)',
+          '![MissingAbsolute](/no/such/dir/missing.png)',
+          '![Web](http://github.com/image3.png)'
+        ].join('\n\n')
+      )
+      preview = new MarkdownPreviewView({ filePath })
+      jasmine.attachToDOM(preview.element)
+      await preview.renderMarkdown()
+
+      const srcFor = alt =>
+        preview.element.querySelector(`img[alt=${alt}]`).getAttribute('src')
+
+      expect(srcFor('Relative')).toBe(imagePath)
+      expect(srcFor('DotRelative')).toBe(imagePath)
+      expect(srcFor('Missing')).toBe('missing.png')
+      expect(srcFor('MissingAbsolute')).toBe('/no/such/dir/missing.png')
+      expect(srcFor('Web')).toBe('http://github.com/image3.png')
+    })
+  })
+
   describe('gfm newlines', function () {
     describe('when gfm newlines are not enabled', function () {
       it('creates a single paragraph with <br>', async () => {
@@ -464,7 +518,7 @@ end\
     it('adds the `has-selection` class to the preview depending on if there is a text selection', async () => {
       jasmine.useRealClock();
       expect(preview.element.classList.contains('has-selection')).toBe(false)
-      await conditionPromise(() => document.querySelector('atom-text-editor'));
+      await preview.renderMarkdown()
       const selection = window.getSelection()
       selection.removeAllRanges()
       selection.selectAllChildren(document.querySelector('atom-text-editor'))

@@ -4,6 +4,16 @@ const MarkdownIt = require("markdown-it");
 const { TextEditor } = require("atom");
 const fuzzyNative = require("@pulsar-edit/fuzzy-native");
 
+// Whether the given path points to a file. Unlike `fs.statSync`, doesn't throw
+// if the path doesn't exist.
+function isFile(filePath) {
+  try {
+    return fs.statSync(filePath).isFile();
+  } catch {
+    return false;
+  }
+}
+
 // Helper Markdown Components
 const mdComponents = {
   deps: {
@@ -180,7 +190,7 @@ function renderMarkdown(content, givenOpts = {}) {
         let resolved = false;
         if (couldBeLocalItem) {
           let newSrc = path.resolve(path.dirname(opts.filePath), rawSrc);
-          if (fs.lstatSync(newSrc).isFile()) {
+          if (isFile(newSrc)) {
             token.attrSet("src", newSrc);
             resolved = true;
           }
@@ -205,14 +215,16 @@ function renderMarkdown(content, givenOpts = {}) {
         // Now to handle the possible web or local link
         let resolved = false;
         if (couldBeLocalItem) {
-          if (fs.lstatSync(rawSrc).isFile()) {
+          // Check the original `src`, since `rawSrc` no longer has its
+          // leading slash.
+          if (isFile(token.attrGet("src"))) {
             // This already resolves to a file, so we don't need to touch it!
             resolved = true;
           } else {
             const [rootDirectory] = atom.project.relativizePath(opts.filePath);
             if (rootDirectory) {
               let newSrc = path.join(rootDirectory, rawSrc);
-              if (fs.lstatSync(newSrc).isFile()) {
+              if (isFile(newSrc)) {
                 token.attrSet("src", newSrc);
                 resolved = true;
               }
@@ -233,13 +245,19 @@ function renderMarkdown(content, givenOpts = {}) {
         }
       } else if (
         !rawSrc.startsWith("http") &&
-        !mdComponents.reg.globalLinks.base64.test(rawSrc) &&
-        hasRootDomain
+        !mdComponents.reg.globalLinks.base64.test(rawSrc)
       ) {
         // This isn't a base64 URL, but it also doesn't start with `./` or `/`,
         // and it's not a full URL with scheme, either. Assume it's an implicit
-        // relative URL.
-        token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawSrc}`);
+        // relative URL — and, like with `./`, try to resolve it locally first.
+        let newSrc = couldBeLocalItem
+          ? path.resolve(path.dirname(opts.filePath), rawSrc)
+          : null;
+        if (newSrc && isFile(newSrc)) {
+          token.attrSet("src", newSrc);
+        } else if (hasRootDomain) {
+          token.attrSet("src", `${cleanRootDomain()}/raw/HEAD/${rawSrc}`);
+        }
       } else if (
         [".gif", ".png", ".jpg", ".jpeg", ".webp"].find(ext => rawSrc.endsWith(ext)) && rawSrc.startsWith("https://github.com") && rawSrc.includes("blob")
       ) {

@@ -1,4 +1,7 @@
 const dedent = require('dedent');
+const fs = require('fs');
+const path = require('path');
+const temp = require('temp').track();
 
 describe("Renders Markdown", () => {
   describe("properly when given no opts", () => {
@@ -120,6 +123,50 @@ describe("Renders Markdown", () => {
       )).toBe(
         '<p><img src="data:image/svg+xml;base64,SoMeBaSe64cArAcTerS+" alt="Baseline icon"></p>\n'
       );
+    });
+
+    describe("when given only a filePath", () => {
+      let dir, filePath, imagePath;
+
+      beforeEach(() => {
+        dir = temp.mkdirSync('atom-spec-ui-images');
+        filePath = path.join(dir, 'README.md');
+        imagePath = path.join(dir, 'image.png');
+        fs.writeFileSync(imagePath, '');
+      });
+
+      const render = (markdown, opts = {}) =>
+        atom.ui.markdown.render(markdown, { filePath, ...opts });
+
+      it("resolves an implicit relative path to an existing file", () => {
+        expect(render("![a](image.png)")).toContain(`src="${imagePath}"`);
+      });
+
+      it("resolves a `./` path to an existing file", () => {
+        expect(render("![a](./image.png)")).toContain(`src="${imagePath}"`);
+      });
+
+      it("leaves an absolute path to an existing file alone", () => {
+        expect(render(`![a](${imagePath})`)).toContain(`src="${imagePath}"`);
+      });
+
+      it("leaves paths to missing files alone instead of throwing", () => {
+        expect(render("![a](missing.png)")).toContain('src="missing.png"');
+        expect(render("![a](./missing.png)")).toContain('src="./missing.png"');
+        expect(render("![a](/no/such/dir/missing.png)")).toContain(
+          'src="/no/such/dir/missing.png"'
+        );
+      });
+
+      it("falls back to a GitHub URL for a missing file when a GitHub rootDomain is also given", () => {
+        expect(
+          render("![a](missing.png)", {
+            rootDomain: "https://github.com/pulsar-edit/pulsar"
+          })
+        ).toContain(
+          'src="https://github.com/pulsar-edit/pulsar/raw/HEAD/missing.png"'
+        );
+      });
     });
   });
 
