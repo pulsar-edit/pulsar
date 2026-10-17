@@ -7,6 +7,28 @@ XPStyle on
   WriteRegStr SHELL_CONTEXT "${UNINSTALL_REGISTRY_KEY}" "InstallLocation" "$INSTDIR"
 !macroend
 
+; Removes a shell integration key that Pulsar registered (see
+; `src/main-process/win-shell.js`), but only if it launches this
+; installation's executable. Pulsar makes the same check before deregistering
+; an entry itself.
+;
+; * ROOT_KEY: the key to delete, under HKCU.
+; * COMMAND_SUBKEY: the subkey (relative to ROOT_KEY) whose default value is
+;   the command.
+; * ARG: the placeholder that the command passes (`%1` or `%V`).
+!macro RemovePulsarShellEntry ROOT_KEY COMMAND_SUBKEY ARG
+  ClearErrors
+  ReadRegStr $0 HKCU "${ROOT_KEY}\${COMMAND_SUBKEY}" ""
+  ${ifNot} ${Errors}
+    ; This must match the command value that `win-shell.js` writes. (`==` is
+    ; case-insensitive, as are Windows paths.)
+    ${if} $0 == '"$INSTDIR\${APP_EXECUTABLE_FILENAME}" "${ARG}"'
+      DeleteRegKey HKCU "${ROOT_KEY}"
+    ${endIf}
+  ${endIf}
+  ClearErrors
+!macroend
+
 !macro customUnInstall ; Macro called by electron-builder
   ; Since adding the PATH occurs during installation, we want to ensure to remove it.
   ; Luckily 'EnvVarUpdate' handles the case of it not being present
@@ -17,48 +39,12 @@ XPStyle on
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources"
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources\app\ppm\bin"
     
-    ; Remove context menu entries
-    ClearErrors
-
-    ; File Context Menu
-    Var /GLOBAL FileContextMenuRK
-    StrCpy $FileContextMenuRK "Software\Classes\*\shell\Pulsar\"
-
-    ReadRegStr $0 HKCU $FileContextMenuRK ""
-    ${ifNot} ${Errors}
-      DeleteRegKey HKCU $FileContextMenuRK
-    ${endIf}
-    ClearErrors
-
-    ; Folder Context Menu
-    Var /GLOBAL FolderContextMenuRK
-    StrCpy $FolderContextMenuRK "Software\Classes\Directory\shell\Pulsar\"
-
-    ReadRegStr $0 HKCU $FolderContextMenuRK ""
-    ${ifNot} ${Errors}
-      DeleteRegKey HKCU $FolderContextMenuRK
-    ${endIf}
-    ClearErrors
-
-    ; Folder Background Context Menu
-    Var /GLOBAL FolderBgContextMenuRK
-    StrCpy $FolderBgContextMenuRK "Software\Classes\Directory\background\shell\Pulsar\"
-
-    ReadRegStr $0 HKCU $FolderBgContextMenuRK ""
-    ${ifNot} ${Errors}
-      DeleteRegKey HKCU $FolderBgContextMenuRK
-    ${endIf}
-    ClearErrors
-    
-    ; File Handler Entry
-    Var /GLOBAL FileHandlerRK
-    StrCpy $FileHandlerRK "Software\Classes\Applications\Pulsar.exe\"
-
-    ReadRegStr $0 HKCU $FileHandlerRK ""
-    ${ifNot} ${Errors}
-      DeleteRegKey HKCU $FileHandlerRK
-    ${endIf}
-    ClearErrors
+    ; Remove shell integration entries (context menus and file handler), if
+    ; this installation registered them.
+    !insertmacro RemovePulsarShellEntry "Software\Classes\*\shell\${PRODUCT_NAME}" "command" "%1"
+    !insertmacro RemovePulsarShellEntry "Software\Classes\Directory\shell\${PRODUCT_NAME}" "command" "%1"
+    !insertmacro RemovePulsarShellEntry "Software\Classes\Directory\background\shell\${PRODUCT_NAME}" "command" "%V"
+    !insertmacro RemovePulsarShellEntry "Software\Classes\Applications\${APP_EXECUTABLE_FILENAME}" "shell\open\command" "%1"
   ${endIf}
 !macroend
 
