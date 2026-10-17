@@ -73,12 +73,10 @@ class PaneElement extends HTMLElement {
     this.addEventListener('drop', handleDrop);
   }
 
-  // Sets up callbacks when PaneElement initializes
-  //
-  // Only called in {Pane::getElement} as of February 2025.
+  // Private: Sets up callbacks when PaneElement initializes.
   //
   // * `model` The container {Pane}.
-  // * An {Object} with the following keys:
+  // * `options` An {Object} with the following keys:
   //   * `views` A {ViewRegistry} used to hide and show pane items.
   //   * `applicationDelegate` An {ApplicationDelegate} used to open file paths.
   //
