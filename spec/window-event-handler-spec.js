@@ -49,6 +49,30 @@ describe('WindowEventHandler', () => {
       }));
   });
 
+  describe('when the window is focused', () => {
+    beforeEach(() => {
+      spyOn(atom.project, 'resurrectBufferIfDeleted');
+    });
+
+    it('attempts to resurrect the buffer of the active text editor', () => {
+      const editor = atom.workspace.buildTextEditor();
+      spyOn(atom.workspace, 'getActiveTextEditor').and.returnValue(editor);
+
+      window.dispatchEvent(new CustomEvent('focus'));
+      expect(atom.project.resurrectBufferIfDeleted).toHaveBeenCalledWith(
+        editor.getBuffer()
+      );
+    });
+
+    it('does nothing if there is no active text editor', () => {
+      spyOn(atom.workspace, 'getActiveTextEditor').and.returnValue(undefined);
+
+      window.dispatchEvent(new CustomEvent('focus'));
+      expect(atom.project.resurrectBufferIfDeleted).not.toHaveBeenCalled();
+      expect(document.body.className).not.toMatch('is-blurred');
+    });
+  });
+
   describe('resize event', () =>
     it('calls storeWindowDimensions', async (done) => {
       jasmine.useRealClock();
