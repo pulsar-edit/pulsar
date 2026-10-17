@@ -8,7 +8,10 @@ injectionRegex: "^(json|JSON)$"
 treeSitter:
   parserSource: 'github:tree-sitter/tree-sitter-json#3fef30de8aee74600f25ec2e319b62a1a870d51e'
   grammar: 'tree-sitter/tree-sitter-json.wasm'
-  highlightsQuery: 'tree-sitter/queries/highlights.scm'
+  highlightsQuery: [
+    'tree-sitter/queries/highlights-no-comments.scm'
+    'tree-sitter/queries/highlights.scm'
+  ]
   indentsQuery: 'tree-sitter/queries/indents.scm'
   foldsQuery: 'tree-sitter/queries/folds.scm'
   tagsQuery: 'tree-sitter/queries/tags.scm'
@@ -44,3 +47,11 @@ fileTypes: [
   'webapp'
   'webmanifest'
 ]
+
+# Comments in JSON are not strictly allowed, but lots of consumers of JSON can
+# tolerate comments in JSON files. We allow the user to opt into comments via a
+# setting.
+comments:
+  start: '// '
+  block: ['/*', '*/']
+  line: '//'

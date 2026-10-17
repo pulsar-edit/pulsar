@@ -106,7 +106,7 @@ describe('PackageTranspilationRegistry', () => {
       coffeeSpec._transpilerSource = 'coffee-transpiler-source';
       omgTranspiler._transpilerSource = 'omg-transpiler-source';
 
-      spyOn(registry, 'getTranspiler').andCallFake(spec => {
+      spyOn(registry, 'getTranspiler').and.callFake(spec => {
         if (spec.transpiler === './transpiler-js') return jsTranspiler;
         if (spec.transpiler === './transpiler-coffee') return coffeeTranspiler;
         if (spec.transpiler === './transpiler-omg') return omgTranspiler;
@@ -122,7 +122,7 @@ describe('PackageTranspilationRegistry', () => {
     });
 
     it('always returns true from shouldCompile for a file in that dir that match a glob', () => {
-      spyOn(originalCompiler, 'shouldCompile').andReturn(false);
+      spyOn(originalCompiler, 'shouldCompile').and.returnValue(false);
       expect(wrappedCompiler.shouldCompile('source', hitPath)).toBe(true);
       expect(wrappedCompiler.shouldCompile('source', hitPathCoffee)).toBe(true);
       expect(wrappedCompiler.shouldCompile('source', hitNonStandardExt)).toBe(
@@ -141,8 +141,8 @@ describe('PackageTranspilationRegistry', () => {
     });
 
     it('calls getCacheKeyData on the transpiler to get additional cache key data', () => {
-      spyOn(registry, 'getTranspilerPath').andReturn('./transpiler-js');
-      spyOn(jsTranspiler, 'getCacheKeyData').andCallThrough();
+      spyOn(registry, 'getTranspilerPath').and.returnValue('./transpiler-js');
+      spyOn(jsTranspiler, 'getCacheKeyData').and.callThrough();
 
       wrappedCompiler.getCachePath('source', missPath, jsSpec);
       expect(jsTranspiler.getCacheKeyData).not.toHaveBeenCalledWith(
@@ -161,9 +161,9 @@ describe('PackageTranspilationRegistry', () => {
     });
 
     it('compiles files matching a glob with the associated transpiler, and the old one otherwise', () => {
-      spyOn(jsTranspiler, 'transpile').andCallThrough();
-      spyOn(coffeeTranspiler, 'transpile').andCallThrough();
-      spyOn(omgTranspiler, 'transpile').andCallThrough();
+      spyOn(jsTranspiler, 'transpile').and.callThrough();
+      spyOn(coffeeTranspiler, 'transpile').and.callThrough();
+      spyOn(omgTranspiler, 'transpile').and.callThrough();
 
       expect(wrappedCompiler.compile('source', hitPath)).toEqual(
         'source-transpiler-js'
@@ -218,7 +218,7 @@ describe('PackageTranspilationRegistry', () => {
       });
 
       it('returns appropriate values from shouldCompile', () => {
-        spyOn(originalCompiler, 'shouldCompile').andReturn(false);
+        spyOn(originalCompiler, 'shouldCompile').and.returnValue(false);
         expect(
           wrappedCompiler.shouldCompile(
             'source',

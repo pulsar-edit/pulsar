@@ -1,11 +1,15 @@
+const { timeoutPromise: wait, conditionPromise } = require('./helpers/async-spec-helpers');
+
+const { CompositeDisposable } = require('atom');
 const fs = require('fs');
 const path = require('path');
 const temp = require('temp').track();
 const dedent = require('dedent');
 const { clipboard } = require('electron');
 const os = require('os');
+const Pane = require('../src/pane');
 const TextEditor = require('../src/text-editor');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const TextMateLanguageMode = require('../src/text-mate-language-mode');
 const WASMTreeSitterLanguageMode = require('../src/wasm-tree-sitter-language-mode');
 
@@ -49,7 +53,7 @@ describe('TextEditor', () => {
 
     // The id generator should skip the id used up by the deserialized one:
     const fresh = new TextEditor();
-    expect(fresh.id).toNotEqual(deserialized.id);
+    expect(fresh.id).not.toEqual(deserialized.id);
   });
 
   describe('when the editor is deserialized', () => {
@@ -140,7 +144,7 @@ describe('TextEditor', () => {
   });
 
   describe('.copy()', () => {
-    it('returns a different editor with the same initial state', () => {
+    it('returns a different editor with the same initial state', async () => {
       expect(editor.getAutoHeight()).toBeFalsy();
       expect(editor.getAutoWidth()).toBeFalsy();
       expect(editor.getShowCursorOnSelection()).toBeTruthy();
@@ -211,7 +215,7 @@ describe('TextEditor', () => {
       });
 
       expect(returnedPromise).toBe(element.component.getNextUpdatePromise());
-      expect(changeSpy.callCount).toBe(1);
+      expect(changeSpy.calls.count()).toBe(1);
       expect(editor.getTabLength()).toBe(6);
       expect(editor.getSoftTabs()).toBe(false);
       expect(editor.isSoftWrapped()).toBe(true);
@@ -366,8 +370,8 @@ describe('TextEditor', () => {
 
         expect(editorCallback).toHaveBeenCalled();
         expect(cursorCallback).toHaveBeenCalled();
-        const eventObject = editorCallback.mostRecentCall.args[0];
-        expect(cursorCallback.mostRecentCall.args[0]).toEqual(eventObject);
+        const eventObject = editorCallback.calls.mostRecent().args[0];
+        expect(cursorCallback.calls.mostRecent().args[0]).toEqual(eventObject);
 
         expect(eventObject.oldBufferPosition).toEqual([0, 0]);
         expect(eventObject.oldScreenPosition).toEqual([0, 0]);
@@ -1619,7 +1623,7 @@ describe('TextEditor', () => {
         editor.selectToBufferPosition([6, 2]);
 
         expect(rangeChangedHandler).toHaveBeenCalled();
-        const eventObject = rangeChangedHandler.mostRecentCall.args[0];
+        const eventObject = rangeChangedHandler.calls.mostRecent().args[0];
 
         expect(eventObject.oldBufferRange).toEqual([[3, 0], [4, 5]]);
         expect(eventObject.oldScreenRange).toEqual([[3, 0], [4, 5]]);
@@ -2250,7 +2254,7 @@ describe('TextEditor', () => {
         spyOn(
           editor.getBuffer().getLanguageMode(),
           'getNonWordCharacters'
-        ).andCallFake(function (position) {
+        ).and.callFake(function (position) {
           const result = '/()"\':,.;<>~!@#$%^&*|+=[]{}`?';
           const scopes = this.scopeDescriptorForPosition(
             position
@@ -2266,6 +2270,55 @@ describe('TextEditor', () => {
 
         expect(editor.getSelections()[0].getText()).toBe('one');
         expect(editor.getSelections()[1].getText()).toBe('two-two');
+      });
+    });
+
+    describe('.selectSubwordsContainingCursors()', () => {
+      it('selects the subword under the cursor in a camelCase identifier', () => {
+        editor.setText('getPreviousWord\n');
+        editor.setCursorBufferPosition([0, 1]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('get');
+
+        editor.setCursorBufferPosition([0, 5]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('Previous');
+
+        editor.setCursorBufferPosition([0, 12]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('Word');
+      });
+
+      it('selects the subword under the cursor in a snake_case identifier', () => {
+        editor.setText('get_previous_word\n');
+        editor.setCursorBufferPosition([0, 1]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('get');
+
+        editor.setCursorBufferPosition([0, 6]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('_previous');
+
+        editor.setCursorBufferPosition([0, 14]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('_word');
+      });
+
+      it('selects the digit sequence under the cursor', () => {
+        editor.setText('version123end\n');
+        editor.setCursorBufferPosition([0, 8]);
+        editor.selectSubwordsContainingCursors();
+        expect(editor.getSelectedText()).toBe('123');
+      });
+
+      it('handles multiple cursors across different subwords', () => {
+        editor.setText('getPreviousWord\n');
+        editor.setCursorBufferPosition([0, 1]);
+        editor.addCursorAtBufferPosition([0, 5]);
+        editor.addCursorAtBufferPosition([0, 12]);
+        editor.selectSubwordsContainingCursors();
+        const texts = editor.getSelections().map(s => s.getText());
+        expect(texts).toEqual(['get', 'Previous', 'Word']);
       });
     });
 
@@ -4002,7 +4055,7 @@ describe('TextEditor', () => {
         it('notifies the observers when inserting text', () => {
           const willInsertSpy = jasmine
             .createSpy()
-            .andCallFake(() =>
+            .and.callFake(() =>
               expect(buffer.lineForRow(1)).toBe(
                 '  var sort = function(items) {'
               )
@@ -4010,7 +4063,7 @@ describe('TextEditor', () => {
 
           const didInsertSpy = jasmine
             .createSpy()
-            .andCallFake(() =>
+            .and.callFake(() =>
               expect(buffer.lineForRow(1)).toBe(
                 'xxxvar sort = function(items) {'
               )
@@ -4025,18 +4078,18 @@ describe('TextEditor', () => {
           expect(willInsertSpy).toHaveBeenCalled();
           expect(didInsertSpy).toHaveBeenCalled();
 
-          let options = willInsertSpy.mostRecentCall.args[0];
+          let options = willInsertSpy.calls.mostRecent().args[0];
           expect(options.text).toBe('xxx');
           expect(options.cancel).toBeDefined();
 
-          options = didInsertSpy.mostRecentCall.args[0];
+          options = didInsertSpy.calls.mostRecent().args[0];
           expect(options.text).toBe('xxx');
         });
 
         it('cancels text insertion when an ::onWillInsertText observer calls cancel on an event', () => {
           const willInsertSpy = jasmine
             .createSpy()
-            .andCallFake(({ cancel }) => cancel());
+            .and.callFake(({ cancel }) => cancel());
 
           const didInsertSpy = jasmine.createSpy();
 
@@ -7617,10 +7670,17 @@ describe('TextEditor', () => {
       editor.update({ autoHeight: false });
       const element = editor.getElement();
       jasmine.attachToDOM(element);
-      element.style.height = element.component.getLineHeight() * 5 + 'px';
+      // NOTE: When line height is a float, `getRowsPerPage` will round up and
+      // consider there to be an extra row per page. Font metrics are more
+      // complicated than they used to be, but in order to make this test
+      // happy, we'll make the editor height a bit shorter so that we don't try
+      // to make six rows instead of five.
+      element.style.height = Math.floor(element.component.getLineHeight() * 5) + 'px';
       element.measureDimensions();
 
       expect(editor.getCursorBufferPosition().row).toBe(0);
+
+      expect(editor.getRowsPerPage()).toBe(5);
 
       editor.pageDown();
       expect(editor.getCursorBufferPosition().row).toBe(5);
@@ -7641,7 +7701,12 @@ describe('TextEditor', () => {
       editor.update({ autoHeight: false });
       const element = editor.getElement();
       jasmine.attachToDOM(element);
-      element.style.height = element.component.getLineHeight() * 5 + 'px';
+      // NOTE: When line height is a float, `getRowsPerPage` will round up and
+      // consider there to be an extra row per page. Font metrics are more
+      // complicated than they used to be, but in order to make this test
+      // happy, we'll make the editor height a bit shorter so that we don't try
+      // to make six rows instead of five.
+      element.style.height = Math.floor(element.component.getLineHeight() * 5) + 'px';
       element.measureDimensions();
 
       expect(editor.getCursorBufferPosition().row).toBe(0);
@@ -8341,11 +8406,181 @@ describe('TextEditor', () => {
     });
   });
 
+  describe('when the file on disk is changed while we have pending modifications', () => {
+    let destination;
+    let disposables;
+    let promptOnConflictOutcome;
+    beforeEach(async () => {
+      jasmine.useRealClock();
+      atom.config.set('core.promptOnConflict', true);
+      let projectPath = temp.mkdirSync('project-with-file-modification');
+      destination = path.resolve(projectPath, 'sample.js');
+      fs.copyFileSync(
+        path.resolve(__dirname, 'fixtures', 'sample.js'),
+        destination
+      );
+      disposables?.dispose();
+      disposables = new CompositeDisposable();
+      atom.project.setPaths([projectPath]);
+      editor = await atom.workspace.open(destination);
+      buffer = editor.buffer;
+      editor.update({ autoIndent: false });
+
+      // Mock `Pane::promptOnConflict` in order to skip the presentation of the
+      // dialog. Instead, we can choose the outcome of the prompt on a per-call
+      // basis.
+      promptOnConflictOutcome = Promise.resolve();
+      if (!Pane.prototype.promptOnConflict.calls) {
+        spyOn(Pane.prototype, 'promptOnConflict').and.callFake(() => {
+          return promptOnConflictOutcome;
+        });
+      }
+
+      await atom.packages.activatePackage('language-javascript');
+      languageMode = buffer.getLanguageMode();
+      if ('useAsyncParsing' in languageMode) {
+        languageMode.useAsyncParsing = false;
+        languageMode.useAsyncIndent = false;
+      }
+      if (languageMode.ready) {
+        await languageMode.ready;
+      }
+      let contents = fs.readFileSync(destination, 'utf8').toString();
+
+      // Modify the buffer (replacing `var` with `let`) so that the buffer is
+      // dirty…
+      editor.setTextInBufferRange(
+        [[0, 0], [0, 3]],
+        'let'
+      );
+      expect(editor.isModified()).toBe(true);
+
+      // …then change the file on disk so that our modifications are orphaned.
+      fs.writeFileSync(destination, `${contents}\n\n// changed`);
+
+      // TEMP: The infrastructure is present to make this a more rigorous
+      // end-to-end test (temp directories, etc.) but `pathwatcher` seems to
+      // have trouble keeping up.
+      //
+      // Since the effect of conflict detection is to flip a particular flag on
+      // the `TextBuffer`, we'll flip it manually here. The purpose of these
+      // specs is to verify that the correct things happen _after_ a certain
+      // condition is met; it's the job of `TextBuffer`’s specs to prove that
+      // file-watching produces that condition.
+      editor.buffer.fileHasChangedSinceLastLoad = true;
+      expect(editor.isInConflict()).toBe(true);
+    });
+
+    afterEach(() => disposables?.dispose());
+
+    it('is considered to be in a conflicted state, but will overwrite with user confirmation', async () => {
+      expect(editor.isInConflict()).toBe(true);
+
+      let uncommittedContents = editor.getText();
+
+      // We've got to save this editor via the `Pane::saveItem` interface to
+      // trigger this conflict warning.
+      let activePane = atom.workspace.getActivePane();
+      activePane.saveItem(editor);
+
+      // User should be shown the dialog…
+      await conditionPromise(() => {
+        return Pane.prototype.promptOnConflict.calls.count() > 0
+      });
+
+      await conditionPromise(() => !editor.isModified());
+
+      // …and whatever was in the buffer when we chose to overwrite should
+      // match what's now present on disk.
+      expect(
+        fs.readFileSync(destination, 'utf8').toString()
+      ).toBe(uncommittedContents);
+
+      // Now that we've written to disk, there's no longer a conflict.
+      expect(editor.isInConflict()).toBe(false);
+
+      // Saving the file to disk should flip this internal flag.
+      expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
+
+      await wait(2000);
+      // The flag should stay this way even if the save triggered the buffer's
+      // `onDidChange` handler.
+      expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
+    });
+
+    it('is considered to be in conflicted state and will not overwrite if user declines', async () => {
+      let contentsOnDisk = fs.readFileSync(destination, 'utf8').toString();
+      expect(editor.isInConflict()).toBe(true);
+
+      promptOnConflictOutcome = Promise.reject({ path: destination });
+      let uncommittedContents = editor.getText();
+
+      let activePane = atom.workspace.getActivePane();
+      activePane.saveItem(editor);
+      await conditionPromise(() => {
+        return Pane.prototype.promptOnConflict.calls.count() > 0
+      });
+
+      expect(
+        fs.readFileSync(destination, 'utf8').toString()
+      ).toBe(contentsOnDisk);
+
+      expect(editor.getText()).toBe(uncommittedContents);
+
+      // Since we cancelled the write, the conflict state should still be
+      // present and unresolved.
+      expect(editor.isInConflict()).toBe(true);
+    });
+
+    describe('but core.promptOnConflict is false', () => {
+      beforeEach(() => {
+        atom.config.set('core.promptOnConflict', false);
+      });
+
+      it('is considered to be in a conflicted state, but will not prompt the user', async () => {
+        expect(editor.isInConflict()).toBe(true);
+        expect(atom.config.get('core.promptOnConflict')).toBe(false);
+
+        let uncommittedContents = editor.getText();
+
+        // We've got to save this editor via the `Pane::saveItem` interface to
+        // trigger this conflict warning.
+        let activePane = atom.workspace.getActivePane();
+        activePane.saveItem(editor);
+
+        await conditionPromise(() => !editor.isModified());
+
+        // User should not have been shown the dialog…
+        expect(Pane.prototype.promptOnConflict).not.toHaveBeenCalled();
+
+        // …yet whatever was in the buffer when we chose to overwrite should
+        // match what's now present on disk.
+        expect(
+          fs.readFileSync(destination, 'utf8').toString()
+        ).toBe(uncommittedContents);
+
+        // Now that we've written to disk, there's no longer a conflict.
+        expect(editor.isInConflict()).toBe(false);
+
+        // Saving the file to disk should flip this internal flag.
+        expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
+
+        await wait(2000);
+        // The flag should stay this way even if the save triggered the buffer's
+        // `onDidChange` handler.
+        expect(editor.buffer.fileHasChangedSinceLastLoad).toBe(false);
+      });
+    });
+  });
+
   describe('.shouldPromptToSave()', () => {
     beforeEach(async () => {
+      jasmine.useRealClock();
+      // Allow for some breathing room to accommodate `pathwatcher`.
+      await wait(process.env.CI ? 500 : 0);
       editor = await atom.workspace.open('sample.js');
       jasmine.unspy(editor, 'shouldPromptToSave');
-      spyOn(atom.stateStore, 'isConnected').andReturn(true);
+      spyOn(atom.stateStore, 'isConnected').and.returnValue(true);
     });
 
     it('returns true when buffer has unsaved changes', () => {
@@ -8371,9 +8606,15 @@ describe('TextEditor', () => {
       jasmine.useRealClock();
 
       editor.setText('initial stuff');
-      await editor.saveAs(temp.openSync('test-file').path);
+      let destination = temp.openSync('test-file').path;
+      await editor.saveAs(destination);
+      expect(fs.readFileSync(destination, 'utf8').toString()).toBe('initial stuff');
 
       editor.setText('other stuff');
+      let promise = new Promise(resolve => editor.onDidConflict(() => {
+        resolve();
+      }));
+      await wait(1000);
       fs.writeFileSync(editor.getPath(), 'new stuff');
       expect(
         editor.shouldPromptToSave({
@@ -8382,7 +8623,7 @@ describe('TextEditor', () => {
         })
       ).toBeFalsy();
 
-      await new Promise(resolve => editor.onDidConflict(resolve));
+      await promise;
       expect(
         editor.shouldPromptToSave({
           windowCloseRequested: true,

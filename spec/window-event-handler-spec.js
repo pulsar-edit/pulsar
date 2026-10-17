@@ -1,6 +1,5 @@
-const KeymapManager = require('atom-keymap');
+const KeymapManager = require('@pulsar-edit/atom-keymap');
 const WindowEventHandler = require('../src/window-event-handler');
-const { conditionPromise } = require('./async-spec-helpers');
 
 describe('WindowEventHandler', () => {
   let windowEventHandler;
@@ -9,7 +8,7 @@ describe('WindowEventHandler', () => {
     atom.uninstallWindowEventHandler();
     spyOn(atom, 'hide');
     const initialPath = atom.project.getPaths()[0];
-    spyOn(atom, 'getLoadSettings').andCallFake(() => {
+    spyOn(atom, 'getLoadSettings').and.callFake(() => {
       const loadSettings = atom.getLoadSettings.originalValue.call(atom);
       loadSettings.initialPath = initialPath;
       return loadSettings;
@@ -28,11 +27,11 @@ describe('WindowEventHandler', () => {
   });
 
   describe('when the window is loaded', () =>
-    it("doesn't have .is-blurred on the body tag", () => {
-      if (process.platform === 'win32') {
-        return;
-      } // Win32TestFailures - can not steal focus
+    it("doesn't have .is-blurred on the body tag", (done) => {
+      jasmine.filterByPlatform({except: ['win32']}, done); // Win32TestFailures - can not steal focus
       expect(document.body.className).not.toMatch('is-blurred');
+
+      done();
     }));
 
   describe('when the window is blurred', () => {
@@ -50,14 +49,38 @@ describe('WindowEventHandler', () => {
       }));
   });
 
+  describe('when the window is focused', () => {
+    beforeEach(() => {
+      spyOn(atom.project, 'resurrectBufferIfDeleted');
+    });
+
+    it('attempts to resurrect the buffer of the active text editor', () => {
+      const editor = atom.workspace.buildTextEditor();
+      spyOn(atom.workspace, 'getActiveTextEditor').and.returnValue(editor);
+
+      window.dispatchEvent(new CustomEvent('focus'));
+      expect(atom.project.resurrectBufferIfDeleted).toHaveBeenCalledWith(
+        editor.getBuffer()
+      );
+    });
+
+    it('does nothing if there is no active text editor', () => {
+      spyOn(atom.workspace, 'getActiveTextEditor').and.returnValue(undefined);
+
+      window.dispatchEvent(new CustomEvent('focus'));
+      expect(atom.project.resurrectBufferIfDeleted).not.toHaveBeenCalled();
+      expect(document.body.className).not.toMatch('is-blurred');
+    });
+  });
+
   describe('resize event', () =>
-    it('calls storeWindowDimensions', async () => {
+    it('calls storeWindowDimensions', async (done) => {
       jasmine.useRealClock();
 
-      spyOn(atom, 'storeWindowDimensions');
+      spyOn(atom, 'storeWindowDimensions').and.callFake(() => {
+        done();
+      });
       window.dispatchEvent(new CustomEvent('resize'));
-
-      await conditionPromise(() => atom.storeWindowDimensions.callCount > 0);
     }));
 
   describe('window:close event', () =>
@@ -69,8 +92,7 @@ describe('WindowEventHandler', () => {
 
   describe('when a link is clicked', () => {
     it('opens the http/https links in an external application', () => {
-      const { shell } = require('electron');
-      spyOn(shell, 'openExternal');
+      spyOn(atom.applicationDelegate, 'openExternal');
 
       const link = document.createElement('a');
       const linkChild = document.createElement('span');
@@ -84,24 +106,24 @@ describe('WindowEventHandler', () => {
       };
 
       windowEventHandler.handleLinkClick(fakeEvent);
-      expect(shell.openExternal).toHaveBeenCalled();
-      expect(shell.openExternal.argsForCall[0][0]).toBe('http://github.com');
-      shell.openExternal.reset();
+      expect(atom.applicationDelegate.openExternal).toHaveBeenCalled();
+      expect(atom.applicationDelegate.openExternal.calls.argsFor(0)[0]).toBe('http://github.com');
+      atom.applicationDelegate.openExternal.calls.reset();
 
       link.href = 'https://github.com';
       windowEventHandler.handleLinkClick(fakeEvent);
-      expect(shell.openExternal).toHaveBeenCalled();
-      expect(shell.openExternal.argsForCall[0][0]).toBe('https://github.com');
-      shell.openExternal.reset();
+      expect(atom.applicationDelegate.openExternal).toHaveBeenCalled();
+      expect(atom.applicationDelegate.openExternal.calls.argsFor(0)[0]).toBe('https://github.com');
+      atom.applicationDelegate.openExternal.calls.reset();
 
       link.href = '';
       windowEventHandler.handleLinkClick(fakeEvent);
-      expect(shell.openExternal).not.toHaveBeenCalled();
-      shell.openExternal.reset();
+      expect(atom.applicationDelegate.openExternal).not.toHaveBeenCalled();
+      atom.applicationDelegate.openExternal.calls.reset();
 
       link.href = '#scroll-me';
       windowEventHandler.handleLinkClick(fakeEvent);
-      expect(shell.openExternal).not.toHaveBeenCalled();
+      expect(atom.applicationDelegate.openExternal).not.toHaveBeenCalled();
     });
 
     it('opens the "atom://" links with URL handler', () => {
@@ -122,7 +144,7 @@ describe('WindowEventHandler', () => {
 
       windowEventHandler.handleLinkClick(fakeEvent);
       expect(uriHandler.handleURI).toHaveBeenCalled();
-      expect(uriHandler.handleURI.argsForCall[0][0]).toBe('atom://github.com');
+      expect(uriHandler.handleURI.calls.argsFor(0)[0]).toBe('atom://github.com');
     });
   });
 
@@ -263,7 +285,7 @@ describe('WindowEventHandler', () => {
         'copy',
         'paste'
       ]);
-      spyOn(atom.applicationDelegate, 'getCurrentWindow').andReturn({
+      spyOn(atom.applicationDelegate, 'getCurrentWindow').and.returnValue({
         webContents: webContentsSpy,
         on: () => {}
       });
@@ -279,8 +301,8 @@ describe('WindowEventHandler', () => {
       expect(webContentsSpy.copy).toHaveBeenCalled();
       expect(webContentsSpy.paste).toHaveBeenCalled();
 
-      webContentsSpy.copy.reset();
-      webContentsSpy.paste.reset();
+      webContentsSpy.copy.calls.reset();
+      webContentsSpy.paste.calls.reset();
 
       const normalInput = document.createElement('input');
       jasmine.attachToDOM(normalInput);

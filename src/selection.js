@@ -1,4 +1,4 @@
-const { Point, Range } = require('text-buffer');
+const { Point, Range } = require('@pulsar-edit/text-buffer');
 const { pick } = require('underscore-plus');
 const { Emitter } = require('event-kit');
 
@@ -381,6 +381,19 @@ module.exports = class Selection {
     this.modifySelection(() =>
       this.cursor.moveToBeginningOfPreviousParagraph()
     );
+  }
+
+  // Public: Modifies the selection to encompass the current subword.
+  //
+  // Returns a {Range}.
+  selectSubword(options = {}) {
+    options.wordRegex = this.cursor.subwordRegExp();
+    this.setBufferRange(
+      this.cursor.getCurrentWordBufferRange(options),
+      options
+    );
+    this.wordwise = true;
+    this.initialScreenRange = this.getScreenRange();
   }
 
   // Public: Modifies the selection to encompass the current word.

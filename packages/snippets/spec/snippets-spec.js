@@ -43,13 +43,13 @@ describe("Snippets extension", () => {
     editorElement = atom.views.getView(editor);
     languageMode = editor.getBuffer().getLanguageMode();
     await languageMode.ready;
-    languageMode.useAsyncParsing = false;
   });
 
   afterEach(async () => {
     if (languageMode) {
       await languageMode.atTransactionEnd();
     }
+    editor.destroy();
     await atom.packages.deactivatePackage('snippets');
   });
 
@@ -961,7 +961,7 @@ third tabstop $3\
         expect(editor.getText()).toBe("[img src][/img]");
       });
 
-      it("bundles the transform mutations along with the original manual mutation for the purposes of undo and redo", async () => {
+      it("bundles the transform mutations along with the original manual mutation for the purposes of undo and redo", () => {
         editor.setText('t12');
         editor.setCursorScreenPosition([0, 3]);
         simulateTabKeyEvent();
@@ -1132,11 +1132,9 @@ foo\
         it(`should transform ${flag} correctly`, () => {
           atom.clipboard.write('lorem Ipsum Dolor');
           let trigger = `v_simple_${flag}`;
-          console.log('expanding:', trigger);
           editor.setText(trigger);
           editor.setCursorScreenPosition([0, trigger.length]);
           simulateTabKeyEvent();
-          console.log('TEXT:', editor.getText());
           expect(editor.getText()).toBe(`lorem Ipsum Dolor ${expected}`);
         });
       }

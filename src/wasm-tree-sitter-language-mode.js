@@ -1,7 +1,7 @@
-const Parser = require('./web-tree-sitter');
+const { Node, Parser } = require('./web-tree-sitter');
 const TokenIterator = require('./token-iterator');
-const { Point, Range, spliceArray } = require('text-buffer');
-const { Patch } = require('superstring');
+const { Point, Range, spliceArray } = require('@pulsar-edit/text-buffer');
+const { Patch } = require('@pulsar-edit/superstring');
 const { CompositeDisposable, Emitter } = require('event-kit');
 const ScopeDescriptor = require('./scope-descriptor');
 const ScopeResolver = require('./scope-resolver');
@@ -28,10 +28,6 @@ const PARSE_JOB_LIMIT_MICROS = 3000;
 const PARSERS_IN_USE = new Set();
 
 const FUNCTION_TRUE = () => true;
-
-function isParseTimeout(err) {
-  return err.message.includes('Parsing failed');
-}
 
 function last(array) {
   return array[array.length - 1];
@@ -85,18 +81,17 @@ function resolveNodePosition(node, descriptor) {
   return result[lastPart];
 }
 
-// Patch Tree-sitter syntax nodes the same way `TreeSitterLanguageMode` did so
-// that we don't break anything that relied on `range` being present.
-function ensureNodeIsPatched(node) {
-  let done = node.range && node.range instanceof Range;
-  if (done) { return; }
-  let proto = Object.getPrototypeOf(node);
-
+// Define some additions to the `Node` class that we need for
+// backward-compatibility.
+function patchNodePrototype(proto) {
+  // The old `TreeSitterLanguageMode` added a `range` property to nodes that
+  // returns a `Range` instance. We do the same for reasons of backward
+  // compatibility — but it's also rather convenient.
   Object.defineProperty(proto, 'range', {
     get() { return rangeForNode(this); }
   });
 
-  // autocomplete-html expects a `closest` function to exist on nodes.
+  // `autocomplete-html` expects a `closest` function to exist on nodes.
   Object.defineProperty(proto, 'closest', {
     value: function closest(types) {
       if (!Array.isArray(types)) { types = [types]; }
@@ -109,6 +104,8 @@ function ensureNodeIsPatched(node) {
     }
   });
 }
+
+patchNodePrototype(Node.prototype);
 
 // Compares “informal” points like the ones in a Tree-sitter tree; saves us
 // from having to convert them to actual `Point`s.
@@ -179,6 +176,15 @@ function isBetweenPoints(point, a, b) {
     comparePoints(point, greater) <= 0;
 }
 
+// Make a function suitable for passing to `Parser::parse` as a progress callback.
+function makeProgressCallback(syncTimeoutMicros = PARSE_JOB_LIMIT_MICROS) {
+  let start = performance.now() * 1000;
+  return () => {
+    let now = performance.now() * 1000;
+    return (now - start) >= syncTimeoutMicros;
+  };
+}
+
 // eslint-disable-next-line no-unused-vars
 let totalBufferChanges = 0;
 let nextTransactionId = 1;
@@ -222,6 +228,11 @@ class WASMTreeSitterLanguageMode {
 
     this.grammarForLanguageString = this.grammarForLanguageString.bind(this);
 
+    // Keep track of parsers by language. This is a `Map` whose keys are
+    // `Language` instances and whose values are arrays of `Parser` instances.
+    // When we need to parse in a certain language, we take the first instance
+    // for that language that is not currently in use by another parsing job,
+    // or create a new `Parser` if there isn't one available.
     this.parsersByLanguage = new Index();
     this.tokenIterator = new TokenIterator(this);
 
@@ -247,7 +258,9 @@ class WASMTreeSitterLanguageMode {
     // considers only a single `LanguageLayer` at a time. For instance, a given
     // indentation task might consult one layer's indentation query to know
     // whether to indent a line, but another layer's indentation query to know
-    // whether to dedent the line. There are no simplicity gains to be made.
+    // whether to dedent the line. There are no simplicity gains to be made
+    // from having each `LanguageLayer` declare its own instance of
+    // `IndentResolver`.
     //
     // `IndentResolver` _could_ therefore fold its methods into
     // `WASMTreeSitterLanguageMode`, but is separate from it for reasons of
@@ -272,6 +285,15 @@ class WASMTreeSitterLanguageMode {
     this.injectionsMarkerLayer?.destroy();
     this.rootLanguageLayer = null;
     this.subscriptions?.dispose();
+
+    // Clean up all `Parser` instances created during the lifetime of this
+    // buffer.
+    for (let parsers of this.parsersByLanguage.values()) {
+      for (let parser of parsers) {
+        parser.delete();
+      }
+    }
+    this.parsersByLanguage.clear();
   }
 
   getGrammar() {
@@ -298,6 +320,9 @@ class WASMTreeSitterLanguageMode {
       parser = pool.find(p => !PARSERS_IN_USE.has(p));
     }
 
+    // We try to find the first `Parser` instance of the given language that is
+    // not currently being used. If we fail, we'll create a new parser and add
+    // it to the pool for future use.
     if (!parser) {
       parser = new Parser();
       parser.setLanguage(language);
@@ -525,18 +550,40 @@ class WASMTreeSitterLanguageMode {
     return result;
   }
 
+  // TODO: This is the original name for the method below. It makes no sense.
+  // Rename it everywhere when legacy Tree-sitter is retired.
+  updateForInjection(grammar) {
+    return this.updateInjectionsForGrammar(grammar);
+  }
+
   // Called when any grammar is added or changed, on the off chance that it
   // affects an injection of ours.
-  updateForInjection(grammar) {
-    if (!this.rootLanguageLayer) { return; }
-    if (!grammar.injectionRegex && !grammar.injectionRegExp) { return; }
-    if (grammar.type !== 'modern-tree-sitter') { return; }
-
-    let layers = this.getAllLanguageLayers();
-    for (let layer of layers) {
-      if (!layer.tree) continue;
-      layer._populateInjections(MAX_RANGE, null);
+  updateInjectionsForGrammar(grammar) {
+    if (!this.rootLanguageLayer) {
+      // We haven't gotten far enough for this to matter yet. Injections will
+      // be handled later.
+      return;
     }
+    if (!grammar.injectionRegex && !grammar.injectionRegExp) {
+      // This grammar has no injection regex, hence there's no way for another
+      // grammar to use it for injection.
+      return;
+    }
+    if (grammar.type !== 'modern-tree-sitter') {
+      // Only other `WASMTreeSitterGrammar`s can be injected into this language
+      // mode.
+      return;
+    }
+
+    // Now we'll visit every layer in the document in turn and see if any of
+    // them might be affected by the addition of this grammar. We keep a cache
+    // to cut down on redundant lookups.
+    let cache = new Map();
+
+    // Each layer calls `updateForInjection` on its children, so we need only
+    // start the process.
+    this.rootLanguageLayer.updateInjectionsForGrammar(grammar, cache);
+    cache.clear();
   }
 
   /*
@@ -727,11 +774,27 @@ class WASMTreeSitterLanguageMode {
     return point;
   }
 
+  // Private: Parse the buffer with the given language.
+  //
+  // Will try to parse synchronously, but will go async if the time budget for
+  // parsing is exceeded.
+  //
+  // * `language`: A Tree-sitter {Language} instance.
+  // * `oldTree`: Optional; the last {Tree} that was produced from parsing.
+  //   Helps reduce parsing time if given because Tree-sitter can re-use the
+  //   tree and make incremental changes as needed.
+  // * `includedRanges`: Optional; an {Array} of objects that contain
+  //   `startIndex`, `endIndex`, `startPosition`, and `endPosition` keys. Tells
+  //   Tree-sitter to consider only those ranges of the document and ignore
+  //   everything else. Used when parsing injections.
+  //
+  // Returns either a {Tree} (if parsing was able to be achieved synchronously)
+  // or a {Promise} that eventually resolves with a {Tree}.
+  //
   parseAsync(language, oldTree, includedRanges, { tag = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     parser.reset();
-    parser.setTimeoutMicros(this.syncTimeoutMicros);
     PARSERS_IN_USE.add(parser);
 
     // When you edit a tree, the positions of nodes in the tree are adjusted
@@ -766,6 +829,7 @@ class WASMTreeSitterLanguageMode {
       let currentText = parseDone ? this.cachedCurrentBufferText : text;
       return currentText.slice(index, endIndex);
     };
+    let progressCallback = makeProgressCallback(this.syncTimeoutMicros);
 
     let tree;
     // eslint-disable-next-line no-unused-vars
@@ -779,27 +843,54 @@ class WASMTreeSitterLanguageMode {
           console.log(`(async: ${batchCount} batches)`);
         }
       }
-      parser.setTimeoutMicros(null);
       PARSERS_IN_USE.delete(parser);
     };
 
     if (devMode && tag) { console.time(tag); }
 
-    try {
-      // Attempt a synchronous parse.
-      tree = parser.parse(callback, oldTree, { includedRanges });
-    } catch (err) {
-      if (!isParseTimeout(err)) { throw err; }
+    // Attempt a synchronous parse.
+    tree = parser.parse(callback, oldTree, { includedRanges, progressCallback });
 
-      // The parse couldn't be completed in the allotted time, so we'll go
-      // async and return a promise.
+    // The tree can be `null` if we never set a language on the `Parser`
+    // instance — but we definitely did that. So if it's `null` after calling
+    // `parse`, it can only be for the other reason: parsing could not finish
+    // in the allotted time. If that happens, we'll go async and return a
+    // promise.
+    if (tree === null) {
       return new Promise((resolve, reject) => {
+        // Perform however many jobs (each of no more than `syncTimeoutMicros`
+        // duration) are needed to finish parsing this document. We yield after
+        // each job so that we don't lock up the UI.
+        //
+        // NOTE: If X equals the job time limit and Y equals how long we yield
+        // in between jobs, it's possible that there are "sweet-spot" values of
+        // X and Y that strike the right balance between performance and prompt
+        // parsing.
+        //
+        // By default, the job time limit is 3000 microseconds, or 3ms. Using
+        // `setImmediate` to reschedule results in a very low value for Y. On
+        // large files, this winds up prioritizing parsing work quite a bit
+        // while still guaranteeing that the UI won't completely lock up.
+        //
+        // But we could try an approach like this instead:
+        //
+        // An animation frame is about 16ms long (usually; depends on the
+        // display). So, for example, we could switch from `setImmediate` to
+        // `requestAnimationFrame` — in which case we'd be saying that we want
+        // to spend no more than 3/16ths of the animation frame (18.75%) on
+        // parsing the buffer. That would represent an increase in Y from what
+        // we're doing now, so it might also be worth it to increase X.
+        //
         const parseJob = () => {
           try {
             batchCount++;
-            tree = parser.parse(callback, oldTree, { includedRanges });
+            tree = parser.parse(callback, oldTree, { includedRanges, progressCallback });
           } catch (err) {
-            if (!isParseTimeout(err)) { return reject(err); }
+            return reject(err);
+          }
+
+          if (tree === null) {
+            // Still not done!
             setImmediate(parseJob);
             return;
           }
@@ -816,11 +907,17 @@ class WASMTreeSitterLanguageMode {
     return tree;
   }
 
+  // Private: Parse the buffer with the given language.
+  //
+  // Always synchronous, unlike {::parseAsync}. This will be used if the
+  // `useAsyncParsing` property on {WasmTreeSitterLanguageMode} is `false`; but
+  // that's meant to be changed _only_ when running certain specs.
+  //
+  // Do not use this method in non-spec scenarios; prefer {::parseAsync}.
   parse(language, oldTree, includedRanges, { tag = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     parser.reset();
-    parser.setTimeoutMicros(null);
 
     let text = this.buffer.getText();
     this.cachedCurrentBufferText = text;
@@ -1728,7 +1825,13 @@ class FoldResolver {
     if (!this.layer.tree || !this.layer.queries.foldsQuery) { return null; }
     if (this.canReuseBoundaries(start, end)) {
       let result = this.boundaries.ge(start);
-      return result;
+      // Are the captures from this cached red-black-tree still fresh?
+      if (result?.value?.node?.tree?.rootNode) {
+        // If this node still exists, we have a fresh tree. If not, these
+        // captures were executed against a tree that's no longer valid, so we
+        // can't inspect them, and we should proceed with a new folds query.
+        return result;
+      }
     }
 
     let scopeResolver = this.layer.scopeResolver;
@@ -1858,12 +1961,25 @@ class FoldResolver {
   }
 
   resolvePositionForDividedFold(capture) {
-    let { name, node } = capture;
+    let { name, node, setProperties: props } = capture;
     if (name === 'fold.start') {
       return new Point(node.startPosition.row, Infinity);
     } else if (name === 'fold.end') {
+      // `@fold.end` can have adjustments applied to it just like `@fold`.
+      let defaultOptions = { 'fold.endAt': 'startPosition' };
+      let options = { ...defaultOptions, ...props };
       let end = node.startPosition;
-      if (end.column === 0 || this.positionIsNotPrecededByTextOnLine(end)) {
+      let originalEnd = end;
+      for (let key in options) {
+        if (!this.capturePropertyIsFoldAdjustment(key)) { continue; }
+        let value = options[key];
+        end = this.applyFoldAdjustment(key, end, node, value, props, this.layer);
+      }
+      // There's an implicit behavior that we apply for ease of use, but we
+      // should skip it if any `#set!` predicates were used to tweak the end
+      // location.
+      let positionDidMove = originalEnd.row !== end.row || originalEnd.column !== end.column;
+      if (!positionDidMove && (end.column === 0 || this.positionIsNotPrecededByTextOnLine(end))) {
         // If the fold ends at the start of the line, adjust it so that it
         // actually ends at the end of the previous line. This behavior is
         // implied in the existing specs.
@@ -1978,6 +2094,11 @@ class NullLanguageModeHighlightIterator {
 }
 
 class NullLayerHighlightIterator {
+  constructor(languageLayer) {
+    this.languageLayer = languageLayer;
+    this.depth = languageLayer.depth;
+    this.coverShallowerScopes = false;
+  }
   seek() {
     return [false, new OpenScopeMap];
   }
@@ -2022,6 +2143,21 @@ class HighlightIterator {
     }
     let { buffer, rootLanguageLayer } = this.languageMode;
     if (!rootLanguageLayer) { return []; }
+
+    if (!endRow) {
+      // Creative consumers of `HighlightIterator` exist in the wild; some of
+      // them expect the `TextMateHighlightIterator::seek` signature that needs
+      // only a starting position.
+      //
+      // So if `endRow` isn’t specified, we should assume it wants to go to the
+      // end of the buffer. This is why `endRow` defaults to `Infinity`. It
+      // will get clipped to the end of the buffer or the end of the language
+      // layer as appropriate.
+      //
+      // This can theoretically get very costly — but it'd be the consumer's
+      // fault for using a private API and not doing its own chunking.
+      endRow = buffer.getEndPosition().row
+    }
 
     let end = {
       row: endRow,
@@ -2113,7 +2249,7 @@ class HighlightIterator {
         // cover shallower scopes, so we need to re-assess our list of already
         // open scopes to see if any of them _would've_ been covered at the
         // point when they were opened.
-        let ranges = iterator.languageLayer.getCurrentRanges();
+        let ranges = iterator.languageLayer.getCurrentRanges() ?? [];
         for (let [earlierIterator, earlierOpenScopes] of openScopesByLayer) {
           // It's possible, though uncommon, for injections to overlap, because
           // there's no mechanism that prevents it. Since we sorted the layers
@@ -2595,9 +2731,28 @@ class LanguageLayer {
 
     this.subscriptions = new CompositeDisposable;
 
+    this.injectionPointsChanged = false;
+
+    const handleInjectionPointChanges = () => {
+      // When we add or remove injection points on this grammar, this language
+      // layer must repopulate its injections.
+      this._populateInjections(MAX_RANGE, null);
+    };
+
+    this.subscriptions.add(
+      this.grammar.onDidAddInjectionPoint(handleInjectionPointChanges),
+      this.grammar.onDidRemoveInjectionPoint(handleInjectionPointChanges)
+    );
+
     this.currentRangesLayer = this.buffer.addMarkerLayer();
     this.ready = false;
     this.queries = {};
+
+    // The markers that hold all the language layer children of this layer.
+    this.childLayerMarkers = new Set();
+    // All language strings that were given to us by injection points in the
+    // past, but could not be matched to grammars.
+    this.unrecognizedLanguageStrings = new Set();
 
     // A constructor can't go async, so all our async administrative tasks hang
     // off this promise. We can `await this.languageLoaded` later on.
@@ -2788,6 +2943,58 @@ class LanguageLayer {
 
   getExtent() {
     return this.marker?.getRange() ?? this.languageMode.buffer.getRange();
+  }
+
+  // Given a grammar, returns whether the grammar might be used for this
+  // layer's current injection points.
+  //
+  // Optionally accepts a `Map` so that it can cache results across a large
+  // number of calls.
+  injectionPointsMatchGrammar(grammar, cache = null) {
+    let matches = (lang, grammar, cache) => {
+      if (cache && cache.has(lang)) {
+        return cache.get(lang) === grammar;
+      }
+      let match = this.languageMode.grammarForLanguageString(lang);
+      if (cache) {
+        cache.set(lang, match);
+      }
+      return match === grammar;
+    };
+
+    // Would this grammar have been a candidate for injection _instead_ of a
+    // grammar that handled one of our active injections?
+    for (let { languageString: lang } of this.childLayerMarkers) {
+      if (matches(lang, grammar, cache)) return true;
+    }
+    // Would this grammar have matched a language string that we were unable to
+    // match to an injection on this layer previously?
+    for (let lang of Array.from(this.unrecognizedLanguageStrings)) {
+      if (matches(lang, grammar, cache)) return true;
+    }
+    return false;
+  }
+
+  // Determine whether a newly added or changed grammar warrants a
+  // reexamination of this layer's injections.
+  updateInjectionsForGrammar(grammar, cache = null) {
+    // Changes to both buffer contents and the grammar's injection points each
+    // independently trigger re-evaluation of injections. This code path is
+    // solely for deciding whether the presence of a specific new or altered
+    // grammar has implications for our current injections.
+    //
+    // Since reworking _all_ our injections is costly, we try to avoid it. If
+    // we can demonstrate that this grammar would not be used even if we _did_
+    // rebuild all injections on this layer from scratch, then we'll have
+    // proven that this step can be skipped.
+    if (this.injectionPointsMatchGrammar(grammar, cache)) {
+      this._populateInjections(MAX_RANGE, null);
+    }
+
+    let childLayers = Array.from(this.childLayerMarkers).map(m => m.languageLayer);
+    for (let child of childLayers) {
+      child.updateInjectionsForGrammar(grammar, cache);
+    }
   }
 
   // Run a highlights query for the given range and process the raw captures
@@ -2997,7 +3204,7 @@ class LanguageLayer {
     if (this.tree) {
       return new LayerHighlightIterator(this, this.tree);
     } else {
-      return new NullLayerHighlightIterator();
+      return new NullLayerHighlightIterator(this);
     }
   }
 
@@ -3443,17 +3650,10 @@ class LanguageLayer {
       // transaction's tree later on.
       this.lastSyntaxTree = tree;
 
-      // Like legacy Tree-sitter, we're patching syntax nodes so that they have
-      // a `range` property that returns a `Range`. We're doing this for
-      // compatibility, but we can't get a reference to the node class itself;
-      // we have to wait until we have an instance and grab the prototype from
-      // there.
-      //
-      // This is the earliest place in the editor lifecycle where we're
-      // guaranteed to be holding an instance of `Node`. Once we patch it here,
-      // we're good to go.
-      //
-      ensureNodeIsPatched(tree.rootNode);
+      // We used to need to monkey-patch the `Node` class by grabbing a
+      // reference to its constructor from an actual node instance. But
+      // `web-tree-sitter` allows us to import the `Node` class directly now,
+      // so we can do this much earlier in the bootstrapping process.
 
       this.rangeList.add(rangeForNode(tree.rootNode));
       if (includedRanges) {
@@ -3706,15 +3906,18 @@ class LanguageLayer {
     return node ?? null;
   }
 
+  // Assuming a buffer change in the given range, decides which injections need
+  // to be created and where to create them, ideally reusing as many layers as
+  // possible from previous updates.
   _populateInjections(range, nodeRangeSet) {
     if (!this.tree) { return; }
+
     const promises = [];
 
     // We won't touch _all_ injections, but we will touch any injection that
     // could possibly have been affected by this layer's update.
-    let existingInjectionMarkers = this.languageMode.injectionsMarkerLayer
-      .findMarkers({ intersectsRange: range })
-      .filter(marker => marker.parentLanguageLayer === this);
+    let existingInjectionMarkers = Array.from(this.childLayerMarkers)
+      .filter(m => m.getRange().intersectsWith(range));
 
     if (existingInjectionMarkers.length > 0) {
       // Enlarge our range to contain all of the injection zones in the
@@ -3739,17 +3942,22 @@ class LanguageLayer {
     // inspection, this bug doesn't seem to be limited to `web-tree-sitter`.
     if (range.isEmpty()) { return; }
 
-    // Now that we've enlarged the range, we might have more existing injection
-    // markers to consider. But check for containment rather than intersection
-    // so that we don't have to enlarge it again.
-    existingInjectionMarkers = this.languageMode.injectionsMarkerLayer
-      .findMarkers({ startsInRange: range, endsInRange: range })
-      .filter(marker => marker.parentLanguageLayer === this);
+    // Imagine our original range touched the outer boundaries of some
+    // injection markers. Above, we widened the range so that it covered the
+    // full bounds of all those markers. But now that we've widened the range,
+    // we should look for markers again. It's possible there are some new ones
+    // that weren't caught in the first pass.
+    //
+    // This time, though, we check for containment rather than intersection
+    // so that we don't have to enlarge the range again.
+    existingInjectionMarkers = Array.from(this.childLayerMarkers)
+      .filter(m => range.containsRange(m.getRange()));
+    existingInjectionMarkers.sort((a, b) => a.compare(b));
 
     const markersToUpdate = new Map();
 
-    // Query for all the nodes that could possibly prompt the creation of
-    // injection points.
+    // Query for all the nodes within the original range that could possibly
+    // prompt the creation of injection points.
     const nodes = this.tree.rootNode.descendantsOfType(
       Object.keys(this.grammar.injectionPointsByType),
       range.start,
@@ -3769,7 +3977,16 @@ class LanguageLayer {
         // Does that string match up with a grammar that we recognize?
         const grammar = this.languageMode.grammarForLanguageString(
           languageName);
-        if (!grammar) { continue; }
+        if (!grammar) {
+          // Keep track of these failures. When a new grammar is added, some of
+          // them might match.
+          this.unrecognizedLanguageStrings.add(languageName);
+          continue;
+        }
+
+        // We matched a language string here, so remove it from this set just
+        // in case it was in there from a past failure.
+        this.unrecognizedLanguageStrings.delete(languageName);
 
         // Does it offer us a node, or array of nodes, which a new injection
         // layer should use for its content?
@@ -3851,6 +4068,13 @@ class LanguageLayer {
           );
 
           marker.parentLanguageLayer = this;
+
+          // Keep track of the language strings we attempt to match to
+          // grammars. This gives us a quick way to determine whether a newly
+          // added grammar will affect our injections.
+          marker.languageString = languageName;
+
+          this.childLayerMarkers.add(marker);
           // eslint-disable-next-line no-unused-vars
           newLanguageLayers++;
         }
@@ -3872,6 +4096,7 @@ class LanguageLayer {
       // stale and should be destroyed.
       if (!markersToUpdate.has(marker)) {
         this.languageMode.emitRangeUpdate(marker.getRange());
+        this.childLayerMarkers.delete(marker);
         marker.languageLayer.destroy();
         // eslint-disable-next-line no-unused-vars
         staleLanguageLayers++;
@@ -3883,6 +4108,47 @@ class LanguageLayer {
         promises.push(marker.languageLayer.update(nodeRangeSet));
       }
     }
+
+    // Now that we've identified all the injection points for this layer, we
+    // can consider them stable until one of these three things happens:
+    //
+    // 1. The buffer changes in any way.
+    // 2. A grammar is added or changed.
+    // 3. A new injection point is added via
+    //   `GrammarRegistry#addInjectionPoint`.
+    //
+    // If #1 happens, all bets are off. But given a buffer change, we know that
+    // only a subset of the buffer is meaningfully affected; hence only the
+    // injections within that range need reappraisal. The other two require
+    // re-assessment of this layer's _entire_ range.
+    //
+    // If #2 happens, we can use what we learned in our last trip through this
+    // function; it's still conclusive _if_ the grammar has not had any new
+    // injection points defined. We can look at all the injection language
+    // names generated in previous calls to this function (whether or not they
+    // were successfully matched with grammars in the past) and see if any of
+    // them would apply to the changed/added grammar. If not, we can skip this
+    // layer.
+    //
+    // On the other hand: if injection points have changed since the last trip
+    // through this function, then a future grammar addition or change must
+    // take the slow path — running this function all over again in case the
+    // different set of injection points produces different injection
+    // candidates. (This very grammar that's just been added could've had
+    // package initializer code that added an injection point to this layer's
+    // grammar.)
+    //
+    // Hence we set the flag below to `false`. Any changes to injection points
+    // will trigger a callback that flips it to `true`. If a new grammar
+    // activates after we're done, it can check this flag as part of its
+    // heuristic to decide if this new grammar would affect the injections
+    // defined on this layer.
+    //
+    // TODO: If adding an injection point is so meaningful, why don't we
+    // automatically re-populate injections whenever we add one for a given
+    // grammar? That's an excellent question. In the future we'll do that
+    // automatically and this logic will get marginally simpler.
+    this.injectionPointsChanged = false;
 
     return Promise.all(promises);
   }
@@ -5082,9 +5348,26 @@ class IndentResolver {
     //
     // Use the position of the first text on the line as the reference point.
     let rowStartingColumn = Math.max(line.search(/\S/), 0);
+    let rowStartingPoint = new Point(row, rowStartingColumn)
     let controllingLayer = languageMode.controllingLayerAtPoint(
-      new Point(row, rowStartingColumn),
-      (layer) => !!layer.queries.indentsQuery
+      rowStartingPoint,
+      (layer) => {
+        if (!layer.queries.indentsQuery) return false;
+        // We're using the same logic here that we used in the dedent phase of
+        // `suggestedIndentForBufferRow`: allow layers that _begin_ at the
+        // cursor, but exclude layers that _end_ at the cursor.
+        //
+        // So first we test for containment exclusive of endpoints…
+        if (layer.containsPoint(rowStartingPoint, true)) {
+          return true;
+        }
+
+        // …but we'll still accept layers that have a content range which
+        // _starts_ at the cursor position.
+        return layer.getCurrentRanges()?.some(r => {
+          return r.start.compare(rowStartingPoint) === 0;
+        });
+      }
     );
 
     if (!controllingLayer) { return undefined; }

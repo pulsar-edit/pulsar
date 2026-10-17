@@ -179,13 +179,15 @@
 ;
 ; All this also applies to `elif`.
 ((identifier) @dedent (#match? @dedent "^(elif|else)$"))
+("else" @dedent (#is? test.error))
+("elif" @dedent (#is? test.error))
 
 ; Likewise, typing `case` at the beginning of a line within a match block — in
 ; cases where it's interpreted as an identifier — strongly suggests that we
 ; should dedent one level so it's properly recognized as a new `case` keyword.
 (
   (identifier) @dedent
-  (#equals? @dedent "case")
+  (#eq? @dedent "case")
   (#is? test.descendantOfType "case_clause")
 )
 

@@ -128,7 +128,7 @@ describe('ViewRegistry', () => {
 
     beforeEach(() => {
       frameRequests = [];
-      spyOn(window, 'requestAnimationFrame').andCallFake(fn =>
+      spyOn(window, 'requestAnimationFrame').and.callFake(fn =>
         frameRequests.push(fn)
       );
     });
@@ -161,8 +161,6 @@ describe('ViewRegistry', () => {
     });
 
     it('performs writes requested from read callbacks in the same animation frame', () => {
-      spyOn(window, 'setInterval').andCallFake(fakeSetInterval);
-      spyOn(window, 'clearInterval').andCallFake(fakeClearInterval);
       const events = [];
 
       registry.updateDocument(() => events.push('write 1'));
@@ -192,23 +190,16 @@ describe('ViewRegistry', () => {
   });
 
   describe('::getNextUpdatePromise()', () =>
-    it('returns a promise that resolves at the end of the next update cycle', () => {
-      let updateCalled = false;
-      let readCalled = false;
+    it('returns a promise that resolves at the end of the next update cycle', async () => {
+      let updateDocumentSpy = jasmine.createSpy('update document');
+      let readDocumentSpy = jasmine.createSpy('read document');
 
-      waitsFor('getNextUpdatePromise to resolve', done => {
-        registry.getNextUpdatePromise().then(() => {
-          expect(updateCalled).toBe(true);
-          expect(readCalled).toBe(true);
-          done();
-        });
+      registry.updateDocument(updateDocumentSpy);
+      registry.readDocument(readDocumentSpy);
 
-        registry.updateDocument(() => {
-          updateCalled = true;
-        });
-        registry.readDocument(() => {
-          readCalled = true;
-        });
-      });
+      await registry.getNextUpdatePromise()
+
+      expect(updateDocumentSpy).toHaveBeenCalled();
+      expect(readDocumentSpy).toHaveBeenCalled();
     }));
 });

@@ -279,6 +279,10 @@ module.exports = class CommandRegistry {
 
   // Public: Simulate the dispatch of a command on a DOM node.
   //
+  // This is useful for passing arguments to a command, as keymaps currently do not
+  // support arguments; for example, add a new command with no arguments that
+  // dispatches another command with arguments, and map the new command to a key binding.
+  //
   // This can be useful for testing when you want to simulate the invocation of a
   // command on a detached DOM node. Otherwise, the DOM node in question needs to
   // be attached to the document so the event bubbles up to the root node to be
@@ -286,6 +290,7 @@ module.exports = class CommandRegistry {
   //
   // * `target` The DOM node at which to start bubbling the command event.
   // * `commandName` {String} indicating the name of the command to dispatch.
+  // * `detail` Any value that will be assigned to the event's `.detail` property. Pass an object with multiple properties if you need multiple command arguments.
   dispatch(target, commandName, detail) {
     const event = new CustomEvent(commandName, { bubbles: true, detail });
     Object.defineProperty(event, 'target', { value: target });

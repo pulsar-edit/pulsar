@@ -4,16 +4,11 @@ describe('Python settings', () => {
 
   afterEach(() => editor.destroy());
 
-  beforeEach(() => {
+  beforeEach(async () => {
     atom.config.set('core.useTreeSitterParsers', false);
-
-
-    waitsForPromise(() => atom.workspace.open().then(function(o) {
-      editor = o;
-      languageMode = editor.languageMode;
-    }));
-
-    waitsForPromise(() => atom.packages.activatePackage('language-python'));
+    editor = await atom.workspace.open();
+    languageMode = editor.languageMode;
+    await atom.packages.activatePackage('language-python');
   });
 
   it('matches lines correctly using the increaseIndentPattern', () => {

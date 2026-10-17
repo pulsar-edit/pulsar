@@ -298,7 +298,7 @@ describe('TextEditorElement', () => {
       expect(attachedCallback).toHaveBeenCalled();
       expect(detachedCallback).not.toHaveBeenCalled();
 
-      attachedCallback.reset();
+      attachedCallback.calls.reset();
       element.remove();
 
       expect(attachedCallback).not.toHaveBeenCalled();
@@ -307,7 +307,7 @@ describe('TextEditorElement', () => {
 
   describe('::setUpdatedSynchronously', () => {
     it('controls whether the text editor is updated synchronously', () => {
-      spyOn(window, 'requestAnimationFrame').andCallFake(fn => fn());
+      spyOn(window, 'requestAnimationFrame').and.callFake(fn => fn());
 
       const element = buildTextEditorElement();
 
@@ -318,7 +318,7 @@ describe('TextEditorElement', () => {
 
       expect(element.textContent).toContain('hello');
 
-      window.requestAnimationFrame.reset();
+      window.requestAnimationFrame.calls.reset();
       element.setUpdatedSynchronously(true);
       element.getModel().setText('goodbye');
       expect(window.requestAnimationFrame).not.toHaveBeenCalled();

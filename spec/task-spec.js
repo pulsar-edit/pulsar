@@ -3,65 +3,66 @@ const Grim = require('grim');
 
 describe('Task', function() {
   describe('@once(taskPath, args..., callback)', () =>
-    it('terminates the process after it completes', function() {
+    it('terminates the process after it completes', async function() {
       let handlerResult = null;
-      const task = Task.once(
-        require.resolve('./fixtures/task-spec-handler'),
-        result => (handlerResult = result)
-      );
+      let task;
+      let processErroredCallbak = jasmine.createSpy();
+      let childProcess;
 
-      let processErrored = false;
-      const { childProcess } = task;
-      spyOn(childProcess, 'kill').andCallThrough();
-      task.childProcess.on('error', () => (processErrored = true));
+      await new Promise((resolve) => {
+        task = Task.once(
+          require.resolve('./fixtures/task-spec-handler'),
+          (result) => {
+            handlerResult = result;
+            resolve();
+          }
+        );
 
-      waitsFor(() => handlerResult != null);
+        childProcess = task.childProcess;
+        spyOn(childProcess, 'kill').and.callThrough();
+        task.childProcess.on('error', processErroredCallbak);
+      })
 
-      runs(function() {
-        expect(handlerResult).toBe('hello');
-        expect(childProcess.kill).toHaveBeenCalled();
-        expect(processErrored).toBe(false);
-      });
+      expect(handlerResult).toBe('hello');
+      expect(childProcess.kill).toHaveBeenCalled();
+      expect(processErroredCallbak).not.toHaveBeenCalled();
     }));
 
-  it('calls listeners registered with ::on when events are emitted in the task', function() {
+  it('calls listeners registered with ::on when events are emitted in the task', async function() {
     const task = new Task(require.resolve('./fixtures/task-spec-handler'));
 
     const eventSpy = jasmine.createSpy('eventSpy');
     task.on('some-event', eventSpy);
 
-    waitsFor(done => task.start(done));
+    await new Promise((resolve) => task.start(resolve))
 
-    runs(() => expect(eventSpy).toHaveBeenCalledWith(1, 2, 3));
+    expect(eventSpy).toHaveBeenCalledWith(1, 2, 3);
   });
 
-  it('unregisters listeners when the Disposable returned by ::on is disposed', function() {
+  it('unregisters listeners when the Disposable returned by ::on is disposed', async function() {
     const task = new Task(require.resolve('./fixtures/task-spec-handler'));
 
     const eventSpy = jasmine.createSpy('eventSpy');
     const disposable = task.on('some-event', eventSpy);
     disposable.dispose();
 
-    waitsFor(done => task.start(done));
+    await new Promise((resolve) => task.start(resolve))
 
-    runs(() => expect(eventSpy).not.toHaveBeenCalled());
+    expect(eventSpy).not.toHaveBeenCalled();
   });
 
-  it('reports deprecations in tasks', function() {
+  it('reports deprecations in tasks', async function() {
     jasmine.snapshotDeprecations();
     const handlerPath = require.resolve(
       './fixtures/task-handler-with-deprecations'
     );
     const task = new Task(handlerPath);
+    await new Promise((resolve) => task.start(resolve))
 
-    waitsFor(done => task.start(done));
-
-    runs(function() {
-      const deprecations = Grim.getDeprecations();
-      expect(deprecations.length).toBe(1);
-      expect(deprecations[0].getStacks()[0][1].fileName).toBe(handlerPath);
-      jasmine.restoreDeprecationsSnapshot();
-    });
+    const deprecations = Grim.getDeprecations();
+    expect(deprecations.length).toBe(1);
+    expect(deprecations[0].getStacks()[0][1].fileName).toBe(handlerPath);
+    jasmine.restoreDeprecationsSnapshot();
   });
 
   it('adds data listeners to standard out and error to report output', function() {
@@ -79,7 +80,7 @@ describe('Task', function() {
   });
 
   it('does not throw an error for forked processes missing stdout/stderr', function() {
-    spyOn(require('child_process'), 'fork').andCallFake(function() {
+    spyOn(require('child_process'), 'fork').and.callFake(function() {
       const Events = require('events');
       const fakeProcess = new Events();
       fakeProcess.send = function() {};
@@ -105,21 +106,20 @@ describe('Task', function() {
       expect(completedEventSpy).not.toHaveBeenCalled();
     });
 
-    it("does not dispatch 'task:cancelled' when invoked on an inactive task", function() {
-      let handlerResult = null;
-      const task = Task.once(
-        require.resolve('./fixtures/task-spec-handler'),
-        result => (handlerResult = result)
-      );
+    it("does not dispatch 'task:cancelled' when invoked on an inactive task", async function() {
+      let task = null;
 
-      waitsFor(() => handlerResult != null);
+      await new Promise(resolve => {
+        task = Task.once(
+          require.resolve('./fixtures/task-spec-handler'),
+          resolve
+        );
+      })
 
-      runs(function() {
-        const cancelledEventSpy = jasmine.createSpy('eventSpy');
-        task.on('task:cancelled', cancelledEventSpy);
-        expect(task.cancel()).toBe(false);
-        expect(cancelledEventSpy).not.toHaveBeenCalled();
-      });
+      const cancelledEventSpy = jasmine.createSpy('eventSpy');
+      task.on('task:cancelled', cancelledEventSpy);
+      expect(task.cancel()).toBe(false);
+      expect(cancelledEventSpy).not.toHaveBeenCalled();
     });
   });
 });

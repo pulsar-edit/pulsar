@@ -490,6 +490,7 @@ function elementForOptions (namespace, name, value, {radio = false}) {
 
   const label = document.createElement('label')
   label.classList.add('control-label')
+  label.dataset.settingKey = keyPath
 
   const titleDiv = document.createElement('div')
   titleDiv.classList.add('setting-title')
@@ -515,6 +516,7 @@ function elementForCheckbox (namespace, name, value) {
 
   const label = document.createElement('label')
   label.for = keyPath
+  label.dataset.settingKey = keyPath
 
   const input = document.createElement('input')
   input.id = keyPath
@@ -544,6 +546,7 @@ function elementForColor (namespace, name, value) {
 
   const label = document.createElement('label')
   label.for = keyPath
+  label.dataset.settingKey = keyPath
 
   const input = document.createElement('input')
   input.id = keyPath
@@ -572,6 +575,7 @@ function elementForEditor (namespace, name, value) {
 
   const label = document.createElement('label')
   label.classList.add('control-label')
+  label.dataset.settingKey = keyPath
 
   const titleDiv = document.createElement('div')
   titleDiv.classList.add('setting-title')
@@ -607,6 +611,7 @@ function elementForArray (namespace, name, value) {
 
   const label = document.createElement('label')
   label.classList.add('control-label')
+  label.dataset.settingKey = keyPath
 
   const titleDiv = document.createElement('div')
   titleDiv.classList.add('setting-title')
@@ -693,7 +698,11 @@ function optionToRadio (option, keyPath) {
   let description = ''
   if (option.hasOwnProperty('value')) {
     value = option.value
-    description = option.description
+    if (atom.i18n.isAutoTranslateLabel(option.description)) {
+      description = atom.i18n.translateLabel(option.description);
+    } else {
+      description = option.description;
+    }
   } else {
     value = option
     description = option
@@ -712,7 +721,11 @@ function optionToSelect (option, keyPath) {
   const optionElement = document.createElement('option')
   if (option.hasOwnProperty('value')) {
     optionElement.value = option.value
-    optionElement.textContent = option.description
+    if (atom.i18n.isAutoTranslateLabel(option.description)) {
+      optionElement.textContent = atom.i18n.translateLabel(option.description);
+    } else {
+      optionElement.textContent = option.description;
+    }
   } else {
     optionElement.value = option
     optionElement.textContent = option

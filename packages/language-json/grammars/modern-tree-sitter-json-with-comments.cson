@@ -1,0 +1,26 @@
+name: 'JSON with Comments'
+scopeName: 'source.json.jsonc'
+type: 'modern-tree-sitter'
+parser: 'tree-sitter-json'
+
+injectionRegex: "^(jsonc|JSONC)$"
+
+treeSitter:
+  parserSource: 'github:tree-sitter/tree-sitter-json#3fef30de8aee74600f25ec2e319b62a1a870d51e'
+  grammar: 'tree-sitter/tree-sitter-json.wasm'
+  highlightsQuery: 'tree-sitter/queries/highlights.scm'
+  indentsQuery: 'tree-sitter/queries/indents.scm'
+  foldsQuery: 'tree-sitter/queries/folds.scm'
+  tagsQuery: 'tree-sitter/queries/tags.scm'
+
+# There are other flavors of JSON that support comments, but most of those have
+# other language features that `tree-sitter-json` doesn't support and will need
+# different Tree-sitter parsers.
+fileTypes: [
+  'jsonc'
+]
+
+comments:
+  start: '// '
+  block: ['/*', '*/']
+  line: '//'

@@ -495,4 +495,22 @@ module.exports = class SnippetExpansion {
     this.editor = editor
     this.snippets.addExpansion(this.editor, this)
   }
+
+  // This getter is present in order to prevent the `emmet` package from
+  // breaking. Because it also adds behavior to the [Tab] key, it relies on
+  // internal state to determine whether a snippet is on its final tab stop,
+  // and that code path has been broken ever since
+  // https://github.com/atom/snippets/pull/312 removed the `tabStopMarkers`
+  // property.
+  //
+  // This getter returns an array that is as useful to `emmet` as
+  // `tabStopMarkers` was, since it can tell `emmet` the number of tab stops in
+  // the active snippet. The array items themselves are not markers, but
+  // `length` is the only thing `emmet` cares about, so this is an acceptable
+  // workaround that requires no code changes on the `emmet` side.
+  //
+  // See https://github.com/pulsar-edit/pulsar/issues/1132.
+  get tabStopMarkers () {
+    return this.insertionsByIndex
+  }
 }

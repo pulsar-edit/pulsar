@@ -56,6 +56,7 @@ class MockNative {
     this.attached = [];
     this.disposed = false;
     this.stopped = false;
+    this.started = false;
 
     this.emitter = new Emitter();
   }
@@ -68,6 +69,20 @@ class MockNative {
 
   onWillStop(callback) {
     return this.emitter.on('will-stop', callback);
+  }
+
+  onDidStart(callback) {
+    return this.emitter.on('did-start', callback);
+  }
+
+  // The registry starts a replacement native itself and waits for `did-start`
+  // before handing the children over, so a mock has to be startable and has to
+  // announce it. Resolved rather than returning nothing, since the registry
+  // relies on the event rather than the return value.
+  start() {
+    this.started = true;
+    this.emitter.emit('did-start');
+    return Promise.resolve();
   }
 
   dispose() {
@@ -100,7 +115,7 @@ describe('NativeWatcherRegistry', function() {
   });
 
   it('reuses an existing NativeWatcher on the same directory', async function() {
-    this.RETRY_FLAKY_TEST_AND_SLOW_DOWN_THE_BUILD();
+    // this.RETRY_FLAKY_TEST_AND_SLOW_DOWN_THE_BUILD();
 
     const EXISTING = new MockNative('existing');
     const existingPath = absolute('existing', 'path');

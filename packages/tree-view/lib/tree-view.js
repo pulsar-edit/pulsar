@@ -1,5 +1,4 @@
 const path = require('path');
-const shell = require('electron').shell;
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const { CompositeDisposable, Emitter } = require('atom');
@@ -290,7 +289,7 @@ class TreeView {
       // This prevents accidental collapsing when an `.entries` element is the
       // event target.
       if (e.target.classList.contains('entries')) return;
-      if (!(e.shiftKy || e.metaKey || e.ctrlKey)) {
+      if (!(e.shiftKey || e.metaKey || e.ctrlKey)) {
         return this.entryClicked(e);
       }
     });
@@ -810,7 +809,10 @@ class TreeView {
         return this.emitter.emit('move-entry-failed', { initialPath, newPath });
       }
     });
-    return dialog.attach();
+    dialog.attach();
+    // This method used to return nothing. We might as well have it return the
+    // instance of `MoveDialog` so that testing is slightly easier.
+    return dialog;
   }
 
   showSelectedEntryInFileManager() {
@@ -822,7 +824,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return atom.showItemInFolder(filePath);
   }
 
   showCurrentFileInFileManager() {
@@ -834,7 +836,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return atom.showItemInFolder(filePath);
   }
 
   getFileManagerName() {
@@ -850,9 +852,21 @@ class TreeView {
 
   openSelectedEntryInNewWindow() {
     let pathToOpen = this.selectedEntry()?.getPath();
-    if (pathToOpen) {
-      return atom.open({ pathsToOpen: [pathToOpen], newWindow: true });
-    }
+    if (!pathToOpen) return;
+
+    // Opening a file in a new window should preserve the current project
+    // roots, just as the tab bar's “Open in New Window” does; but opening a
+    // folder means opening that folder _as_ a project, so it stands alone.
+    let pathsToOpen = fs.isDirectorySync(pathToOpen)
+      ? [pathToOpen]
+      : [...atom.project.getPaths(), pathToOpen];
+
+    return atom.open({
+      pathsToOpen,
+      newWindow: true,
+      devMode: atom.devMode,
+      safeMode: atom.safeMode
+    });
   }
 
   copySelectedEntry() {
@@ -874,7 +888,7 @@ class TreeView {
     return dialog.attach();
   }
 
-  removeSelectedEntries() {
+  async removeSelectedEntries() {
     let activePath = this.getActivePath();
     let selectedPaths, selectedEntries;
     if (this.hasFocus()) {
@@ -896,13 +910,25 @@ class TreeView {
       }
     }
 
-    return atom.confirm({
+    atom.confirm({
       message: `Are you sure you want to delete the selected ${selectedPaths.length > 1 ? 'items' : 'item'}?`,
       detailedMessage: `You are deleting:\n${selectedPaths.join('\n')}`,
       buttons: ['Move to Trash', 'Cancel']
-    }, (response) => {
+    }, async (response) => {
       if (response === 0) { // Move to Trash
         let failedDeletions = [];
+        let deletionPromises = [];
+
+        // Since this goes async, all entries that correspond to paths we're
+        // about to delete will soon detach frmo the tree. So we should figure
+        // out ahead of time which element we're going to select when we're
+        // done.
+        let newSelectedEntry;
+        let firstSelectedEntry = selectedEntries[0];
+        if (firstSelectedEntry) {
+          newSelectedEntry = firstSelectedEntry.closest('.directory:not(.selected)');
+        }
+
         for (let selectedPath of selectedPaths) {
           // Don't delete entries which no longer exist. This can happen, for
           // example, when
@@ -913,17 +939,24 @@ class TreeView {
           //   but the parent folder is deleted first.
           if (!fs.existsSync(selectedPath)) continue;
 
-          this.emitter.emit('will-delete-entry', { pathToDelete: selectedPath });
+          let meta = { pathToDelete: selectedPath };
 
-          // TODO: `shell.trashItem` is the favored way to do this.
-          if (shell.moveItemToTrash(selectedPath)) {
-            this.emitter.emit('entry-deleted', { pathToDelete: selectedPath });
-          } else {
-            this.emitter.emit('delete-entry-failed', { pathToDelete: selectedPath });
+          this.emitter.emit('will-delete-entry', meta);
+
+          let promise = atom.trashItem(selectedPath).then(() => {
+            this.emitter.emit('entry-deleted', meta);
+          }).catch(() => {
+            this.emitter.emit('delete-entry-failed', meta);
             failedDeletions.push(selectedPath);
-          }
-          repoForPath(selectedPath)?.getPathStatus(selectedPath);
+          }).finally(() => {
+            repoForPath(selectedPath)?.getPathStatus(selectedPath);
+          });
+
+          deletionPromises.push(promise);
         }
+
+        await Promise.allSettled(deletionPromises);
+
         if (failedDeletions.length > 0) {
           atom.notifications.addError(
             this.formatTrashFailureMessage(failedDeletions),
@@ -934,9 +967,9 @@ class TreeView {
             }
           );
         }
-        let firstSelectedEntry = selectedEntries[0];
-        if (firstSelectedEntry) {
-          this.selectEntry(firstSelectedEntry.closest('.directory:not(.selected)'));
+
+        if (newSelectedEntry) {
+          this.selectEntry(newSelectedEntry);
         }
 
         if (atom.config.get('tree-view.squashDirectoryNames')) {
@@ -1188,9 +1221,7 @@ class TreeView {
         // directories
         fs.copySync(initialPath, newPath);
       } else {
-        // read the old file and write a new one at target location
-        // TODO: replace with fs.copyFileSync
-        fs.writeFileSync(newPath, fs.readFileSync(initialPath));
+        fs.copyFileSync(initialPath, newPath);
       }
       this.emitter.emit('entry-copied', { initialPath, newPath });
       let repo = repoForPath(newPath);
@@ -1567,8 +1598,8 @@ class TreeView {
           // holding a lock on expanded folders and preventing them from being
           // moved or deleted.
           //
-          // TODO: This can be removed when tree-view is switched to
-          // @atom/watcher.
+          // TODO: Investigate whether this is still needed now that we're on
+          // the `watchPath` API.
           let initialPath = initialPaths[j];
           this.entryForPath(initialPath)?.collapse?.();
           if ((process.platform === 'darwin' && event.metaKey) || event.ctrlKey) {

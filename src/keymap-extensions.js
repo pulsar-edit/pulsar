@@ -1,6 +1,6 @@
 const fs = require('fs-plus');
 const path = require('path');
-const KeymapManager = require('atom-keymap');
+const KeymapManager = require('@pulsar-edit/atom-keymap');
 const CSON = require('season');
 
 const buildMetadata = require('../package.json');
@@ -9,19 +9,19 @@ if (buildMetadata != null) {
   bundledKeymaps = buildMetadata._atomKeymaps;
 }
 
-KeymapManager.prototype.onDidLoadBundledKeymaps = function(callback) {
+KeymapManager.prototype.onDidLoadBundledKeymaps = function (callback) {
   return this.emitter.on('did-load-bundled-keymaps', callback);
 };
 
-KeymapManager.prototype.onDidLoadUserKeymap = function(callback) {
+KeymapManager.prototype.onDidLoadUserKeymap = function (callback) {
   return this.emitter.on('did-load-user-keymap', callback);
 };
 
-KeymapManager.prototype.canLoadBundledKeymapsFromMemory = function() {
+KeymapManager.prototype.canLoadBundledKeymapsFromMemory = function () {
   return bundledKeymaps != null;
 };
 
-KeymapManager.prototype.loadBundledKeymaps = function() {
+KeymapManager.prototype.loadBundledKeymaps = function () {
   if (bundledKeymaps != null) {
     for (let keymapName in bundledKeymaps) {
       const keymap = bundledKeymaps[keymapName];
@@ -35,7 +35,7 @@ KeymapManager.prototype.loadBundledKeymaps = function() {
   return this.emitter.emit('did-load-bundled-keymaps');
 };
 
-KeymapManager.prototype.getUserKeymapPath = function() {
+KeymapManager.prototype.getUserKeymapPath = function () {
   if (this.configDirPath == null) {
     return "";
   }
@@ -46,7 +46,7 @@ KeymapManager.prototype.getUserKeymapPath = function() {
   return path.join(this.configDirPath, 'keymap.cson');
 };
 
-KeymapManager.prototype.loadUserKeymap = function() {
+KeymapManager.prototype.loadUserKeymap = function () {
   const userKeymapPath = this.getUserKeymapPath();
   if (!fs.isFileSync(userKeymapPath)) {
     return;
@@ -73,7 +73,7 @@ KeymapManager.prototype.loadUserKeymap = function() {
   return this.emitter.emit('did-load-user-keymap');
 };
 
-KeymapManager.prototype.subscribeToFileReadFailure = function() {
+KeymapManager.prototype.subscribeToFileReadFailure = function () {
   return this.onDidFailToReadFile((error) => {
     const userKeymapPath = this.getUserKeymapPath();
     const message = `Failed to load \`${userKeymapPath}\``;

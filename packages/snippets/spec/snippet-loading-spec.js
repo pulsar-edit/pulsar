@@ -1,6 +1,8 @@
 const path = require('path');
 const fs = require('fs');
 const temp = require('temp').track();
+const { conditionPromise, timeoutPromise: wait } = require('./async-spec-helpers');
+
 
 describe("Snippet Loading", () => {
   let configDirPath, snippetsService;
@@ -18,15 +20,27 @@ describe("Snippet Loading", () => {
     ]);
   });
 
-  afterEach(() => {
-    waitsForPromise(() => Promise.resolve(atom.packages.deactivatePackages('snippets')));
-    runs(() => {
-      jasmine.unspy(atom.packages, 'getLoadedPackages');
-    });
+  afterEach(async () => {
+    jasmine.useRealClock();
+    await atom.packages.deactivatePackage('snippets');
+    jasmine.unspy(atom.packages, 'getLoadedPackages');
+    // Give `pathwatcher` some room to breathe.
+    await wait(50);
   });
 
+  async function activateSnippetsPackagePromise () {
+    let { mainModule } = await atom.packages.activatePackage('snippets');
+    snippetsService = mainModule.provideSnippets();
+    mainModule.loaded = false;
+    await mainModule.waitForSnippetsLoaded();
+
+    await conditionPromise(() => {
+      return snippetsService.bundledSnippetsLoaded();
+    }, 'all snippets to load');
+  }
+
   const activateSnippetsPackage = () => {
-    waitsForPromise(() => atom.packages.activatePackage("snippets").then(({mainModule}) => {
+    waitsForPromise(() => atom.packages.activatePackage("snippets").then(({ mainModule }) => {
       snippetsService = mainModule.provideSnippets();
       mainModule.loaded = false;
     }));
@@ -76,15 +90,15 @@ describe("Snippet Loading", () => {
       snippet = snippetsService.snippetsForScopes(['.test'])['testhtmllabels'];
       expect(snippet.prefix).toBe('testhtmllabels');
       expect(snippet.body).toBe('testing 456');
-      expect(snippet.leftLabelHTML).toBe('<span style=\"color:red\">Label</span>');
-      expect(snippet.rightLabelHTML).toBe('<span style=\"color:white\">Label</span>');
+      expect(snippet.leftLabelHTML).toBe('<span style="color:red">Label</span>');
+      expect(snippet.rightLabelHTML).toBe('<span style="color:white">Label</span>');
     });
   });
 
   it("registers a command if a package snippet defines one", () => {
     waitsForPromise(() => {
       return atom.packages.activatePackage("snippets").then(
-        ({mainModule}) => {
+        ({ mainModule }) => {
           return new Promise((resolve) => {
             mainModule.onDidLoadSnippets(resolve);
           });
@@ -111,13 +125,13 @@ describe("Snippet Loading", () => {
 
   describe("::loadPackageSnippets(callback)", () => {
     const jsPackage = () => {
-      const pack = atom.packages.loadPackage('language-javascript')
+      const pack = atom.packages.loadPackage('language-javascript');
       pack.path = path.join(
         atom.getLoadSettings().resourcePath,
         'node_modules', 'language-javascript'
-      )
-      return pack
-    }
+      );
+      return pack;
+    };
 
     beforeEach(() => { // simulate a list of packages where the javascript core package is returned at the end
       atom.packages.getLoadedPackages.andReturn([
@@ -145,7 +159,7 @@ describe("Snippet Loading", () => {
     it("invokes listeners when all snippets are loaded", () => {
       let loadedCallback = null;
 
-      waitsFor("package to activate", done => atom.packages.activatePackage("snippets").then(({mainModule}) => {
+      waitsFor("package to activate", done => atom.packages.activatePackage("snippets").then(({ mainModule }) => {
         mainModule.onDidLoadSnippets(loadedCallback = jasmine.createSpy('onDidLoadSnippets callback'));
         done();
       }));
@@ -155,8 +169,10 @@ describe("Snippet Loading", () => {
   });
 
   describe("when ~/.atom/snippets.json exists", () => {
-    beforeEach(() => {
-      fs.mkdirSync(configDirPath, {recursive: true});
+    let snippet;
+    beforeEach(async () => {
+      jasmine.useRealClock();
+      fs.mkdirSync(configDirPath, { recursive: true });
       fs.writeFileSync(path.join(configDirPath, 'snippets.json'), `\
 {
   ".foo": {
@@ -168,24 +184,21 @@ describe("Snippet Loading", () => {
 }\
 `
       );
-      activateSnippetsPackage();
+      await activateSnippetsPackagePromise();
     });
 
-    it("loads the snippets from that file", () => {
-      let snippet = null;
+    it("loads the snippets from that file", async () => {
+      snippet = snippetsService.snippetsForScopes(['.foo'])['foo'];
 
-      waitsFor(() => snippet = snippetsService.snippetsForScopes(['.foo'])['foo']);
-
-      runs(() => {
-        expect(snippet.name).toBe('foo snippet');
-        expect(snippet.prefix).toBe("foo");
-        expect(snippet.body).toBe("bar1");
-      });
+      expect(snippet.name).toBe('foo snippet');
+      expect(snippet.prefix).toBe("foo");
+      expect(snippet.body).toBe("bar1");
     });
 
     describe("when that file changes", () => {
-      it("reloads the snippets", () => {
-        fs.mkdirSync(configDirPath, {recursive: true});
+      it("reloads the snippets", async () => {
+        jasmine.useRealClock();
+        fs.mkdirSync(configDirPath, { recursive: true });
         fs.writeFileSync(path.join(configDirPath, 'snippets.json'), `\
 {
 ".foo": {
@@ -198,24 +211,26 @@ describe("Snippet Loading", () => {
 `
         );
 
-        waitsFor("snippets to be changed", () => {
+        await conditionPromise(() => {
           const snippet = snippetsService.snippetsForScopes(['.foo'])['foo'];
           return snippet && snippet.body === 'bar2';
-        });
+        }, 'snippets to be changed');
 
-        runs(() => {
-          fs.mkdirSync(configDirPath, {recursive: true});
-          fs.writeFileSync(path.join(configDirPath, 'snippets.json'), "");
-        });
+        fs.mkdirSync(configDirPath, { recursive: true });
+        fs.writeFileSync(path.join(configDirPath, 'snippets.json'), "");
 
-        waitsFor("snippets to be removed", () => !snippetsService.snippetsForScopes(['.foo'])['foo']);
+        await conditionPromise(() => {
+          let result = snippetsService.snippetsForScopes(['.foo'])['foo'];
+          return !result;
+        }, 'snippets to be removed');
       });
     });
   });
 
   describe("when ~/.atom/snippets.cson exists", () => {
-    beforeEach(() => {
-      fs.mkdirSync(configDirPath, {recursive: true});
+    beforeEach(async () => {
+      jasmine.useRealClock();
+      fs.mkdirSync(configDirPath, { recursive: true });
       fs.writeFileSync(path.join(configDirPath, 'snippets.cson'), `\
 ".foo":
   "foo snippet":
@@ -223,24 +238,26 @@ describe("Snippet Loading", () => {
     "body": "bar1"\
 `
       );
-      activateSnippetsPackage();
+      await activateSnippetsPackagePromise();
     });
 
-    it("loads the snippets from that file", () => {
-      let snippet = null;
+    it("loads the snippets from that file", async () => {
+      jasmine.useRealClock();
+      let snippet;
 
-      waitsFor(() => snippet = snippetsService.snippetsForScopes(['.foo'])['foo']);
-
-      runs(() => {
-        expect(snippet.name).toBe('foo snippet');
-        expect(snippet.prefix).toBe("foo");
-        expect(snippet.body).toBe("bar1");
+      await conditionPromise(() => {
+        snippet = snippetsService.snippetsForScopes(['.foo'])['foo'];
+        return snippet;
       });
+
+      expect(snippet.name).toBe('foo snippet');
+      expect(snippet.prefix).toBe("foo");
+      expect(snippet.body).toBe("bar1");
     });
 
     describe("when that file changes", () => {
-      it("reloads the snippets", () => {
-        fs.mkdirSync(configDirPath, {recursive: true});
+      it("reloads the snippets", async () => {
+        fs.mkdirSync(configDirPath, { recursive: true });
         fs.writeFileSync(path.join(configDirPath, 'snippets.cson'), `\
 ".foo":
   "foo snippet":
@@ -249,35 +266,33 @@ describe("Snippet Loading", () => {
 `
         );
 
-        waitsFor("snippets to be changed", () => {
+        await conditionPromise(() => {
           const snippet = snippetsService.snippetsForScopes(['.foo'])['foo'];
           return snippet && snippet.body === 'bar2';
-        });
+        }, 'snippets to be changed');
 
-        runs(() => {
-          fs.mkdirSync(configDirPath, {recursive: true});
-          fs.writeFileSync(path.join(configDirPath, 'snippets.cson'), "");
-        });
 
-        waitsFor("snippets to be removed", () => {
+        fs.mkdirSync(configDirPath, { recursive: true });
+        fs.writeFileSync(path.join(configDirPath, 'snippets.cson'), "");
+
+        await conditionPromise(() => {
           const snippet = snippetsService.snippetsForScopes(['.foo'])['foo'];
           return snippet == null;
-        });
+        }, 'snippets to be removed');
       });
     });
   });
 
-  it("notifies the user when the user snippets file cannot be loaded", () => {
+  it("notifies the user when the user snippets file cannot be loaded", async () => {
+    jasmine.useRealClock();
     fs.writeFileSync(path.join(configDirPath, 'snippets.cson'), '".junk":::');
 
-    activateSnippetsPackage();
+    await activateSnippetsPackagePromise();
 
-    runs(() => {
-      expect(console.warn).toHaveBeenCalled();
-      if (atom.notifications != null) {
-        expect(atom.notifications.addError).toHaveBeenCalled();
-      }
-    });
+    expect(console.warn).toHaveBeenCalled();
+    if (atom.notifications != null) {
+      expect(atom.notifications.addError).toHaveBeenCalled();
+    }
   });
 
   describe("packages-with-snippets-disabled feature", () => {

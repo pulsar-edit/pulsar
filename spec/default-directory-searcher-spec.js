@@ -23,7 +23,7 @@ describe('DefaultDirectorySearcher', function() {
       didSearchPaths() {}
     };
 
-    spyOn(Task.prototype, 'terminate').andCallThrough();
+    spyOn(Task.prototype, 'terminate').and.callThrough();
 
     await searcher.search(
       [

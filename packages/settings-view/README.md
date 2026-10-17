@@ -7,7 +7,7 @@ Edit core configuration settings, install and configure packages, and change the
 ## Usage
 You can open the Settings View by navigating to
 ***LNX***: _Edit > Preferences_ -
-***MAC***: _Atom > Preferences_ -
+***MAC***: _Pulsar > Preferences_ -
 ***WIN***: _File > Settings_.
 
 In order to install new packages and themes, click on the _Install_ section on the left-hand side.

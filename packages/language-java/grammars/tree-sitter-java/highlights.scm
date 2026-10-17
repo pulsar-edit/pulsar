@@ -1,28 +1,28 @@
 ; COMMENTS
 ; ========
 
-((comment) @comment.line.double-slash.java
+((line_comment) @comment.line.double-slash.java
   (#match? @comment.line.double-slash.java "^//"))
 
-((comment) @punctuation.definition.comment.java
-  (#match? @punctuation.definition.comment.java "^//")
+((line_comment) @punctuation.definition.comment.begin.java
+  (#match? @punctuation.definition.comment.begin.java "^//")
   (#set! adjust.startAndEndAroundFirstMatchOf "^//"))
 
 
-((comment) @comment.block.documentation.javadoc.java
+((block_comment) @comment.block.documentation.javadoc.java
   (#match? @comment.block.documentation.javadoc.java "^/\\*\\*")
-  (#set! capture.final true)
+  (#set! capture.final)
   (#set! highlight.invalidateOnChange true))
 
-((comment) @comment.block.java
+((block_comment) @comment.block.java
   (#match? @comment.block.java "^/\\*")
   (#set! highlight.invalidateOnChange true))
 
-((comment) @punctuation.definition.comment.begin.java
+((block_comment) @punctuation.definition.comment.begin.java
   (#match? @punctuation.definition.comment.begin.java "^/\\*\\*?")
   (#set! adjust.startAndEndAroundFirstMatchOf "^/\\*"))
 
-((comment) @punctuation.definition.comment.end.java
+((block_comment) @punctuation.definition.comment.end.java
   (#match? @punctuation.definition.comment.end.java "\\*/$")
   (#set! adjust.startAndEndAroundFirstMatchOf "\\*/$"))
 
@@ -62,17 +62,17 @@
 
 (extends_interfaces "extends" @storage.modifier.extends.java)
 
-(extends_interfaces
-  (interface_type_list
-    (type_identifier) @entity.other.inherited-class.java)
-    (#set! capture.final true))
+; (extends_interfaces
+;   (interface_type_list
+;     (type_identifier) @entity.other.inherited-class.java)
+;     (#set! capture.final true))
 
 (super_interfaces "implements" @storage.modifier.implements.java)
 
-(super_interfaces
-  (interface_type_list
-    (type_identifier) @entity.other.inherited-class.java)
-    (#set! capture.final true))
+; (super_interfaces
+;   (interface_type_list
+;     (type_identifier) @entity.other.inherited-class.java)
+;     (#set! capture.final true))
 
 (static_initializer "static" @storage.modifier.static.java)
 
@@ -118,7 +118,7 @@
   (#set! capture.final true))
 
 (type_identifier) @storage.type.java
-(type_parameter (identifier) @storage.type.java)
+(type_parameter (type_identifier) @storage.type.java)
 
 (void_type) @storage.type.void.java
 (integral_type) @storage.type.integral.java
@@ -254,12 +254,22 @@
   (#set! adjust.startAndEndAroundFirstMatchOf "'$"))
 
 
+; Both regular string literals and multi-line string literals have the
+; `string_literal` node name. So we'll detect the multi-line strings first…
+((string_literal) @string.quoted.triple.block.java
+  (#match? @string.quoted.triple.block.java "^\"\"\"")
+  (#set! capture.final))
+
+; …and whatever doesn't match the pattern above will fall back to this match —
+; which can only be an ordinary double-quoted string.
 (string_literal) @string.quoted.double.java
 
+; Meanwhile, the punctuation queries are written flexibly so that they will
+; match either kind of string literal.
 ((string_literal) @punctuation.definition.string.begin.java
-  (#set! adjust.startAndEndAroundFirstMatchOf "^\""))
+  (#set! adjust.startAndEndAroundFirstMatchOf "^\"(\"\")?"))
 ((string_literal) @punctuation.definition.string.end.java
-  (#set! adjust.startAndEndAroundFirstMatchOf "\"$"))
+  (#set! adjust.startAndEndAroundFirstMatchOf "(\"\")?\"$"))
 
 ; CAVEAT: Parser doesn't recognize escape sequences in strings.
 

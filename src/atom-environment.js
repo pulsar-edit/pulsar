@@ -42,13 +42,15 @@ const PaneAxis = require('./pane-axis');
 const Pane = require('./pane');
 const Dock = require('./dock');
 const TextEditor = require('./text-editor');
-const TextBuffer = require('text-buffer');
+const TextBuffer = require('@pulsar-edit/text-buffer');
 const TextEditorRegistry = require('./text-editor-registry');
 const StartupTime = require('./startup-time');
 const { getReleaseChannel } = require('./get-app-details.js');
 const UI = require('./ui.js');
+const I18n = require("./i18n.js");
 const packagejson = require("../package.json");
 
+const { closeAllWatchers } = require('@pulsar-edit/pathwatcher');
 const stat = util.promisify(fs.stat);
 
 let nextId = 0;
@@ -59,6 +61,23 @@ let nextId = 0;
  *
  * An instance of this class is always available as the `atom` global.
  */
+// Error messages that should not cause the dev tools to open. These are
+// Chromium notifications that arrive through `window.onerror` despite not
+// indicating a fault; see `installUncaughtErrorHandler`.
+const IGNORED_ERROR_MESSAGES = [
+  // These errors mean that a `ResizeObserver` handler made a change that would
+  // ordinarily trigger a resize and recursively trigger the handler again;
+  // when this happens, Chromium reports it and defers the handler until the
+  // next frame.
+  //
+  // This is not actually an error! It's not unusual to have this happen during
+  // ordinary layout-heavy work. Ideally it would be a `console.warn`. At any
+  // rate, the presence of such an error in the console _definitely_ should not
+  // trigger dev tools opening!
+  /ResizeObserver loop completed with undelivered notifications/,
+  /ResizeObserver loop limit exceeded/
+];
+
 class AtomEnvironment {
 
   constructor(params = {}) {
@@ -87,8 +106,6 @@ class AtomEnvironment {
     /** @type {NotificationManager} */
     this.notifications = new NotificationManager();
 
-    this.stateStore = new StateStore('AtomEnvironments', 1);
-
     /** @type {Config} */
     this.config = new Config({
       saveCallback: settings => {
@@ -104,6 +121,18 @@ class AtomEnvironment {
       type: 'object',
       properties: _.clone(ConfigSchema)
     });
+
+    this.stateStore = new StateStore('AtomEnvironments', 1, {
+      config: this.config
+    });
+
+    /** @type {I18n} */
+    const localeLoadStartTime = performance.now();
+    this.i18n = new I18n({
+      config: this.config
+    });
+    this.i18n.preload();
+    this.localeLoadTime = Math.round(performance.now() - localeLoadStartTime);
 
     /** @type {KeymapManager} */
     this.keymaps = new KeymapManager({
@@ -152,11 +181,12 @@ class AtomEnvironment {
     /** @type {MenuManager} */
     this.menu = new MenuManager({
       keymapManager: this.keymaps,
-      packageManager: this.packages
+      packageManager: this.packages,
+      i18n: this.i18n
     });
 
     /** @type {ContextMenuManager} */
-    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps });
+    this.contextMenu = new ContextMenuManager({ keymapManager: this.keymaps, i18n: this.i18n });
 
     this.packages.setMenuManager(this.menu);
     this.packages.setContextMenuManager(this.contextMenu);
@@ -244,6 +274,8 @@ class AtomEnvironment {
     // before opening a buffer.
     require('./text-editor-element');
 
+    this.isDestroying = false;
+
     this.window = params.window;
     this.document = params.document;
     this.blobStore = params.blobStore;
@@ -256,6 +288,10 @@ class AtomEnvironment {
       userSettings,
       projectSpecification
     } = this.getLoadSettings();
+
+    this.stateStore.initialize({
+      configDirPath: this.getConfigDirPath()
+    });
 
     ConfigSchema.projectHome = {
       type: 'string',
@@ -274,6 +310,10 @@ class AtomEnvironment {
     if (projectSpecification != null && projectSpecification.config != null) {
       this.project.replace(projectSpecification);
     }
+
+    this.i18n.initialize({
+      resourcePath: resourcePath
+    });
 
     this.menu.initialize({ resourcePath });
     this.contextMenu.initialize({ resourcePath, devMode });
@@ -323,7 +363,7 @@ class AtomEnvironment {
     this.attachSaveStateListeners();
     this.windowEventHandler.initialize(this.window, this.document);
 
-    this.workspace.initialize();
+    this.workspace.initialize({ configDirPath: this.getConfigDirPath() });
 
     const didChangeStyles = this.didChangeStyles.bind(this);
     this.disposables.add(this.styles.onDidAddStyleElement(didChangeStyles));
@@ -451,7 +491,7 @@ class AtomEnvironment {
     this.workspace.reset(this.packages);
     this.registerDefaultOpeners();
     this.project.reset(this.packages);
-    this.workspace.initialize();
+    this.workspace.initialize({ configDirPath: this.getConfigDirPath() });
     this.grammars.clear();
     this.textEditors.clear();
     this.views.clear();
@@ -461,34 +501,52 @@ class AtomEnvironment {
   destroy() {
     if (!this.project) return;
 
+    // Set this flag and then don't reset it after `destroy` is done, since we
+    // need other disposing objects to be able to check it. We won't need to
+    // reset it because another environment will be created.
+    this.isDestroying = true;
+    this.emitter.emit('will-destroy');
+
     this.disposables.dispose();
+
     if (this.workspace) this.workspace.destroy();
     this.workspace = null;
     this.themes.workspace = null;
+
     if (this.project) this.project.destroy();
     this.project = null;
+
     this.commands.clear();
+
     if (this.stylesElement) this.stylesElement.remove();
+
     this.uriHandlerRegistry.destroy();
 
     this.uninstallWindowEventHandler();
   }
 
-  /**
-   * @memberof AtomEnvironment
-   * @function onDidBeep
-   * @desc Invoke the given callback whenever {@link ::beep} is called.
-   * @listens ::beep
-   * @param {function} callback - Function to be called whenever {@link ::beep} is called.
-   * @returns {Disposable} on which `.dispose()` can be called to unsubscribe.
-   * @category Event Subscription
-   */
+  // Extend: Invoke the given callback when the environment is destroying, as
+  // happens during window close or reload.
+  //
+  // * `callback` {Function} to be called when the environment starts
+  //   destroying
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onWillDestroy(callback) {
+    return this.emitter.on('will-destroy', callback);
+  }
+
+  // Extended: Invoke the given callback whenever {::beep} is called.
+  //
+  // * `callback` {Function} to be called whenever {::beep} is called
+  //
+  // Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
   onDidBeep(callback) {
     return this.emitter.on('did-beep', callback);
   }
 
   // Extended: Invoke the given callback when there is an unhandled error, but
-  // before the devtools pop open
+  // before the devtools pop open.
   //
   // * `callback` {Function} to be called whenever there is an unhandled error
   //   * `event` {Object}
@@ -760,12 +818,60 @@ class AtomEnvironment {
 
   // Extended: Set the full screen state of the current window.
   setFullScreen(fullScreen = false) {
-    return this.applicationDelegate.setWindowFullScreen(fullScreen);
+    let result = this.applicationDelegate.setWindowFullScreen(fullScreen);
+    // On Linux, setting full screen (no matter the value) hides the menu bar.
+    // Hence we must re-assert this setting.
+    this.setAutoHideMenuBar(this.config.get('core.autoHideMenuBar'));
+    return result;
   }
 
   // Extended: Toggle the full screen state of the current window.
   toggleFullScreen() {
     return this.setFullScreen(!this.isFullScreen());
+  }
+
+  // Extended: Moves an item to the trash.
+  //
+  // Returns a {Promise} that resolves when the operation has completed or
+  // rejects in the event of failure.
+  trashItem(filePath) {
+    return this.applicationDelegate.trashItem(filePath);
+  }
+
+  // Extended: Reveals the given path in the system’s file browser, selecting
+  // it if possible.
+  //
+  // Returns a {Promise} that resolves when the operation has completed or
+  // rejects in the event of failure.
+  showItemInFolder(filePath) {
+    return this.applicationDelegate.showItemInFolder(filePath);
+  }
+
+  // Extended: Opens the given path in the default manner for the operating
+  // system.
+  //
+  // For instance: if you pass the path to a directory, will likely open that
+  // directory in a file browser. If you pass the path to an image file, will
+  // likely open that image file in a web browser or an image editing
+  // application.
+  //
+  // Returns a {Promise} that resolves when the operation has completed or
+  // rejects in the event of failure.
+  openPath(filePath) {
+    return this.applicationDelegate.openPath(filePath);
+  }
+
+  // Extended: Opens the given URL in the default manner for the operating
+  // system.
+  //
+  // For instance: passing an `https:` URI will open it in the default web
+  // browser, and passing a `mailto:` link will open it in the default mail
+  // client.
+  //
+  // Returns a {Promise} that resolves when the operation has completed or
+  // rejects in the event of failure.
+  openExternal(url) {
+    return this.applicationDelegate.openExternalDirect(url);
   }
 
   // Restore the window to its previous dimensions and show it.
@@ -1094,6 +1200,7 @@ class AtomEnvironment {
   }
 
   async prepareToUnloadEditorWindow() {
+    await this.project.resurrectAllDeletedBuffers();
     try {
       await this.saveState({ isUnloading: true });
     } catch (error) {
@@ -1115,6 +1222,7 @@ class AtomEnvironment {
   }
 
   unloadEditorWindow() {
+    closeAllWatchers();
     if (!this.project) return;
 
     this.storeWindowBackground();
@@ -1145,7 +1253,12 @@ class AtomEnvironment {
 
       const eventObject = { message, url, line, column, originalError };
 
-      let openDevTools = true;
+      // Calling `preventDefault` will suppress the opening of the dev tools.
+      // But some errors are common enough that we should not let them open
+      // the dev tools under any circumstances.
+      let openDevTools = !IGNORED_ERROR_MESSAGES.some(pattern =>
+        pattern.test(message)
+      );
       eventObject.preventDefault = () => {
         openDevTools = false;
       };
@@ -1352,11 +1465,14 @@ class AtomEnvironment {
   }
 
   async addToProject(projectPaths) {
-    const state = await this.loadState(this.getStateKey(projectPaths));
+    let stateKeyForNewProjectPaths = await this.getStateKey(projectPaths, { pathsOnly: true });
+    const state = await this.loadState(stateKeyForNewProjectPaths);
+    // When this is an “empty” project, adding one or more paths could lead the
+    // window to offer to “adopt” any state that existed for those paths.
     if (state && this.project.getPaths().length === 0) {
       this.attemptRestoreProjectStateForPaths(state, projectPaths);
     } else {
-      projectPaths.map(folder => this.project.addPath(folder));
+      this.project.addPaths(projectPaths);
     }
   }
 
@@ -1410,9 +1526,7 @@ class AtomEnvironment {
             });
             resolveDiscardStatePromise(Promise.resolve(null));
           } else if (response === 1) {
-            for (let selectedPath of projectPaths) {
-              this.project.addPath(selectedPath);
-            }
+            this.project.addPaths(projectPaths);
             resolveDiscardStatePromise(
               Promise.all(filesToOpen.map(file => this.workspace.open(file)))
             );
@@ -1443,7 +1557,7 @@ or use Pane::saveItemAs for programmatic saving.`);
     if (this.enablePersistence && this.project) {
       const state = this.serialize(options);
       if (!storageKey)
-        storageKey = this.getStateKey(this.project && this.project.getPaths());
+        storageKey = await this.getStateKey(this.project && this.project.getPaths());
       if (storageKey) {
         await this.stateStore.save(storageKey, state);
       } else {
@@ -1452,17 +1566,17 @@ or use Pane::saveItemAs for programmatic saving.`);
     }
   }
 
-  loadState(stateKey) {
+  async loadState(stateKey) {
     if (this.enablePersistence) {
       if (!stateKey)
-        stateKey = this.getStateKey(this.getLoadSettings().initialProjectRoots);
+        stateKey = await this.getStateKey(this.getLoadSettings().initialProjectRoots);
       if (stateKey) {
-        return this.stateStore.load(stateKey);
+        return await this.stateStore.load(stateKey);
       } else {
-        return this.applicationDelegate.getTemporaryWindowState();
+        return await this.applicationDelegate.getTemporaryWindowState();
       }
     } else {
-      return Promise.resolve(null);
+      return null;
     }
   }
 
@@ -1529,21 +1643,8 @@ or use Pane::saveItemAs for programmatic saving.`);
     }
   }
 
-  getStateKey(paths) {
-    if (paths && paths.length > 0) {
-      const sha1 = crypto
-        .createHash('sha1')
-        .update(
-          paths
-            .slice()
-            .sort()
-            .join('\n')
-        )
-        .digest('hex');
-      return `editor-${sha1}`;
-    } else {
-      return null;
-    }
+  async getStateKey(paths, options = {}) {
+    return this.applicationDelegate.getStateKey(paths, options);
   }
 
   getConfigDirPath() {
@@ -1679,7 +1780,7 @@ or use Pane::saveItemAs for programmatic saving.`);
         missingFolders.map(location => location.pathToOpen)
       );
       const state = await this.loadState(
-        this.getStateKey(Array.from(foldersForStateKey))
+        await this.getStateKey(Array.from(foldersForStateKey), { pathsOnly: true })
       );
 
       // only restore state if this is the first path added to the project
@@ -1692,9 +1793,7 @@ or use Pane::saveItemAs for programmatic saving.`);
         );
         restoredState = true;
       } else {
-        for (let folder of foldersToAddToProject) {
-          this.project.addPath(folder);
-        }
+        this.project.addPaths(foldersToAddToProject);
       }
     }
 
@@ -1740,7 +1839,30 @@ or use Pane::saveItemAs for programmatic saving.`);
           '` do not exist.';
       }
 
-      this.notifications.addWarning(message, { description });
+      let notification;
+
+      let removeMissingPaths = async () => {
+        this.applicationDelegate.setProjectRoots(this.project.getPaths());
+
+        if (notification) {
+          notification.dismiss();
+        }
+      };
+
+      let skipRemove = () => {
+        if (notification) {
+          notification.dismiss();
+        }
+      }
+
+      notification = this.notifications.addWarning(message, {
+        description,
+        dismissable: true,
+        buttons: [
+          { text: 'Remove all', onDidClick: removeMissingPaths },
+          { text: 'Skip for now', onDidClick: skipRemove }
+        ]
+      });
     }
 
     ipcRenderer.send('window-command', 'window:locations-opened');

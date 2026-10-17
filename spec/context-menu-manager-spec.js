@@ -5,7 +5,7 @@ describe('ContextMenuManager', function() {
 
   beforeEach(function() {
     const { resourcePath } = atom.getLoadSettings();
-    contextMenu = new ContextMenuManager({ keymapManager: atom.keymaps });
+    contextMenu = new ContextMenuManager({ keymapManager: atom.keymaps, i18n: atom.i18n });
     contextMenu.initialize({ resourcePath });
 
     parent = document.createElement('div');
@@ -506,6 +506,59 @@ describe('ContextMenuManager', function() {
             {
               label: 'My Other Command',
               id: 'My Other Command',
+              command: 'test:my-other-command'
+            },
+            {
+              label: 'My Command',
+              id: 'My Command',
+              command: 'test:my-command',
+              after: ['test:my-other-command']
+            }
+          ]
+        }
+      ]);
+    });
+
+    it('translates labels when a LocaleLabel is present', function() {
+      const I18n = require("../src/i18n.js");
+      atom.i18n.localeFallbackList = I18n.localeNegotiation(
+        "es-MX",
+        [ "zh-Hant" ]
+      );
+      atom.i18n.addStrings({
+        example: {
+          stringKey: "Hello Pulsar",
+          otherStringKey: "Goodbye Pulsar"
+        }
+      }, "en");
+
+      contextMenu.add({
+        '.parent': [
+          {
+            label: '%example.stringKey%',
+            submenu: [
+              {
+                label: 'My Command',
+                command: 'test:my-command',
+                after: ['test:my-other-command']
+              },
+              {
+                label: '%example.otherStringKey%',
+                command: 'test:my-other-command'
+              }
+            ]
+          }
+        ]
+      });
+      const dispatchedEvent = { target: parent };
+      expect(contextMenu.templateForEvent(dispatchedEvent)).toEqual([
+        {
+          label: 'Hello Pulsar',
+          id: 'Hello Pulsar',
+          submenu: [
+            {
+              label: 'Goodbye Pulsar',
+              id: 'Goodbye Pulsar',
               command: 'test:my-other-command'
             },
             {

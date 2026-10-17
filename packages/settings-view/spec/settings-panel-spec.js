@@ -465,4 +465,57 @@ describe("SettingsPanel", () => {
       });
     });
   });
+
+  describe('settings rendering', () => {
+    beforeEach(() => {
+      const config = {
+        type: 'object',
+        properties: {
+          troz: {
+            title: 'troz',
+            // Testing paragraph breaks inside a description.
+            description: 'The troz setting.\n\nIgnored unless `zort` is also `true`.',
+            type: 'string',
+            default: 'troz',
+          },
+          minMax: {
+            name: 'minMax',
+            title: 'Min max',
+            description: 'The minMax setting',
+            type: 'integer',
+            default: 10,
+            minimum: 1,
+            maximum: 100
+          },
+          commaValueArray: {
+            name: 'commaValueArray',
+            title: 'Comma value in array',
+            description: 'An array with a comma value',
+            type: 'array',
+            default: []
+          }
+        }
+      };
+
+      atom.config.setSchema('foo', config);
+      settingsPanel = new SettingsPanel({namespace: 'foo', includeTitle: false});
+    });
+
+    it('renders a setting description as Markdown', () => {
+      // A setting with internal paragraph breaks should end up with two P
+      // elements…
+      const trozDescription = settingsPanel.element.querySelector(
+        `label[data-setting-key="foo.troz"] > .setting-description`
+      );
+      expect(trozDescription.querySelectorAll('p').length).toBe(2);
+
+      // …but a setting without any paragraph breaks should have its outer P
+      // element stripped.
+      const minMaxDescription = settingsPanel.element.querySelector(
+        `label[data-setting-key="foo.minMax"] > .setting-description`
+      );
+      expect(minMaxDescription.querySelectorAll('p').length).toBe(0);
+    });
+  });
+
 });

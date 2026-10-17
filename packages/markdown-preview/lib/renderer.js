@@ -4,6 +4,8 @@ const createDOMPurify = require('dompurify')
 const emoji = require('emoji-images')
 const fs = require('fs-plus')
 let marked = null // Defer until used
+let githubSlugger = null
+let innertext = null
 let renderer = null
 let cheerio = null
 let yamlFrontMatter = null
@@ -108,6 +110,7 @@ function chooseRender(text, filePath) {
       filePath: filePath,
       breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
       useDefaultEmoji: true,
+      useGitHubHeadings: true,
       sanitizeAllowUnknownProtocols: atom.config.get('markdown-preview.allowUnsafeProtocols')
     })
     return atom.ui.markdown.convertToDOM(html)
@@ -145,6 +148,17 @@ exports.toHTML = async function (text, filePath, grammar) {
   const domFragment = chooseRender(text, filePath)
   const div = document.createElement('div')
   annotatePreElements(domFragment, getDefaultLanguageForGrammar(grammar))
+
+  // Mark each PRE element with a `data-serialized` attribute.
+  //
+  // This helps distinguish between a PRE in the preview pane (which we want to
+  // hide, since the read-only editor is shown in its place) and a PRE in the
+  // generated HTML (which we want to show, since there is no substitute
+  // element).
+  for (let pre of domFragment.querySelectorAll('pre')) {
+    pre.dataset.serialized = true
+  }
+
   div.appendChild(domFragment)
   document.body.appendChild(div)
 
@@ -160,17 +174,26 @@ exports.toHTML = async function (text, filePath, grammar) {
 function render(text, filePath) {
   if (marked == null || yamlFrontMatter == null || cheerio == null) {
     marked = require('marked')
+    const GithubSlugger = require('github-slugger')
+    innertext = require('innertext')
     yamlFrontMatter = require('yaml-front-matter')
     cheerio = require('cheerio')
 
     renderer = new marked.Renderer()
+    githubSlugger = new GithubSlugger()
     renderer.listitem = function (text, isTask) {
       const listAttributes = isTask ? ' class="task-list-item"' : ''
 
       return `<li ${listAttributes}>${text}</li>\n`
     }
+    renderer.heading = function (text, level) {
+      const headingText = innertext(text)
+      const id = `user-content-${githubSlugger.slug(headingText)}`
+      return `<h${level} id="${id}">${text}</h${level}>\n`
+    }
   }
 
+  githubSlugger.reset()
   marked.setOptions({
     breaks: atom.config.get('markdown-preview.breakOnSingleNewline'),
     renderer
@@ -373,19 +396,33 @@ function convertAtomEditorToStandardElement(editorElement, preElement) {
     // In this code path, we're transplanting the highlighted editor HTML into
     // the existing `pre` element, so we should empty its contents first.
     preElement.innerHTML = ''
-    const done = () =>
-      editor.component.getNextUpdatePromise().then(function () {
-        for (const line of editorElement.querySelectorAll(
-          '.line:not(.dummy)'
-        )) {
+    let timeout
+    const done = () => {
+      let updated = false;
+      let proceed = function () {
+        clearTimeout(timeout)
+        for (const line of editorElement.querySelectorAll('.line:not(.dummy)')) {
           const line2 = document.createElement('div')
           line2.className = 'line'
           line2.innerHTML = line.firstChild.innerHTML
           preElement.appendChild(line2)
         }
         editorElement.remove()
+        updated = true
         resolve()
-      })
+      }
+      editor.component.getNextUpdatePromise().then(proceed)
+
+      // Guard against the next component update not happening promptly — or
+      // not happening at all. This isn't the right fix, but as a workaround
+      // it'll do.
+      timeout = setTimeout(() => {
+        // If we haven't had an update yet, force one.
+        if (updated) return
+        editor.component.updateSync()
+        proceed()
+      }, 500)
+    }
     const languageMode = editor.getBuffer().getLanguageMode()
     if (languageMode.fullyTokenized || languageMode.tree) {
       done()

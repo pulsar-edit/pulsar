@@ -16,8 +16,9 @@
     }
   },
   "devDependencies": {
-    "@webref/css": "^6.3.4",
-    "content": "github:mdn/content",
-    "superagent": "^8.0.9"
+    "@webref/css": "^6.18.1",
+    "@webref/elements": "^2.4.0",
+    "download-git-repo": "^3.0.2",
+    "superagent": "^10.1.1"
   }
 }

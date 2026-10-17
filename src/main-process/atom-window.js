@@ -1,3 +1,6 @@
+const electronRemote = require('@electron/remote/main')
+electronRemote.initialize()
+
 const {
   BrowserWindow,
   app,
@@ -13,7 +16,7 @@ const { EventEmitter } = require('events');
 const StartupTime = require('../startup-time');
 
 let ICON_PATH = path.resolve(process.resourcesPath, 'pulsar.png');
-if(!fs.existsSync(ICON_PATH)) {
+if (!fs.existsSync(ICON_PATH)) {
   ICON_PATH = path.resolve(__dirname, '..', '..', 'resources', 'pulsar.png');
 }
 
@@ -57,14 +60,11 @@ module.exports = class AtomWindow extends EventEmitter {
         // Disable the `auxclick` feature so that `click` events are triggered in
         // response to a middle-click.
         // (Ref: https://github.com/atom/atom/pull/12696#issuecomment-290496960)
-        disableBlinkFeatures: 'Auxclick',
+        disableBlinkFeatures: 'Auxclick,ObservableAPI',
         nodeIntegration: true,
         contextIsolation: false,
-        enableRemoteModule: true,
         webviewTag: true,
 
-        // TodoElectronIssue: remote module is deprecated https://www.electronjs.org/docs/breaking-changes#default-changed-enableremotemodule-defaults-to-false
-        enableRemoteModule: true,
         // node support in threads
         nodeIntegrationInWorker: true
       },
@@ -93,6 +93,7 @@ module.exports = class AtomWindow extends EventEmitter {
     const BrowserWindowConstructor =
       settings.browserWindowConstructor || BrowserWindow;
     this.browserWindow = new BrowserWindowConstructor(options);
+    electronRemote.enable(this.browserWindow.webContents)
 
     Object.defineProperty(this.browserWindow, 'loadSettingsJSON', {
       get: () =>
@@ -129,11 +130,12 @@ module.exports = class AtomWindow extends EventEmitter {
 
     StartupTime.addMarker('main-process:atom-window:end');
 
-    // Expose the startup markers to the renderer process, so we can have unified
-    // measures about startup time between the main process and the renderer process.
+    // Expose the startup markers to the renderer process, so we can have
+    // unified measures about startup time between the main process and the
+    // renderer process.
     Object.defineProperty(this.browserWindow, 'startupMarkers', {
       get: () => {
-        // We only want to make the main process startup data available once,
+        // We want to make the main process startup data available only once —
         // so if the window is refreshed or a new window is opened, the
         // renderer process won't use it again.
         const timingData = StartupTime.exportData();
@@ -252,9 +254,17 @@ module.exports = class AtomWindow extends EventEmitter {
       if (result.response === 0) this.browserWindow.destroy();
     });
 
-    this.browserWindow.webContents.on('render-process-gone', async () => {
+    this.browserWindow.webContents.on('render-process-gone', async (_event, details) => {
+      // `details.reason` is the only thing that distinguishes a renderer
+      // killed for memory (`oom`) from one that hit a native fault
+      // (`crashed`). Without it, a headless CI run reports nothing but
+      // "crashed" no matter what actually happened… which is also a lie when
+      // the reason is `clean-exit` or `killed`.
       if (this.headless) {
-        console.log('Renderer process crashed, exiting');
+        const reason = details?.reason ?? 'unknown';
+        console.log(
+          `Renderer process gone (reason: ${reason}, exit code: ${details?.exitCode}); exiting`
+        );
         this.atomApplication.exit(100);
         return;
       }
@@ -286,7 +296,7 @@ module.exports = class AtomWindow extends EventEmitter {
 
     this.setupContextMenu();
 
-    // Spec window's web view should always have focus
+    // Spec window's web view should always have focus.
     if (this.isSpec)
       this.browserWindow.on('blur', () => this.browserWindow.focusOnWebView());
   }
@@ -349,6 +359,7 @@ module.exports = class AtomWindow extends EventEmitter {
       NODE_ENV,
       NODE_PATH,
       ATOM_HOME,
+      ATOM_CHANNEL,
       ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT
     } = env;
 
@@ -356,6 +367,7 @@ module.exports = class AtomWindow extends EventEmitter {
       NODE_ENV,
       NODE_PATH,
       ATOM_HOME,
+      ATOM_CHANNEL,
       ATOM_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT
     });
   }

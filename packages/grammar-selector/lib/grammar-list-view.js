@@ -165,17 +165,11 @@ module.exports = class GrammarListView {
 // manner.
 function getLanguageModeConfig() {
   let isTreeSitterMode = atom.config.get('core.useTreeSitterParsers');
-  let isLegacy = atom.config.get('core.useLegacyTreeSitter');
-  if (!isTreeSitterMode) return 'textmate';
-  return isLegacy ? 'node-tree-sitter' : 'web-tree-sitter';
+  return isTreeSitterMode ? 'web-tree-sitter' : 'textmate';
 }
 
 function isModernTreeSitter(grammar) {
   return grammar.constructor.name === 'WASMTreeSitterGrammar';
-}
-
-function isLegacyTreeSitter(grammar) {
-  return grammar.constructor.name === 'TreeSitterGrammar';
 }
 
 function compareGrammarType(a, b) {
@@ -189,15 +183,9 @@ function getParserPreferenceForScopeName(scopeName) {
     'core.useTreeSitterParsers',
     { scope: [scopeName] }
   );
-  let useLegacyTreeSitter = atom.config.get(
-    'core.useLegacyTreeSitter',
-    { scope: [scopeName] }
-  );
 
   if (!useTreeSitterParsers) {
     return 'textmate';
-  } else if (useLegacyTreeSitter) {
-    return 'node-tree-sitter';
   } else {
     return 'web-tree-sitter';
   }
@@ -208,9 +196,7 @@ function getBadgeTextForGrammar(grammar) {
     case 'Grammar':
       return 'TextMate';
     case 'WASMTreeSitterGrammar':
-      return 'Modern Tree-sitter';
-    case 'TreeSitterGrammar':
-      return 'Legacy Tree-sitter';
+      return 'Tree-sitter';
   }
 }
 
@@ -224,11 +210,6 @@ const BADGE_COLORS_BY_LANGUAGE_MODE_CONFIG = {
     'WASMTreeSitterGrammar': 'badge-success',
     'TreeSitterGrammar': 'badge-warning',
     'Grammar': 'badge-info'
-  },
-  'node-tree-sitter': {
-    'TreeSitterGrammar': 'badge-success',
-    'WASMTreeSitterGrammar': 'badge-warning',
-    'Grammar': 'badge-info'
   }
 };
 
@@ -240,11 +221,6 @@ function getBadgeColorForGrammar(grammar) {
 
 function getGrammarScore(grammar) {
   let languageParser = getParserPreferenceForScopeName(grammar.scopeName);
-  if (isModernTreeSitter(grammar)) {
-    return languageParser === 'node-tree-sitter' ? -1 : -2;
-  }
-  if (isLegacyTreeSitter(grammar)) {
-    return languageParser === 'node-tree-sitter' ? -2 : -1;
-  }
+  if (isModernTreeSitter(grammar)) return -2;
   return languageParser === 'textmate' ? -3 : 0;
 }

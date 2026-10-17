@@ -2,9 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const Grim = require('grim');
 const dedent = require('dedent');
-const Parser = require('./web-tree-sitter');
-const { CompositeDisposable, Emitter } = require('event-kit');
-const { File } = require('pathwatcher');
+const { Language, Parser, Query } = require('./web-tree-sitter');
+const { CompositeDisposable, Disposable, Emitter } = require('event-kit');
+const { File } = require('@pulsar-edit/pathwatcher');
 const { normalizeDelimiters } = require('./comment-utils.js');
 
 const parserInitPromise = Parser.init();
@@ -22,8 +22,6 @@ const QUERY_CAPTURES_DEPRECATION_EXPLANATION = dedent`\
   specify \`startPosition\` and \`endPosition\` properties within \`options\`.
 `;
 
-let didWrapQueryCaptures = false;
-
 // When `web-tree-sitter` harmonized its API with that of `node-tree-sitter`,
 // some function signatures changed. The most impactful one for us is probably
 // `Query#captures`, since two crucial positional arguments were moved into a
@@ -32,9 +30,7 @@ let didWrapQueryCaptures = false;
 // We've changed all of our usages, but it's possible some community packages
 // won't have been able to update yet. We should emit a deprecation message in
 // those cases and restructure the arguments on the fly.
-function wrapQueryCaptures(query) {
-  didWrapQueryCaptures = true;
-  let QueryPrototype = Object.getPrototypeOf(query);
+function wrapQueryCaptures(QueryPrototype) {
   let originalCaptures = QueryPrototype.captures;
   // We put `node` into its own argument so that this new function’s `length`
   // property matches that of the old function. (Both are inaccurate, but they
@@ -65,8 +61,36 @@ function wrapQueryCaptures(query) {
   };
 }
 
+wrapQueryCaptures(Query.prototype);
+
 // Extended: This class holds an instance of a Tree-sitter grammar.
 module.exports = class WASMTreeSitterGrammar {
+
+  // Cache each `Language` instance at its own path.
+  static LANGUAGE_CACHE = new Map();
+
+  static async loadLanguage(grammarPath) {
+    // We should load each language a maximum of once.
+    //
+    // This cache makes certain trade-offs. Without it, two different grammars
+    // within the same package can point to the same WASM file and each have
+    // its own distinct “copy” of the language. Using the cache avoids this
+    // waste, but makes it unsafe for us to assume we can delete a language
+    // from this cache if its grammar is deactivated.
+    //
+    // So that's the main downside: out of an abundance of caution, we don't
+    // ever prune this cache, even if the grammar that originally loaded a
+    // language is deactivated. But deactivation of a grammar after
+    // instantiation is an uncommon occurrence outside of the test suite, so we
+    // can live with this for now.
+    if (this.LANGUAGE_CACHE.has(grammarPath)) {
+      return this.LANGUAGE_CACHE.get(grammarPath);
+    }
+    let language = await Language.load(grammarPath);
+    this.LANGUAGE_CACHE.set(grammarPath, language);
+    return language;
+  }
+
   constructor(registry, grammarPath, params) {
     this.registry = registry;
     this.name = params.name;
@@ -199,9 +223,10 @@ module.exports = class WASMTreeSitterGrammar {
     await parserInitPromise;
     if (!this._language) {
       try {
-        this._language = await Parser.Language.load(this.treeSitterGrammarPath);
+        this._language = await WASMTreeSitterGrammar.loadLanguage(this.treeSitterGrammarPath);
       } catch (err) {
         console.error(`Error loading grammar for ${this.scopeName}; original error follows`);
+        console.error(err);
         throw err;
       }
     }
@@ -299,7 +324,7 @@ module.exports = class WASMTreeSitterGrammar {
     if (!language) { return null; }
     let query = this.queryCache.get(queryType);
     if (!query) {
-      query = language.query(this[queryType]);
+      query = new Query(language, this[queryType]);
       this.queryCache.set(queryType, query);
     }
     return query;
@@ -330,16 +355,7 @@ module.exports = class WASMTreeSitterGrammar {
         // let timeTag = `${this.scopeName} ${queryType} load time`;
         try {
           // if (inDevMode) { console.time(timeTag); }
-          query = language.query(this[queryType]);
-
-          // We want to augment the `Query` class to add backward compatibility
-          // for the `captures` method. But since `web-tree-sitter` doesn’t
-          // export references to these inner Tree-sitter classes, we have to
-          // wait until we’re holding an instance of a `Query` and grab its
-          // prototype. Luckily, we still only have to do this once.
-          if (!didWrapQueryCaptures) {
-            wrapQueryCaptures(query);
-          }
+          query = new Query(language, this[queryType]);
 
           // if (inDevMode) { console.timeEnd(timeTag); }
           this.queryCache.set(queryType, query);
@@ -366,7 +382,7 @@ module.exports = class WASMTreeSitterGrammar {
   // Returns a {Promise} that will resolve to a Tree-sitter `Query` object.
   async createQuery(queryContents) {
     let language = await this.getLanguage();
-    return language.query(queryContents);
+    return new Query(language, queryContents);
   }
 
   // Extended: Creates an arbitrary query from this grammar. Package authors
@@ -383,7 +399,7 @@ module.exports = class WASMTreeSitterGrammar {
     if (!this._language) {
       throw new Error(`Language not loaded!`);
     }
-    return this._language.query(queryContents);
+    return new Query(this._language, queryContents);
   }
 
   // Used by the specs to override a particular query for testing.
@@ -463,6 +479,26 @@ module.exports = class WASMTreeSitterGrammar {
     return this.emitter.on('did-load-query-files', callback);
   }
 
+  // Extended: Calls `callback` when an injection point is added to this
+  // grammar.
+  //
+  // * callback A function with the following argument:
+  //   * injectionPoint The injection point added to the grammar. See
+  //     {WASMTreeSitterGrammar::addInjectionPoint}.
+  onDidAddInjectionPoint(callback) {
+    return this.emitter.on('did-add-injection-point', callback);
+  }
+
+  // Extended: Calls `callback` when an injection point is removed from this
+  // grammar.
+  //
+  // * callback A function with the following argument:
+  //   * injectionPoint The injection point removed from this grammar. See
+  //     {WASMTreeSitterGrammar::addInjectionPoint}.
+  onDidRemoveInjectionPoint(callback) {
+    return this.emitter.on('did-remove-injection-point', callback);
+  }
+
   activate() {
     this.registration = this.registry.addGrammar(this);
   }
@@ -470,7 +506,14 @@ module.exports = class WASMTreeSitterGrammar {
   deactivate() {
     this.registration?.dispose();
     this.subscriptions?.dispose();
+    // A new `Query` object gets instantiated for each kind of query every time
+    // a grammar activates. Make sure they're cleaned up upon deactivation;
+    // they're WASM object and will not automatically get GC’d.
+    for (let value of this.queryCache.values()) {
+      value.delete();
+    }
     this.queryCache.clear();
+    this._language = null;
   }
 
   // Extended: Define a set of rules for when this grammar should delegate to a
@@ -546,6 +589,7 @@ module.exports = class WASMTreeSitterGrammar {
       injectionPoints = this.injectionPointsByType[type] = [];
     }
     injectionPoints.push(injectionPoint);
+    this.emitter.emit('did-add-injection-point', injectionPoint);
   }
 
   removeInjectionPoint(injectionPoint) {
@@ -557,6 +601,7 @@ module.exports = class WASMTreeSitterGrammar {
         delete this.injectionPointsByType[injectionPoint.type];
       }
     }
+    this.emitter.emit('did-remove-injection-point', injectionPoint);
   }
 
   inspect() {
@@ -568,7 +613,7 @@ module.exports = class WASMTreeSitterGrammar {
   */
   /* eslint-disable no-unused-vars */
   onDidUpdate(_callback) {
-    // do nothing
+    return new Disposable(() => {});
   }
 
   tokenizeLines(text, _compatibilityMode = true) {
@@ -576,9 +621,14 @@ module.exports = class WASMTreeSitterGrammar {
   }
 
   tokenizeLine(line, _ruleStack, _firstLine) {
+    // We can't tokenize arbitrary content in isolation. Return as much as we
+    // can; that way code that assumes it's working with a TextMate grammar at
+    // least won't break.
     return {
-      value: line,
-      scopes: [this.scopeName]
+      line,
+      tags: [],
+      tokens: [],
+      ruleStack: []
     };
   }
   /* eslint-enable no-unused-vars */

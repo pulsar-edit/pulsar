@@ -1,6 +1,6 @@
 const _ = require('underscore-plus');
 const { CompositeDisposable, Emitter } = require('event-kit');
-const { Point, Range } = require('text-buffer');
+const { Point, Range } = require('@pulsar-edit/text-buffer');
 const TokenizedLine = require('./tokenized-line');
 const TokenIterator = require('./token-iterator');
 const ScopeDescriptor = require('./scope-descriptor');
@@ -29,17 +29,14 @@ class TextMateLanguageMode {
     this.tokenizationStarted = false;
     this.id = params.id != null ? params.id : nextId++;
     this.buffer = params.buffer;
-    this.largeFileMode = params.largeFileMode;
     this.config = params.config ?? atom.config;
-    this.largeFileMode =
-      params.largeFileMode != null
-        ? params.largeFileMode
-        : this.buffer.buffer.getLength() >= 2 * 1024 * 1024;
-
     this.grammar = params.grammar || NullGrammar;
     this.rootScopeDescriptor = new ScopeDescriptor({
       scopes: [this.grammar.scopeName]
     });
+    const largeFileThreshold = this.config.get('editor.largeFileThreshold', { scope: this.rootScopeDescriptor }) ?? 2;
+    this.largeFileMode =
+      params.largeFileMode ?? (largeFileThreshold > 0 && this.buffer.buffer.getLength() >= largeFileThreshold * 1024 * 1024);
     this.disposables.add(
       this.grammar.onDidUpdate(() => this.retokenizeLines())
     );

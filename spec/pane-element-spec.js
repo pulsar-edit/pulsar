@@ -301,8 +301,8 @@ describe('PaneElement', function() {
           { path: '/fake2' }
         ]);
         paneElement.dispatchEvent(event);
-        expect(atom.applicationDelegate.open.callCount).toBe(1);
-        expect(atom.applicationDelegate.open.argsForCall[0][0]).toEqual({
+        expect(atom.applicationDelegate.open.calls.count()).toBe(1);
+        expect(atom.applicationDelegate.open.calls.argsFor(0)[0]).toEqual({
           pathsToOpen: ['/fake1', '/fake2'],
           here: true
         });

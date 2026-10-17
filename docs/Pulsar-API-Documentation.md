@@ -34,10 +34,10 @@ giving it full control over the <code>SelectListView</code> used to show results
 <dl>
 <dt><a href="#etch">etch</a></dt>
 <dd></dd>
-<dt><a href="#css">css</a></dt>
+<dt><a href="#downloadGitRepo">downloadGitRepo</a></dt>
 <dd><p>This file will manage the updating of <code>autocomplete-css</code> <code>completions.json</code>.
   We will mainly utilize <code>@webref/css</code>.listAll() function that returns a full CSS
-  list of all properties seperated by their spec shortname. An example
+  list of all properties separated by their spec shortname. An example
   of this format is defined below for ease of future modifications.</p>
 <p>  Some important notes about the data contained here:
     - Often times the <code>value</code> within the <code>property</code> will be in the following format:
@@ -51,7 +51,7 @@ giving it full control over the <code>SelectListView</code> used to show results
       So this should be handled by the same parser.
     - Additionally an important note is that nowhere in this data do we get any kind
       of description about the data that could lend a hand in being documentation.
-      So the documentation must be gathered seperatly. Likely the best way to collect
+      So the documentation must be gathered separately. Likely the best way to collect
       our documentation data is via <code>mdn/content</code>.
       Within <code>content/files/en-us/web/css</code> is a directory of folders titled
       by the name of properties.</p>
@@ -182,8 +182,6 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dd></dd>
 <dt><a href="#path">path</a></dt>
 <dd></dd>
-<dt><a href="#path">path</a></dt>
-<dd></dd>
 <dt><a href="#_">_</a></dt>
 <dd></dd>
 <dt><a href="#path">path</a></dt>
@@ -196,11 +194,9 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dt><a href="#renderMarkdown">renderMarkdown(content, givenOpts)</a> ⇒ <code>string</code></dt>
 <dd><p>Takes a Markdown document and renders it as HTML.</p>
 </dd>
-<dt><a href="#beforeEach">beforeEach()</a></dt>
-<dd></dd>
-<dt><a href="#beforeEach">beforeEach()</a></dt>
-<dd></dd>
 <dt><a href="#conditionPromise">conditionPromise()</a></dt>
+<dd></dd>
+<dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
 <dt><a href="#conditionPromise">conditionPromise()</a></dt>
 <dd></dd>
@@ -220,6 +216,9 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dd></dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
+<dt><a href="#getPath">getPath(spec)</a> ⇒ <code>string</code></dt>
+<dd><p>Returns an absolute path from the given spec.</p>
+</dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
 <dt><a href="#isIterable">isIterable(obj)</a> ⇒ <code>Boolean</code></dt>
@@ -261,30 +260,26 @@ An instance of this class is always available as the `atom` global.
 **Kind**: global class  
 
 * [AtomEnvironment](#AtomEnvironment)
-    * _instance_
-        * [.clipboard](#AtomEnvironment+clipboard) : [<code>Clipboard</code>](#Clipboard)
-        * [.deserializers](#AtomEnvironment+deserializers) : <code>DeserializerManager</code>
-        * [.views](#AtomEnvironment+views) : <code>ViewRegistry</code>
-        * [.notifications](#AtomEnvironment+notifications) : <code>NotificationManager</code>
-        * [.config](#AtomEnvironment+config) : <code>Config</code>
-        * [.keymaps](#AtomEnvironment+keymaps) : <code>KeymapManager</code>
-        * [.tooltips](#AtomEnvironment+tooltips) : <code>TooltipManager</code>
-        * [.commands](#AtomEnvironment+commands) : <code>CommandRegistry</code>
-        * [.grammars](#AtomEnvironment+grammars) : <code>GrammarRegistry</code>
-        * [.styles](#AtomEnvironment+styles) : <code>StyleManager</code>
-        * [.packages](#AtomEnvironment+packages) : <code>PackageManager</code>
-        * [.themes](#AtomEnvironment+themes) : <code>ThemeManager</code>
-        * [.menu](#AtomEnvironment+menu) : <code>MenuManager</code>
-        * [.contextMenu](#AtomEnvironment+contextMenu) : <code>ContextMenuManager</code>
-        * [.project](#AtomEnvironment+project) : <code>Project</code>
-        * [.textEditors](#AtomEnvironment+textEditors) : <code>TextEditorRegistry</code>
-        * [.workspace](#AtomEnvironment+workspace) : <code>Workspace</code>
-        * [.history](#AtomEnvironment+history) : <code>HistoryManager</code>
-        * _Messaging the User_
-            * [.beep()](#AtomEnvironment+beep)
-    * _static_
-        * _Event Subscription_
-            * [.onDidBeep(callback)](#AtomEnvironment.onDidBeep) ⇒ <code>Disposable</code>
+    * [.clipboard](#AtomEnvironment+clipboard) : [<code>Clipboard</code>](#Clipboard)
+    * [.deserializers](#AtomEnvironment+deserializers) : <code>DeserializerManager</code>
+    * [.views](#AtomEnvironment+views) : <code>ViewRegistry</code>
+    * [.notifications](#AtomEnvironment+notifications) : <code>NotificationManager</code>
+    * [.config](#AtomEnvironment+config) : <code>Config</code>
+    * [.keymaps](#AtomEnvironment+keymaps) : <code>KeymapManager</code>
+    * [.tooltips](#AtomEnvironment+tooltips) : <code>TooltipManager</code>
+    * [.commands](#AtomEnvironment+commands) : <code>CommandRegistry</code>
+    * [.grammars](#AtomEnvironment+grammars) : <code>GrammarRegistry</code>
+    * [.styles](#AtomEnvironment+styles) : <code>StyleManager</code>
+    * [.packages](#AtomEnvironment+packages) : <code>PackageManager</code>
+    * [.themes](#AtomEnvironment+themes) : <code>ThemeManager</code>
+    * [.menu](#AtomEnvironment+menu) : <code>MenuManager</code>
+    * [.contextMenu](#AtomEnvironment+contextMenu) : <code>ContextMenuManager</code>
+    * [.project](#AtomEnvironment+project) : <code>Project</code>
+    * [.textEditors](#AtomEnvironment+textEditors) : <code>TextEditorRegistry</code>
+    * [.workspace](#AtomEnvironment+workspace) : <code>Workspace</code>
+    * [.history](#AtomEnvironment+history) : <code>HistoryManager</code>
+    * _Messaging the User_
+        * [.beep()](#AtomEnvironment+beep)
 
 <a name="AtomEnvironment+clipboard"></a>
 
@@ -366,19 +361,6 @@ Visually and audibly trigger a beep.
 **Kind**: instance method of [<code>AtomEnvironment</code>](#AtomEnvironment)  
 **Category**: Messaging the User  
 **Emits**: <code>event:beep</code>  
-<a name="AtomEnvironment.onDidBeep"></a>
-
-### AtomEnvironment.onDidBeep(callback) ⇒ <code>Disposable</code>
-Invoke the given callback whenever [::beep](::beep) is called.
-
-**Kind**: static method of [<code>AtomEnvironment</code>](#AtomEnvironment)  
-**Returns**: <code>Disposable</code> - on which `.dispose()` can be called to unsubscribe.  
-**Category**: Event Subscription  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| callback | <code>function</code> | Function to be called whenever [::beep](::beep) is called. |
-
 <a name="Clipboard"></a>
 
 ## Clipboard
@@ -440,12 +422,12 @@ giving it full control over the `SelectListView` used to show results.
 ## etch
 **Kind**: global constant  
 **Jsx**: etch.dom  
-<a name="css"></a>
+<a name="downloadGitRepo"></a>
 
-## css
+## downloadGitRepo
 This file will manage the updating of `autocomplete-css` `completions.json`.
   We will mainly utilize `@webref/css`.listAll() function that returns a full CSS
-  list of all properties seperated by their spec shortname. An example
+  list of all properties separated by their spec shortname. An example
   of this format is defined below for ease of future modifications.
 
   Some important notes about the data contained here:
@@ -460,7 +442,7 @@ This file will manage the updating of `autocomplete-css` `completions.json`.
       So this should be handled by the same parser.
     - Additionally an important note is that nowhere in this data do we get any kind
       of description about the data that could lend a hand in being documentation.
-      So the documentation must be gathered seperatly. Likely the best way to collect
+      So the documentation must be gathered separately. Likely the best way to collect
       our documentation data is via `mdn/content`.
       Within `content/files/en-us/web/css` is a directory of folders titled
       by the name of properties.
@@ -616,11 +598,6 @@ This file aims to run some short simple tests against `update.js`. Focusing
 ## path
 **Kind**: global constant  
 **Babel**:   
-<a name="path"></a>
-
-## path
-**Kind**: global constant  
-**Babel**:   
 <a name="_"></a>
 
 ## \_
@@ -631,19 +608,14 @@ This file aims to run some short simple tests against `update.js`. Focusing
 ## path
 **Kind**: global constant  
 **Babel**:   
-<a name="beforeEach"></a>
-
-## beforeEach()
-**Kind**: global function  
-**Babel**:   
-<a name="beforeEach"></a>
-
-## beforeEach()
-**Kind**: global function  
-**Babel**:   
 <a name="conditionPromise"></a>
 
 ## conditionPromise()
+**Kind**: global function  
+**Babel**:   
+<a name="beforeEach"></a>
+
+## beforeEach()
 **Kind**: global function  
 **Babel**:   
 <a name="conditionPromise"></a>
@@ -703,6 +675,18 @@ This file aims to run some short simple tests against `update.js`. Focusing
 ## beforeEach()
 **Kind**: global function  
 **Babel**:   
+<a name="getPath"></a>
+
+## getPath(spec) ⇒ <code>string</code>
+Returns an absolute path from the given spec.
+
+**Kind**: global function  
+**Returns**: <code>string</code> - An absolute path of the given spec.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| spec | <code>string</code> | A path specifier which may be an absolute,    pseudo-drive, or relative path. |
+
 <a name="beforeEach"></a>
 
 ## beforeEach()

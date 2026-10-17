@@ -13,7 +13,17 @@
   (array)
   (symbol_array)
   (string_array)
+  (case_match)
 ] @fold
+
+(
+  [
+    (when)
+    (in_clause)
+  ] @fold
+  (#set! fold.endAt endPosition)
+  ; (#set! fold.offsetEnd 1)
+)
 
 ; Multi-line comment syntax (=begin…=end) is obscure and out of favor, but we
 ; might as well make it foldable.
