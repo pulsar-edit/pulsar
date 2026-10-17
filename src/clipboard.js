@@ -53,16 +53,7 @@ module.exports = class Clipboard {
   // * `text` The {String} to store.
   // * `metadata` (optional) The additional info to associate with the text.
   write(text, metadata) {
-    const lineEndingOption = atom.config.get('editor.convertLineEndingOnCopy');
-    if (lineEndingOption !== "off") {
-      text = text.replace(
-        /\r?\n/g,
-        lineEndingOption === "CRLF" ||
-          (lineEndingOption === "system" && process.platform === 'win32')
-          ? '\r\n'
-          : '\n'
-      );
-    }
+    text = text.replace(/\r?\n/g, process.platform === 'win32' ? '\r\n' : '\n');
 
     this.signatureForMetadata = this.md5(text);
     this.metadata = metadata;
