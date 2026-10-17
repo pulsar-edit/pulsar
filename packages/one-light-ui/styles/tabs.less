@@ -40,9 +40,18 @@
     box-shadow: inherit;
     border-left: @tab-border;
     &.active {
-      --tab-color: @tab-text-color-active;
       background-color: @tab-background-color-active;
       box-shadow: none;
+
+      &:not(.deleted):not(.conflicted) {
+        --tab-color: @tab-text-color-active;
+      }
+    }
+    &.deleted {
+      --tab-color: @text-color-error;
+    }
+    &.conflicted {
+      --tab-color: @text-color-warning;
     }
     &:first-of-type {
       border-left-color: transparent;
@@ -267,7 +276,11 @@ atom-dock .tab-bar .tab::before {
   &[data-type$="TimecopView"],
   &[data-type$="StyleguideView"],
   &[data-type="MarkdownPreviewView"] {
-    --tab-color: @tab-text-color-editor;
+    color: var(--tab-color);
     background-color: @tab-background-color-editor; // Match syntax background color
+
+    &:not(.deleted):not(.conflicted) {
+      --tab-color: @tab-text-color-editor;
+    }
   }
 }
