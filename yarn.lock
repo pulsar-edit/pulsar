@@ -1983,10 +1983,10 @@
   dependencies:
     node-addon-api "^8.5.0"
 
-"@pulsar-edit/text-buffer@^15.1.1":
-  version "15.1.1"
-  resolved "https://registry.yarnpkg.com/@pulsar-edit/text-buffer/-/text-buffer-15.1.1.tgz#557af53a5e54d041f9a8fcf1a5e04f425e68d202"
-  integrity sha512-akvv+sqZIFg9cA+Owp30hyXBnPLEf9IH5p1Fs80rPLil8adKohDopTu/gAO1Jc6GjQCoDql7kBJNiVMZXht1oQ==
+"@pulsar-edit/text-buffer@^15.1.2":
+  version "15.1.2"
+  resolved "https://registry.yarnpkg.com/@pulsar-edit/text-buffer/-/text-buffer-15.1.2.tgz#9a29a3faeb188841d77e9f8992461e8b4bd65e92"
+  integrity sha512-EZbDTq73vo5UxWixDA7bBu14R3Xb9ok03n7DSGE7n46D7P2RVc8+MlOcFOE4n/ucFOpWm74B8jq/OzHfXupZpw==
   dependencies:
     "@pulsar-edit/pathwatcher" "^9.0.4"
     "@pulsar-edit/superstring" "^3.0.8"
