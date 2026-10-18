@@ -1,4 +1,5 @@
 const Registry = require('winreg');
+const { execFile } = require('child_process');
 const Path = require('path');
 const { getAppName } = require('../get-app-details.js');
 
@@ -11,6 +12,15 @@ const fileIconPath = `"${Path.join(
   'resources',
   'pulsar.ico'
 )}"`;
+
+// The `reg.exe` that ships with Windows — the same one `winreg` uses — rather
+// than whichever `reg.exe` comes first on the `PATH`. Windows sets
+// `SystemRoot` and `windir` for every process; if neither is present, fall
+// back to a `PATH` lookup instead of failing.
+function getRegExePath() {
+  const systemRoot = process.env.SystemRoot ?? process.env.windir;
+  return systemRoot ? Path.join(systemRoot, 'System32', 'reg.exe') : 'reg.exe';
+}
 
 class ShellOption {
   constructor(key, parts) {
@@ -34,15 +44,24 @@ class ShellOption {
   register(callback) {
     let doneCount = this.parts.length;
     this.parts.forEach(part => {
-      let reg = new Registry({
-        hive: 'HKCU',
-        key: part.key != null ? `${this.key}\\${part.key}` : this.key
+      const keyPath = `HKCU${part.key != null ? `${this.key}\\${part.key}` : this.key}`;
+      const args = ['ADD', keyPath];
+      if (part.name === '') {
+        args.push('/ve');
+      } else {
+        args.push('/v', part.name);
+      }
+      args.push('/t', 'REG_SZ', '/d', part.value, '/f');
+      // Run `reg.exe` directly instead of through `cmd.exe` (as `winreg`
+      // does), so that our values — which contain quotes, spaces, and `%1` —
+      // reach it intact. `windowsHide` keeps a console window from flashing
+      // up for each call.
+      execFile(getRegExePath(), args, { shell: false, windowsHide: true }, (error) => {
+        if (error) {
+          console.error(`Failed to write registry value in ${keyPath}:`, error);
+        }
+        if (--doneCount === 0) return callback();
       });
-      return reg.create(() =>
-        reg.set(part.name, Registry.REG_SZ, part.value, () => {
-          if (--doneCount === 0) return callback();
-        })
-      );
     });
   }
 
