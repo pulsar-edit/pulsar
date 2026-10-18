@@ -13,6 +13,15 @@ const fileIconPath = `"${Path.join(
   'pulsar.ico'
 )}"`;
 
+// The `reg.exe` that ships with Windows — the same one `winreg` uses — rather
+// than whichever `reg.exe` comes first on the `PATH`. Windows sets
+// `SystemRoot` and `windir` for every process; if neither is present, fall
+// back to a `PATH` lookup instead of failing.
+function getRegExePath() {
+  const systemRoot = process.env.SystemRoot ?? process.env.windir;
+  return systemRoot ? Path.join(systemRoot, 'System32', 'reg.exe') : 'reg.exe';
+}
+
 class ShellOption {
   constructor(key, parts) {
     this.isRegistered = this.isRegistered.bind(this);
@@ -43,7 +52,14 @@ class ShellOption {
         args.push('/v', part.name);
       }
       args.push('/t', 'REG_SZ', '/d', part.value, '/f');
-      execFile('reg.exe', args, { shell: false }, () => {
+      // Run `reg.exe` directly instead of through `cmd.exe` (as `winreg`
+      // does), so that our values — which contain quotes, spaces, and `%1` —
+      // reach it intact. `windowsHide` keeps a console window from flashing
+      // up for each call.
+      execFile(getRegExePath(), args, { shell: false, windowsHide: true }, (error) => {
+        if (error) {
+          console.error(`Failed to write registry value in ${keyPath}:`, error);
+        }
         if (--doneCount === 0) return callback();
       });
     });
