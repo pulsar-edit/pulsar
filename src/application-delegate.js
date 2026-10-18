@@ -4,6 +4,14 @@ const ipcHelpers = require('./ipc-helpers');
 const { Emitter, Disposable } = require('event-kit');
 const getWindowLoadSettings = require('./get-window-load-settings');
 
+// Reconstructs a failed shell operation's error on this side of the IPC
+// boundary. An `Error` sent over IPC keeps its `message` but loses custom
+// properties like `code`, so the main process sends `code` separately.
+function rejectShellFailure(error, code) {
+  if (code !== undefined) error.code = code;
+  return Promise.reject(error);
+}
+
 module.exports = class ApplicationDelegate {
   constructor() {
     this.pendingSettingsUpdateCount = 0;
@@ -384,21 +392,21 @@ module.exports = class ApplicationDelegate {
   // We'll leave `openExternal` in place above because some existing specs
   // rely on being able to mock it.
   openExternalDirect(url) {
-    return ipcRenderer.invoke('openExternal', url).then(({ outcome, error, result }) => {
+    return ipcRenderer.invoke('openExternal', url).then(({ outcome, error, code, result }) => {
       if (outcome === 'success') {
         return result;
       } else if (outcome === 'failure') {
-        return Promise.reject(error);
+        return rejectShellFailure(error, code);
       }
     });
   }
 
   openPath(filePath) {
-    return ipcRenderer.invoke('openPath', filePath).then(({ outcome, error, result }) => {
+    return ipcRenderer.invoke('openPath', filePath).then(({ outcome, error, code, result }) => {
       if (outcome === 'success') {
         return result;
       } else if (outcome === 'failure') {
-        return Promise.reject(error);
+        return rejectShellFailure(error, code);
       }
     });
   }
@@ -406,13 +414,13 @@ module.exports = class ApplicationDelegate {
   trashItem(filePath) {
     // A simple wrapper around `shell.trashItem`, since the main process is the
     // most reliable place from which to call this method.
-    return ipcRenderer.invoke('trashItem', filePath).then(({ outcome, error, result }) => {
+    return ipcRenderer.invoke('trashItem', filePath).then(({ outcome, error, code, result }) => {
       if (outcome === 'success') {
         // `result` is undefined, but we might as well guard against an
         // Electron API change in the future.
         return result;
       } else if (outcome === 'failure') {
-        return Promise.reject(error);
+        return rejectShellFailure(error, code);
       }
     });
   }
@@ -420,11 +428,11 @@ module.exports = class ApplicationDelegate {
   showItemInFolder(filePath) {
     // A simple wrapper around `shell.showItemInFolder`, which currently can
     // only be called from the main process.
-    return ipcRenderer.invoke('showItemInFolder', filePath).then(({ outcome, error, result }) => {
+    return ipcRenderer.invoke('showItemInFolder', filePath).then(({ outcome, error, code, result }) => {
       if (outcome === 'success') {
         return result;
       } else if (outcome === 'failure') {
-        return Promise.reject(error);
+        return rejectShellFailure(error, code);
       }
     });
   }

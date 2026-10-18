@@ -969,8 +969,10 @@ describe('AtomEnvironment', () => {
       const nonexistentPath = path.join(tempDir, 'zzyzx.txt');
       expect(fs.existsSync(nonexistentPath)).toBe(false);
 
-      // Electron's `shell.openPath` reports failure by resolving with an error
-      // message; `atom.openPath` should reject with an `Error` instead.
+      // `atom.openPath` checks for the path's existence before asking the
+      // system to open it — otherwise, on Windows, the system would show an
+      // error dialog and wait for the user to dismiss it. The resulting
+      // error's `code` must also survive the trip from the main process.
       let error;
       try {
         await atom.openPath(nonexistentPath);
@@ -979,6 +981,7 @@ describe('AtomEnvironment', () => {
       }
       expect(error).toEqual(jasmine.any(Error));
       expect(error?.message).toBeTruthy();
+      expect(error?.code).toBe('ENOENT');
     });
   });
 });
