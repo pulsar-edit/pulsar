@@ -177,8 +177,15 @@ ipcMain.handle('showItemInFolder', async (_, filePath) => {
 
 ipcMain.handle('openPath', async (_, filePath) => {
   try {
-    let result = await shell.openPath(filePath);
-    return { outcome: 'success', result };
+    // Unlike the other `shell` methods here, `shell.openPath` doesn't reject
+    // on failure; it resolves with an error message (or an empty string on
+    // success). Normalize that so that `atom.openPath` rejects on failure,
+    // like its siblings.
+    let errorMessage = await shell.openPath(filePath);
+    if (errorMessage) {
+      return { outcome: 'failure', error: new Error(errorMessage) };
+    }
+    return { outcome: 'success' };
   } catch (error) {
     return { outcome: 'failure', error };
   }

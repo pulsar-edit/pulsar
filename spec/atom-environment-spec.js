@@ -960,4 +960,25 @@ describe('AtomEnvironment', () => {
       }
     });
   });
+
+  describe('::openPath()', () => {
+    // We can't test the success case without launching an external
+    // application.
+    it('rejects when asked to open a nonexistent path', async () => {
+      const tempDir = temp.mkdirSync('open-path-');
+      const nonexistentPath = path.join(tempDir, 'zzyzx.txt');
+      expect(fs.existsSync(nonexistentPath)).toBe(false);
+
+      // Electron's `shell.openPath` reports failure by resolving with an error
+      // message; `atom.openPath` should reject with an `Error` instead.
+      let error;
+      try {
+        await atom.openPath(nonexistentPath);
+      } catch (e) {
+        error = e;
+      }
+      expect(error).toEqual(jasmine.any(Error));
+      expect(error?.message).toBeTruthy();
+    });
+  });
 });
