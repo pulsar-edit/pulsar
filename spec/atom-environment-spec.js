@@ -960,4 +960,28 @@ describe('AtomEnvironment', () => {
       }
     });
   });
+
+  describe('::openPath()', () => {
+    // We can't test the success case without launching an external
+    // application.
+    it('rejects when asked to open a nonexistent path', async () => {
+      const tempDir = temp.mkdirSync('open-path-');
+      const nonexistentPath = path.join(tempDir, 'zzyzx.txt');
+      expect(fs.existsSync(nonexistentPath)).toBe(false);
+
+      // `atom.openPath` checks for the path's existence before asking the
+      // system to open it — otherwise, on Windows, the system would show an
+      // error dialog and wait for the user to dismiss it. The resulting
+      // error's `code` must also survive the trip from the main process.
+      let error;
+      try {
+        await atom.openPath(nonexistentPath);
+      } catch (e) {
+        error = e;
+      }
+      expect(error).toEqual(jasmine.any(Error));
+      expect(error?.message).toBeTruthy();
+      expect(error?.code).toBe('ENOENT');
+    });
+  });
 });

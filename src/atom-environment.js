@@ -525,7 +525,7 @@ class AtomEnvironment {
     this.uninstallWindowEventHandler();
   }
 
-  // Extend: Invoke the given callback when the environment is destroying, as
+  // Extended: Invoke the given callback when the environment is destroying, as
   // happens during window close or reload.
   //
   // * `callback` {Function} to be called when the environment starts

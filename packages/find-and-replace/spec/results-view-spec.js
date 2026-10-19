@@ -833,6 +833,11 @@ describe('ResultsView', () => {
         await resultsPromise();
 
         resultsView = getResultsView();
+        // Results arrive a file at a time; wait for both kinds of path row.
+        await waitForCondition(() =>
+          resultsView.refs.listView.element.querySelector('.path-row .first-icon-class') &&
+            resultsView.refs.listView.element.querySelector('.path-row .third-icon-class')
+        );
         let fileIconClasses = Array.from(resultsView.refs.listView.element.querySelectorAll('.path-row .icon')).map(el => el.className);
         expect(fileIconClasses).toContain('first-icon-class second-icon-class icon');
         expect(fileIconClasses).toContain('third-icon-class fourth-icon-class icon');

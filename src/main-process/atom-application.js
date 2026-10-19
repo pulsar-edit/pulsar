@@ -137,6 +137,13 @@ ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
 });
 
+// Describes a failed shell operation for the renderer. An `Error` sent over
+// IPC keeps its `message` but loses custom properties like `code`, so we send
+// `code` alongside it; `ApplicationDelegate` puts it back.
+function shellFailure(error) {
+  return { outcome: 'failure', error, code: error?.code };
+}
+
 // Handle file deletion requests.
 //
 // Works around https://github.com/electron/electron/issues/29598, which seems
@@ -156,7 +163,7 @@ ipcMain.handle('trashItem', async (_, filePath) => {
     return { outcome: 'success', result };
   } catch (error) {
     // …and rejects on failure.
-    return { outcome: 'failure', error };
+    return shellFailure(error);
   }
 });
 
@@ -171,25 +178,71 @@ ipcMain.handle('showItemInFolder', async (_, filePath) => {
     return { outcome: 'success', result };
   } catch (error) {
     // Not sure whether this can even fail, but might as well handle it.
-    return { outcome: 'failure', error };
+    return shellFailure(error);
   }
 });
 
+// How long to wait for `shell.openPath` or `shell.openExternal` before giving
+// up. On Windows, these can block for as long as the system shows UI for the
+// request (e.g., a "How do you want to open this file?" picker), which is
+// indefinitely if the user leaves it open.
+const SHELL_OPERATION_TIMEOUT_MS = 60000;
+
+// Settles like `promise`, or rejects with an `ETIMEDOUT` error after `ms`
+// milliseconds, whichever comes first. The underlying operation is not
+// cancelled — it may still be waiting on a system dialog, and can still
+// complete after we've given up on it.
+function withShellTimeout(promise, ms, description) {
+  let timer;
+  let timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      let error = new Error(
+        `Timed out waiting for the system to ${description}; the operation may still complete.`
+      );
+      error.code = 'ETIMEDOUT';
+      reject(error);
+    }, ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 ipcMain.handle('openPath', async (_, filePath) => {
   try {
-    let result = await shell.openPath(filePath);
-    return { outcome: 'success', result };
+    // On Windows, asking the system to open a nonexistent path shows an error
+    // dialog and blocks until it's dismissed; fail fast instead.
+    if (!fs.existsSync(filePath)) {
+      let error = new Error(`Path does not exist: ${filePath}`);
+      error.code = 'ENOENT';
+      return shellFailure(error);
+    }
+    // Unlike the other `shell` methods here, `shell.openPath` doesn't reject
+    // on failure; it resolves with an error message (or an empty string on
+    // success). Normalize that so that `atom.openPath` rejects on failure,
+    // like its siblings.
+    let errorMessage = await withShellTimeout(
+      shell.openPath(filePath),
+      SHELL_OPERATION_TIMEOUT_MS,
+      'open the path'
+    );
+    if (errorMessage) {
+      return shellFailure(new Error(errorMessage));
+    }
+    return { outcome: 'success' };
   } catch (error) {
-    return { outcome: 'failure', error };
+    return shellFailure(error);
   }
 });
 
 ipcMain.handle('openExternal', async (_, url) => {
   try {
-    let result = await shell.openExternal(url);
+    let result = await withShellTimeout(
+      shell.openExternal(url),
+      SHELL_OPERATION_TIMEOUT_MS,
+      'open the URL'
+    );
     return { outcome: 'success', result };
   } catch (error) {
-    return { outcome: 'failure', error };
+    return shellFailure(error);
   }
 });
 
