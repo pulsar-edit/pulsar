@@ -24,6 +24,12 @@ env:
   # worth investigating.)
   MAX_GLIBC_VERSION: '2.31'
   MAX_GLIBCXX_VERSION: '3.4.28'
+  # Our Playwright tests drive the packaged app through `_electron` and never
+  # launch a Playwright-managed browser, so there's no need for the browser
+  # download that `playwright`'s postinstall otherwise does on every
+  # `yarn install`. Skipping it saves a couple of minutes per install and
+  # keeps us from failing whenever Playwright's CDN is unreachable.
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
   ROLLING_UPLOAD_TOKEN: ${{ secrets.ROLLING_RELEASE_UPLOAD_TOKEN }}
   # Below variables allow us to quickly control visual tests for each platform
   RUN_WINDOWS_VT: false
