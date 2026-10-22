@@ -582,17 +582,6 @@ module.exports = class Project extends Model {
     return Promise.all(promises);
   }
 
-  // Extended: Access a {Promise} that resolves when the filesystem watcher associated with a project
-  // root directory is ready to begin receiving events.
-  //
-  // This is especially useful in test cases, where it's important to know that the watcher is
-  // ready before manipulating the filesystem to produce events.
-  //
-  // * `projectPath` {String} One of the project's root directories.
-  //
-  // Returns a {Promise} that resolves with the {PathWatcher} associated with this project root
-  // once it has initialized and is ready to start sending events. The Promise will reject with
-  // an error instead if `projectPath` is not currently a root directory.
   // Private: Dispose of the watcher a promise resolves to, once it resolves.
   //
   // A rejected promise means there was never a watcher to dispose of, and
@@ -607,6 +596,17 @@ module.exports = class Project extends Model {
     );
   }
 
+  // Extended: Access a {Promise} that resolves when the filesystem watcher associated with a project
+  // root directory is ready to begin receiving events.
+  //
+  // This is especially useful in test cases, where it's important to know that the watcher is
+  // ready before manipulating the filesystem to produce events.
+  //
+  // * `projectPath` {String} One of the project's root directories.
+  //
+  // Returns a {Promise} that resolves with the {PathWatcher} associated with this project root
+  // once it has initialized and is ready to start sending events. The Promise will reject with
+  // an error instead if `projectPath` is not currently a root directory.
   getWatcherPromise(projectPath) {
     return (
       this.watcherPromisesByPath[projectPath] ||
