@@ -7,6 +7,10 @@ export default class GuideView {
   constructor(props) {
     this.props = props;
     this.brand = atom.branding.name;
+    this.command = atom.branding.id;
+    // The "Install Shell Commands" section should be shown only on macOS.
+    this.isMac = process.platform === 'darwin';
+
     this.didClickProjectButton = this.didClickProjectButton.bind(this);
     this.didClickGitButton = this.didClickGitButton.bind(this);
     this.didClickGitHubButton = this.didClickGitHubButton.bind(this);
@@ -15,7 +19,9 @@ export default class GuideView {
     this.didClickStylingButton = this.didClickStylingButton.bind(this);
     this.didClickInitScriptButton = this.didClickInitScriptButton.bind(this);
     this.didClickSnippetsButton = this.didClickSnippetsButton.bind(this);
+    this.didClickInstallShellCommandsButton = this.didClickInstallShellCommandsButton.bind(this);
     etch.initialize(this);
+
   }
 
   update() { }
@@ -27,6 +33,34 @@ export default class GuideView {
           <section className="welcome-panel">
             <h1 className="welcome-title">Get to know {this.brand}!</h1>
 
+            <details className="welcome-card"
+              {...this.getSectionProps('shellCommands')}
+              hidden={!this.isMac}
+            >
+              <summary className="welcome-summary icon icon-terminal">
+                Install <span className="welcome-highlight">Shell</span> Commands
+              </summary>
+              <div className="welcome-detail">
+                <p>
+                  {this.brand} can be invoked from your terminal program once you install the <code>{this.command}</code> shell command to your <code>/usr/local/bin</code>.
+                </p>
+                <p>
+                  <button
+                    ref="installShellCommandsButton"
+                    onclick={this.didClickInstallShellCommandsButton}
+                    className="btn btn-primary"
+                  >
+                    Install Shell Commands
+                  </button>
+                </p>
+
+                <p className="welcome-note">
+                  <strong>Next time:</strong> You can open a project from the terminal via <code>pulsar /path/to/project</code>. <a href="https://docs.pulsar-edit.dev/getting-started/terminal-commands/">Read more about the <code>pulsar</code> command</a>.
+                </p>
+              </div>
+
+            </details>
+
             <details
               className="welcome-card"
               {...this.getSectionProps('project')}
@@ -34,6 +68,7 @@ export default class GuideView {
               <summary className="welcome-summary icon icon-repo">
                 Open a <span className="welcome-highlight">Project</span>
               </summary>
+
               <div className="welcome-detail">
                 <p>
                   <img
@@ -236,8 +271,8 @@ export default class GuideView {
                 </p>
                 <p>Uncomment some of the examples or try out your own.</p>
                 <p className="welcome-note">
-                  <strong>Next time:</strong> You can open your init script from
-                  Menu > {this.getApplicationMenuName()}.
+                  <strong>Next time:</strong> You can open your init script via{' '}
+                   <i>Menu &gt; {this.getApplicationMenuName()}</i>.
                 </p>
               </div>
             </details>
@@ -276,8 +311,8 @@ export default class GuideView {
                   create a snippet!
                 </p>
                 <p className="welcome-note">
-                  <strong>Next time:</strong> You can open your snippets in Menu
-                  > {this.getApplicationMenuName()}.
+                  <strong>Next time:</strong> You can open your snippets via <i>Menu
+                  &gt; {this.getApplicationMenuName()}</i>.
                 </p>
               </div>
             </details>
@@ -396,6 +431,13 @@ export default class GuideView {
     atom.commands.dispatch(
       atom.views.getView(atom.workspace),
       'github:toggle-github-tab'
+    );
+  }
+
+  didClickInstallShellCommandsButton () {
+    atom.commands.dispatch(
+      atom.views.getView(atom.workspace),
+      'window:install-shell-commands'
     );
   }
 
