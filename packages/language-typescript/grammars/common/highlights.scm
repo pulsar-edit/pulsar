@@ -787,6 +787,15 @@
 (template_substitution
   "${" @punctuation.section.embedded.begin._LANG_
   "}" @punctuation.section.embedded.end._LANG_
+  (#set! capture.final)
+)
+
+; Interpolations within type definitions:
+; type FooIdType = `${FooType}_id`
+(template_type
+  "${" @punctuation.section.embedded.begin._LANG_
+  "}" @punctuation.section.embedded.end._LANG_
+  (#set! capture.final)
 )
 
 ; Scope interpolations with `meta.embedded.line` if they start and end on the
@@ -884,6 +893,11 @@
   "await"
   "debugger"
 ] @keyword.control._TYPE_._LANG_
+
+((import_attribute "with" @keyword.control.with._LANG_)
+  (#set! capture.final))
+
+"with" @keyword.control.with._LANG_ @invalid.deprecated.with._LANG_
 
 
 ; REGEX

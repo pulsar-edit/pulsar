@@ -1227,15 +1227,24 @@ module.exports = class TextEditorComponent {
     let decorationToMeasure = this.decorationsToMeasure.cursors.get(marker);
     if (!decorationToMeasure) {
       const isLastCursor = model.getLastCursor().getMarker() === marker;
-      const screenPosition = reversed ? screenRange.start : screenRange.end;
-      const { row, column } = screenPosition;
+      const rawScreenPosition = reversed ? screenRange.start : screenRange.end;
+      const { row } = rawScreenPosition;
+      let { column } = rawScreenPosition;
 
       if (row < this.getRenderedStartRow() || row >= this.getRenderedEndRow())
         return;
 
+      // Clamp column to line length to prevent cursor rendering at invalid
+      // positions due to intermittent timing issues with display layer updates
+      const lineLength = model.lineLengthForScreenRow(row);
+      if (column > lineLength) {
+        column = lineLength;
+      }
+
+      const screenPosition = { row, column };
       this.requestHorizontalMeasurement(row, column);
       let columnWidth = 0;
-      if (model.lineLengthForScreenRow(row) > column) {
+      if (lineLength > column) {
         columnWidth = 1;
         this.requestHorizontalMeasurement(row, column + 1);
       }
@@ -2626,30 +2635,27 @@ module.exports = class TextEditorComponent {
       columnsToMeasure.sort((a, b) => a - b);
 
       const screenLine = this.renderedScreenLineForRow(row);
+
+      // Skip rows whose screen line or line component is not currently
+      // rendered. Measurements can be queued for non-rendered rows by calls
+      // to pixelPositionForScreenPosition or pendingAutoscroll when block
+      // decorations shift lines outside the rendered range. Because clear()
+      // runs after the forEach, throwing here prevents it from ever being
+      // reached, poisoning horizontalPositionsToMeasure permanently and
+      // causing an infinite error loop on every subsequent animation frame.
+      if (!screenLine || !this.lineComponentsByScreenLineId.get(screenLine.id)) {
+        if (atom.inDevMode()) {
+          console.warn(
+            'measureHorizontalPositions: skipped non-rendered row',
+            row
+          );
+        }
+        return;
+      }
+
       const lineComponent = this.lineComponentsByScreenLineId.get(
         screenLine.id
       );
-
-      if (!lineComponent) {
-        const error = new Error(
-          'Requested measurement of a line component that is not currently rendered'
-        );
-        error.metadata = {
-          row,
-          columnsToMeasure,
-          renderedScreenLineIds: this.renderedScreenLines.map(line => line.id),
-          extraRenderedScreenLineIds: Array.from(
-            this.extraRenderedScreenLines.keys()
-          ),
-          lineComponentScreenLineIds: Array.from(
-            this.lineComponentsByScreenLineId.keys()
-          ),
-          renderedStartRow: this.getRenderedStartRow(),
-          renderedEndRow: this.getRenderedEndRow(),
-          requestedScreenLineId: screenLine.id
-        };
-        throw error;
-      }
 
       const lineNode = lineComponent.element;
       const textNodes = lineComponent.textNodes;
@@ -3747,13 +3753,30 @@ class DummyScrollbarComponent {
     );
   }
 
+  // This element can be wider (or taller) than the scrollbar that the browser
+  // draws inside it, so a mousedown here isn't necessarily on the scrollbar.
+  // If it isn't, it's meant for the text beneath, so we pass it along to the
+  // editor.
   didMouseDown(event) {
-    let { bottom, right } = this.element.getBoundingClientRect();
-    const clickedOnScrollbar =
-      this.props.orientation === 'horizontal'
-        ? event.clientY >= bottom - this.getRealScrollbarHeight()
-        : event.clientX >= right - this.getRealScrollbarWidth();
+    // The browser reports a mousedown on a scrollbar as targeting the
+    // scrolling element itself; a mousedown anywhere else in this element
+    // lands on its child. This works even for overlay scrollbars (the default
+    // on macOS), which take up no layout space and so can't be detected by
+    // measurement: a click where an overlay scrollbar would be targets this
+    // element only while the scrollbar is visible.
+    const clickedOnScrollbar = event.target
+      ? event.target === this.element
+      : this.isWithinRealScrollbar(event);
     if (!clickedOnScrollbar) this.props.didMouseDown(event);
+  }
+
+  // Fallback for events with no target: compare the click position with the
+  // measured size of the real scrollbar.
+  isWithinRealScrollbar(event) {
+    let { bottom, right } = this.element.getBoundingClientRect();
+    return this.props.orientation === 'horizontal'
+      ? event.clientY >= bottom - this.getRealScrollbarHeight()
+      : event.clientX >= right - this.getRealScrollbarWidth();
   }
 
   getRealScrollbarWidth() {
@@ -4740,7 +4763,12 @@ class LinesTileComponent {
         const oldDecorations = oldProps.blockDecorations
           ? oldProps.blockDecorations.get(screenLineId)
           : null;
-        const lineNode = lineComponentsByScreenLineId.get(screenLineId).element;
+        const lineComponent = lineComponentsByScreenLineId.get(screenLineId);
+        // Skip block decorations whose screen line is not in this tile.
+        // This can happen when decorations are destroyed or moved between
+        // tiles during the same update cycle.
+        if (!lineComponent) return;
+        const lineNode = lineComponent.element;
         let lastAfter = lineNode;
 
         for (let i = 0; i < newDecorations.length; i++) {

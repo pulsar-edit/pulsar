@@ -2,6 +2,7 @@ const AtomWindow = require('./atom-window');
 const ApplicationMenu = require('./application-menu');
 const AtomProtocolHandler = require('./atom-protocol-handler');
 const { onDidChangeScrollbarStyle, getScrollbarStyle } = require('./scrollbar-style');
+const { getStateKey, releaseStateKey, reserveStateKey } = require('./state-keys');
 const StorageFolder = require('../storage-folder');
 const Config = require('../config');
 const ConfigFile = require('../config-file');
@@ -134,6 +135,115 @@ ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
 
 ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
+});
+
+// Describes a failed shell operation for the renderer. An `Error` sent over
+// IPC keeps its `message` but loses custom properties like `code`, so we send
+// `code` alongside it; `ApplicationDelegate` puts it back.
+function shellFailure(error) {
+  return { outcome: 'failure', error, code: error?.code };
+}
+
+// Handle file deletion requests.
+//
+// Works around https://github.com/electron/electron/issues/29598, which seems
+// to be the cause of failed deletion attempts on Windows.
+ipcMain.handle('trashItem', async (_, filePath) => {
+  // We can't toss a promise over the wall, so we'll `await` it on our side and
+  // report the progress back to the renderer.
+  //
+  // If we return an `Error` object from this handler in the case of error,
+  // `ipcRenderer.invoke` will detect it and wrap it with its own explanation.
+  // We want to preserve the original error and hide the implementation
+  // details, so we instead return an object with an explicit `outcome`
+  // property to avoid this behavior.
+  try {
+    // `shell.trashItem` resolves with an empty value on success…
+    let result = await shell.trashItem(filePath);
+    return { outcome: 'success', result };
+  } catch (error) {
+    // …and rejects on failure.
+    return shellFailure(error);
+  }
+});
+
+ipcMain.handle('showItemInFolder', async (_, filePath) => {
+  try {
+    // Result will be `undefined`, but might as well return it in case of a
+    // future Electron API change.
+    //
+    // Unlike the others, this method does not return a promise; but we must go
+    // async anyway.
+    let result = shell.showItemInFolder(filePath);
+    return { outcome: 'success', result };
+  } catch (error) {
+    // Not sure whether this can even fail, but might as well handle it.
+    return shellFailure(error);
+  }
+});
+
+// How long to wait for `shell.openPath` or `shell.openExternal` before giving
+// up. On Windows, these can block for as long as the system shows UI for the
+// request (e.g., a "How do you want to open this file?" picker), which is
+// indefinitely if the user leaves it open.
+const SHELL_OPERATION_TIMEOUT_MS = 60000;
+
+// Settles like `promise`, or rejects with an `ETIMEDOUT` error after `ms`
+// milliseconds, whichever comes first. The underlying operation is not
+// cancelled — it may still be waiting on a system dialog, and can still
+// complete after we've given up on it.
+function withShellTimeout(promise, ms, description) {
+  let timer;
+  let timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      let error = new Error(
+        `Timed out waiting for the system to ${description}; the operation may still complete.`
+      );
+      error.code = 'ETIMEDOUT';
+      reject(error);
+    }, ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+ipcMain.handle('openPath', async (_, filePath) => {
+  try {
+    // On Windows, asking the system to open a nonexistent path shows an error
+    // dialog and blocks until it's dismissed; fail fast instead.
+    if (!fs.existsSync(filePath)) {
+      let error = new Error(`Path does not exist: ${filePath}`);
+      error.code = 'ENOENT';
+      return shellFailure(error);
+    }
+    // Unlike the other `shell` methods here, `shell.openPath` doesn't reject
+    // on failure; it resolves with an error message (or an empty string on
+    // success). Normalize that so that `atom.openPath` rejects on failure,
+    // like its siblings.
+    let errorMessage = await withShellTimeout(
+      shell.openPath(filePath),
+      SHELL_OPERATION_TIMEOUT_MS,
+      'open the path'
+    );
+    if (errorMessage) {
+      return shellFailure(new Error(errorMessage));
+    }
+    return { outcome: 'success' };
+  } catch (error) {
+    return shellFailure(error);
+  }
+});
+
+ipcMain.handle('openExternal', async (_, url) => {
+  try {
+    let result = await withShellTimeout(
+      shell.openExternal(url),
+      SHELL_OPERATION_TIMEOUT_MS,
+      'open the URL'
+    );
+    return { outcome: 'success', result };
+  } catch (error) {
+    return shellFailure(error);
+  }
 });
 
 // The application's singleton class.
@@ -340,6 +450,7 @@ module.exports = class AtomApplication extends EventEmitter {
   openWithOptions(options) {
     const {
       pathsToOpen,
+      stateKey,
       executedFrom,
       foldersToOpen,
       urlsToOpen,
@@ -359,14 +470,11 @@ module.exports = class AtomApplication extends EventEmitter {
       env
     } = options;
 
-    if (!preserveFocus) {
-      app.focus();
-    }
-
     if (test) {
       return this.runTests({
         headless: true,
         devMode,
+        stateKey,
         resourcePath: this.resourcePath,
         executedFrom,
         pathsToOpen,
@@ -398,6 +506,8 @@ module.exports = class AtomApplication extends EventEmitter {
         profileStartup,
         clearWindowState,
         addToLastWindow,
+        preserveFocus,
+        stateKey,
         env
       });
     } else if (urlsToOpen && urlsToOpen.length > 0) {
@@ -417,6 +527,7 @@ module.exports = class AtomApplication extends EventEmitter {
         profileStartup,
         clearWindowState,
         addToLastWindow,
+        preserveFocus,
         env
       });
     }
@@ -429,6 +540,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
   // Public: Removes the {AtomWindow} from the global window list.
   removeWindow(window) {
+    releaseStateKey(window);
     this.windowStack.removeWindow(window);
     if (this.getAllWindows().length === 0 && process.platform !== 'darwin') {
       app.quit();
@@ -981,7 +1093,23 @@ module.exports = class AtomApplication extends EventEmitter {
       ipcHelpers.respondTo('focus-window', window => window.focus())
     );
     this.disposable.add(
-      ipcHelpers.respondTo('show-window', window => window.show())
+      ipcHelpers.respondTo('show-window', window => {
+        window.show();
+        let atomWindow = this.atomWindowForBrowserWindow(window);
+        if (atomWindow?.preserveFocus) {
+          atomWindow.preserveFocus = false;
+          return;
+        }
+        // On Linux, `window.show()` is enough to make the new window
+        // frontmost, at least on X11. (TODO: Investigate Wayland behavior.)
+        //
+        // On both Windows and macOS (despite their varying window management
+        // models!) we must also call `app.focus()` to ensure the frontmost
+        // Pulsar window is brought above windows from other applications.
+        if (process.platform !== 'linux') {
+          app.focus({ steal: true });
+        }
+      })
     );
     this.disposable.add(
       ipcHelpers.respondTo('hide-window', window => window.hide())
@@ -990,6 +1118,15 @@ module.exports = class AtomApplication extends EventEmitter {
       ipcHelpers.respondTo(
         'get-temporary-window-state',
         window => window.temporaryState
+      )
+    );
+    this.disposable.add(
+      ipcHelpers.respondTo(
+        'get-state-key',
+        (browserWindow, projectPaths, options) => {
+          const win = this.atomWindowForBrowserWindow(browserWindow);
+          return getStateKey(win, projectPaths, options);
+        }
       )
     );
 
@@ -1254,6 +1391,7 @@ module.exports = class AtomApplication extends EventEmitter {
   async openPaths({
     pathsToOpen,
     foldersToOpen,
+    stateKey,
     executedFrom,
     pidToKillWhenClosed,
     newWindow,
@@ -1264,6 +1402,7 @@ module.exports = class AtomApplication extends EventEmitter {
     window,
     clearWindowState,
     addToLastWindow,
+    preserveFocus,
     env
   } = {}) {
     if (!env) env = process.env;
@@ -1357,10 +1496,21 @@ module.exports = class AtomApplication extends EventEmitter {
       openedWindow = existingWindow;
       StartupTime.addMarker('main-process:atom-application:open-in-existing');
       openedWindow.openLocations(locationsToOpen);
-      if (openedWindow.isMinimized()) {
-        openedWindow.restore();
-      } else {
-        openedWindow.focus();
+      if (!preserveFocus) {
+        if (openedWindow.isMinimized()) {
+          openedWindow.restore();
+        } else {
+          openedWindow.focus();
+        }
+        // On Linux, `window.show()` is enough to make the existing window
+        // frontmost, at least on X11. (TODO: Investigate Wayland behavior.)
+        //
+        // On both Windows and macOS (despite their varying window management
+        // models!) we must also call `app.focus()` to ensure the frontmost
+        // Pulsar window is brought above windows from other applications.
+        if (process.platform !== 'linux') {
+          app.focus({ steal: true });
+        }
       }
       openedWindow.replaceEnvironment(env);
     } else {
@@ -1399,7 +1549,11 @@ module.exports = class AtomApplication extends EventEmitter {
         clearWindowState,
         env
       });
+      openedWindow.preserveFocus = preserveFocus;
       this.addWindow(openedWindow);
+      if (stateKey) {
+        reserveStateKey(openedWindow, stateKey);
+      }
       openedWindow.focus();
     }
 
@@ -1478,7 +1632,10 @@ module.exports = class AtomApplication extends EventEmitter {
       version: APPLICATION_STATE_VERSION,
       windows: windows
         .filter(window => !window.isSpec)
-        .map(window => ({ projectRoots: window.projectRoots }))
+        .map(window => ({
+          projectRoots: window.projectRoots,
+          stateKey: getStateKey(window, window.projectRoots)
+        }))
     };
     state.windows.reverse();
 
@@ -1499,6 +1656,7 @@ module.exports = class AtomApplication extends EventEmitter {
       // Schema: {version: '1', windows: [{projectRoots: ['<root-dir>', ...]}, ...]}
       return state.windows.map(each => ({
         foldersToOpen: each.projectRoots,
+        stateKey: each.stateKey,
         devMode: this.devMode,
         safeMode: this.safeMode,
         newWindow: true
@@ -1864,7 +2022,10 @@ module.exports = class AtomApplication extends EventEmitter {
     const normalizedPath = path.normalize(
       path.resolve(executedFrom, fs.normalize(result.pathToOpen))
     );
-    if (!url.parse(pathToOpen).protocol) {
+
+    if (!url.parse(result.pathToOpen).protocol) {
+      // If this isn't a URL, it's a file path. File paths need to be resolved
+      // and normalized, whereas we assume URLs are already unambiguous.
       result.pathToOpen = normalizedPath;
     }
 

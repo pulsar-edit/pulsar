@@ -6,7 +6,36 @@ const { createPaneElement } = require('./pane-element');
 
 let nextInstanceId = 1;
 
-class SaveCancelledError extends Error {}
+// Thrown when a user cancels a save operation.
+class SaveCancelledError extends Error {
+  name = 'SaveCancelledError';
+}
+
+// Thrown when a user cancels a save operation because of a buffer conflict.
+class SaveConflictedError extends Error {
+  name = 'SaveConflictedError';
+}
+
+// Handles values that could be booleans, functions, or undefined.
+//
+// Pane items implement several `isX` methods — `isDestroyed`, `isDeleted`,
+// `isModified`, et cetera. But all of these are optional. We could just do
+// `item.isDestroyed?.()` — except that, in at least one high-profile case, a
+// package has implemented defined `isDestroyed` _incorrectly_ as a boolean
+// instead of a function! And calling `item.isDestroyed?.()` on a boolean
+// throws an error.
+//
+// So this is our way of handling such scenarios without re-introducing lots of
+// boilerplate. We use this for some `isX` methods, but not all. (Newer methods
+// don't get this treatment because of almost zero chance of misimplementation
+// in the wild.)
+function interpret(obj, booleanOrFunctionName) {
+  let booleanOrFunction = obj[booleanOrFunctionName];
+  if (typeof booleanOrFunction === 'function') {
+    return obj[booleanOrFunctionName]();
+  }
+  return false;
+}
 
 // Extended: A container for presenting content in the center of the workspace.
 // Panes can contain multiple items, one of which is *active* at a given time.
@@ -39,8 +68,10 @@ module.exports = class Pane {
     state.activeItem = items[activeItemIndex];
     if (!state.activeItem && activeItemURI) {
       state.activeItem = state.items.find(
-        item =>
-          typeof item.getURI === 'function' && item.getURI() === activeItemURI
+        item => {
+          let itemURI = item.getURI?.() ?? item.getUri?.();
+          return itemURI === activeItemURI;
+        }
       );
     }
 
@@ -475,7 +506,7 @@ module.exports = class Pane {
         itemStackIndices.length !== this.items.length ||
         itemStackIndices.includes(-1)
       ) {
-        itemStackIndices = this.items.map((item, i) => i);
+        itemStackIndices = this.items.map((_, i) => i);
       }
 
       for (let itemIndex of itemStackIndices) {
@@ -642,10 +673,9 @@ module.exports = class Pane {
       options = { index: options };
     }
 
-    const index =
-      options.index != null ? options.index : this.getActiveItemIndex() + 1;
-    const moved = options.moved != null ? options.moved : false;
-    const pending = options.pending != null ? options.pending : false;
+    const index = options.index ?? this.getActiveItemIndex() + 1;
+    const moved = options.moved ?? false;
+    const pending = options.pending ?? false;
 
     if (!item || typeof item !== 'object') {
       throw new Error(
@@ -653,7 +683,7 @@ module.exports = class Pane {
       );
     }
 
-    if (typeof item.isDestroyed === 'function' && item.isDestroyed()) {
+    if (interpret(item, 'isDestroyed')) {
       throw new Error(
         `Adding a pane item with URI '${typeof item.getURI === 'function' &&
           item.getURI()}' that has already been destroyed`
@@ -685,7 +715,7 @@ module.exports = class Pane {
 
     this.emitter.emit('did-add-item', { item, index, moved });
     if (!moved) {
-      if (this.container) this.container.didAddPaneItem(item, this, index);
+      this.container?.didAddPaneItem(item, this, index);
     }
 
     if (replacingPendingItem) this.destroyItem(lastPendingItem);
@@ -828,17 +858,18 @@ module.exports = class Pane {
     const index = this.items.indexOf(item);
     if (index === -1) return false;
 
+    // Don't allow deletion of permanent dock items unless `force` is `true`.
     if (
       !force &&
-      typeof item.isPermanentDockItem === 'function' &&
-      item.isPermanentDockItem() &&
+      interpret(item, 'isPermanentDockItem') &&
       (!this.container || this.container.getLocation() !== 'center')
     ) {
       return false;
     }
 
-    // In the case where there are no `onWillDestroyPaneItem` listeners, preserve the old behavior
-    // where `Pane.destroyItem` and callers such as `Pane.close` take effect synchronously.
+    // In the case where there are no `onWillDestroyPaneItem` listeners,
+    // preserve the old behavior where `Pane::destroyItem` and callers such as
+    // `Pane::close` take effect synchronously.
     if (this.emitter.listenerCountForEventName('will-destroy-item') > 0) {
       await this.emitter.emitAsync('will-destroy-item', { item, index });
     }
@@ -862,8 +893,7 @@ module.exports = class Pane {
 
     if (
       !force &&
-      typeof item.shouldPromptToSave === 'function' &&
-      item.shouldPromptToSave()
+      item.shouldPromptToSave?.()
     ) {
       if (!(await this.promptToSaveItem(item))) return false;
     }
@@ -886,26 +916,84 @@ module.exports = class Pane {
     );
   }
 
-  promptToSaveItem(item, options = {}) {
+  // Prompt the user about an item's conflicted state during an attempt to
+  // save. The user must decide whether to cancel the attempted save… or force
+  // it and overwrite what's on disk.
+  //
+  // Returns a {Promise} that resolves with {Boolean} `true` when a save can
+  // proceed… or rejects with an error when the save is aborted.
+  promptOnConflict(item) {
     return new Promise((resolve, reject) => {
-      if (
-        typeof item.shouldPromptToSave !== 'function' ||
-        !item.shouldPromptToSave(options)
-      ) {
+      // Don't prompt if the user hasn't opted into it.
+      if (!atom.config.get('core.promptOnConflict')) return resolve(true);
+
+      // Ensure the item implements an `isInConflict` method, and that it
+      // returns `true`.
+      if (!item.isInConflict?.()) {
         return resolve(true);
       }
+      // Figure out how to describe the buffer in the dialog.
+      const uri = item.getURI?.() ?? item.getUri?.() ?? null;
+      const title = item.getTitle?.() || uri;
 
-      let uri;
-      if (typeof item.getURI === 'function') {
-        uri = item.getURI();
-      } else if (typeof item.getUri === 'function') {
-        uri = item.getUri();
+      let message, detail;
+      let isDeleted = interpret(item, 'isDeleted');
+      let firstButton = isDeleted ? 'Save' : 'Overwrite';
+      if (isDeleted) {
+        // The message is a bit different when the file no longer exists on
+        // disk.
+        message = `'${title}' was deleted on disk. Do you still want to save this file?`;
+        detail = 'The contents of the buffer are stale because of pending changes.';
       } else {
+        message = `'${title}' has changed on disk. Do you want to overwrite this file with your changes?`;
+        detail = 'The contents of the buffer may be stale.'
+      }
+
+      this.applicationDelegate.confirm({
+        message,
+        detail,
+
+        // TODO: Individual pane items may have additional strategies to
+        // contribute (e.g., conflict resolution view). Implement a way for
+        // them to contribute buttons to this dialog — and to handle them in
+        // the callback below.
+        buttons: [firstButton, 'Cancel']
+      }, (response) => {
+        switch (response) {
+          case 0:
+            return resolve(true);
+          case 1:
+            return reject(new SaveConflictedError('Save cancelled due to conflict'));
+        }
+      });
+    });
+  }
+
+  // Decide whether to show a dialog to the user inviting them to save the
+  // given pane item.
+  //
+  // In order to trigger prompt-to-save, a pane item must implement the
+  // `shouldPromptToSave` method and have it return `true` under the proper
+  // circumstances. It must also implement `getURI` and have it return a URI
+  // that represents the pane item.
+  //
+  // Returns a {Promise} that resolves with a {Boolean}. If `true`, the item
+  // should proceed with destruction; if `false`, the user has cancelled the
+  // closing of the pane item.
+  promptToSaveItem(item, options = {}) {
+    return new Promise((resolve, _reject) => {
+      if (!item.shouldPromptToSave?.(options)) {
         return resolve(true);
       }
 
-      const title =
-        (typeof item.getTitle === 'function' && item.getTitle()) || uri;
+      // If the item has no way of providing us a URI, then it probably wasn't
+      // designed to represent a resource that can be saved.
+      if (typeof item.getURI !== 'function' && typeof item.getUri !== 'function') {
+        return resolve(true);
+      }
+
+      let uri = item.getURI?.() ?? item.getUri?.();
+      let title = item.getTitle?.() || uri;
 
       const saveDialog = (saveButtonText, saveFn, message) => {
         this.applicationDelegate.confirm(
@@ -922,6 +1010,10 @@ module.exports = class Pane {
                   if (error instanceof SaveCancelledError) {
                     resolve(false);
                   } else if (error) {
+                    // For whatever reason, the save failed. In the event that
+                    // the failure is due to the location not existing (network
+                    // share?) or permissions being wrong… we offer the user
+                    // the ability to choose a new destination.
                     saveDialog(
                       'Save as',
                       this.saveItemAs,
@@ -945,7 +1037,7 @@ module.exports = class Pane {
       saveDialog(
         'Save',
         this.saveItem,
-        `'${title}' has changes, do you want to save them?`
+        `'${title}' has changes; do you want to save them?`
       );
     });
   }
@@ -971,38 +1063,58 @@ module.exports = class Pane {
   // * `item` The item to save.
   // * `nextAction` (optional) {Function} which will be called with no argument
   //   after the item is successfully saved, or with the error if it failed.
-  //   The return value will be that of `nextAction` or `undefined` if it was not
-  //   provided
+  //   The return value will be that of `nextAction` or `undefined` if it was
+  //   not provided.
   //
-  // Returns a {Promise} that resolves when the save is complete
+  // Returns a {Promise} that resolves when the save is complete, or rejects if
+  // the save could not be completed.
   saveItem(item, nextAction) {
     if (!item) return Promise.resolve();
 
-    let itemURI;
-    if (typeof item.getURI === 'function') {
-      itemURI = item.getURI();
-    } else if (typeof item.getUri === 'function') {
-      itemURI = item.getUri();
-    }
+    let itemURI = item.getURI?.() ?? item.getUri?.();
 
     if (itemURI != null) {
       if (typeof item.save === 'function') {
-        return promisify(() => item.save())
+        // If `isInConflict` is implemented, we call it first to figure out if
+        // it's safe to attempt to save.
+        let conflicted = item.isInConflict?.();
+
+        // If the item is conflicted, we'll show a dialog in order to decide
+        // how to proceed. The user may choose to overwrite (force the save) or
+        // cancel.
+        let preface = () => promisify(() => item.save());
+        if (conflicted && atom.config.get('core.promptOnConflict')) {
+          preface = () => {
+            return this.promptOnConflict(item)
+              .then(() => item.save());
+          };
+        }
+
+        return preface()
           .then(() => {
             if (nextAction) nextAction();
-          })
-          .catch(error => {
+          }).catch(error => {
             if (nextAction) {
               nextAction(error);
             } else {
               this.handleSaveError(error, item);
             }
+            // Re-propagate cancellation errors so callers know the save was
+            // aborted. Other errors are already handled by
+            // handleSaveError/nextAction above.
+            if (error instanceof SaveCancelledError || error instanceof SaveConflictedError) {
+              return Promise.reject(error);
+            }
           });
       } else if (nextAction) {
+        // Don't check if this item is in conflict; if it can't be saved,
+        // there's no hazard.
         nextAction();
         return Promise.resolve();
       }
     } else {
+      // The file has not been committed to disk, so there's no conflict
+      // hazard.
       return this.saveItemAs(item, nextAction);
     }
   }
@@ -1013,16 +1125,13 @@ module.exports = class Pane {
   // * `item` The item to save.
   // * `nextAction` (optional) {Function} which will be called with no argument
   //   after the item is successfully saved, or with the error if it failed.
-  //   The return value will be that of `nextAction` or `undefined` if it was not
-  //   provided
+  //   The return value will be that of `nextAction` or `undefined` if it was
+  //   not provided.
   async saveItemAs(item, nextAction) {
     if (!item) return;
     if (typeof item.saveAs !== 'function') return;
 
-    const saveOptions =
-      typeof item.getSaveDialogOptions === 'function'
-        ? item.getSaveDialogOptions()
-        : {};
+    const saveOptions = item.getSaveDialogOptions?.() ?? {};
 
     const itemPath = item.getPath();
     if (itemPath && !saveOptions.defaultPath)
@@ -1062,13 +1171,17 @@ module.exports = class Pane {
     return saveDialogPromise;
   }
 
-  // Public: Save all items.
-  saveItems() {
+  // Public: Save all modified items in this pane.
+  //
+  // Returns a {Promise} that resolves when all items have been saved.
+  async saveItems() {
+    let promises = [];
     for (let item of this.getItems()) {
-      if (typeof item.isModified === 'function' && item.isModified()) {
-        this.saveItem(item);
+      if (interpret(item, 'isModified')) {
+        promises.push(this.saveItem(item));
       }
     }
+    return await Promise.all(promises);
   }
 
   // Public: Return the first item that matches the given URI or undefined if
@@ -1077,11 +1190,9 @@ module.exports = class Pane {
   // * `uri` {String} containing a URI.
   itemForURI(uri) {
     return this.items.find(item => {
-      if (typeof item.getURI === 'function') {
-        return item.getURI() === uri;
-      } else if (typeof item.getUri === 'function') {
-        return item.getUri() === uri;
-      }
+      let itemUri = item.getURI?.() ?? item.getUri?.();
+      if (!itemUri) return false;
+      return uri === itemUri;
     });
   }
 
@@ -1173,6 +1284,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitLeft(params) {
@@ -1184,6 +1296,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitRight(params) {
@@ -1195,6 +1308,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitUp(params) {
@@ -1206,6 +1320,7 @@ module.exports = class Pane {
   // * `params` (optional) {Object} with the following keys:
   //   * `items` (optional) {Array} of items to add to the new pane.
   //   * `copyActiveItem` (optional) {Boolean} true will copy the active item into the new split pane
+  //   * `activate` (optional) {Boolean} `false` will leave the currently active pane active instead of activating the new pane. Defaults to `true`.
   //
   // Returns the new {Pane}.
   splitDown(params) {
@@ -1259,7 +1374,9 @@ module.exports = class Pane {
     if (params && params.moveActiveItem && this.activeItem)
       this.moveItemToPane(this.activeItem, newPane);
 
-    newPane.activate();
+    if (!params || params.activate !== false) {
+      newPane.activate();
+    }
     return newPane;
   }
 
@@ -1295,10 +1412,10 @@ module.exports = class Pane {
 
   // If the parent is a horizontal axis, returns its last child if it is a pane;
   // otherwise returns a new pane created by splitting this pane rightward.
-  findOrCreateRightmostSibling() {
+  findOrCreateRightmostSibling(params) {
     const rightmostSibling = this.findRightmostSibling();
     if (rightmostSibling === this) {
-      return this.splitRight();
+      return this.splitRight(params);
     } else {
       return rightmostSibling;
     }
@@ -1336,10 +1453,10 @@ module.exports = class Pane {
 
   // If the parent is a vertical axis, returns its last child if it is a pane;
   // otherwise returns a new pane created by splitting this pane bottomward.
-  findOrCreateBottommostSibling() {
+  findOrCreateBottommostSibling(params) {
     const bottommostSibling = this.findBottommostSibling();
     if (bottommostSibling === this) {
-      return this.splitDown();
+      return this.splitDown(params);
     } else {
       return bottommostSibling;
     }
@@ -1358,8 +1475,7 @@ module.exports = class Pane {
   }
 
   handleSaveError(error, item) {
-    const itemPath =
-      error.path || (typeof item.getPath === 'function' && item.getPath());
+    const itemPath = error.path || item.getPath?.();
     const addWarningWithPath = (message, options) => {
       if (itemPath) message = `${message} '${itemPath}'`;
       this.notificationManager.addWarning(message, options);

@@ -1,5 +1,4 @@
 const path = require('path');
-const { shell } = require('@electron/remote');
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
 const { CompositeDisposable, Emitter } = require('atom');
@@ -825,7 +824,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return atom.showItemInFolder(filePath);
   }
 
   showCurrentFileInFileManager() {
@@ -837,7 +836,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return atom.showItemInFolder(filePath);
   }
 
   getFileManagerName() {
@@ -853,9 +852,21 @@ class TreeView {
 
   openSelectedEntryInNewWindow() {
     let pathToOpen = this.selectedEntry()?.getPath();
-    if (pathToOpen) {
-      return atom.open({ pathsToOpen: [pathToOpen], newWindow: true });
-    }
+    if (!pathToOpen) return;
+
+    // Opening a file in a new window should preserve the current project
+    // roots, just as the tab bar's “Open in New Window” does; but opening a
+    // folder means opening that folder _as_ a project, so it stands alone.
+    let pathsToOpen = fs.isDirectorySync(pathToOpen)
+      ? [pathToOpen]
+      : [...atom.project.getPaths(), pathToOpen];
+
+    return atom.open({
+      pathsToOpen,
+      newWindow: true,
+      devMode: atom.devMode,
+      safeMode: atom.safeMode
+    });
   }
 
   copySelectedEntry() {
@@ -932,7 +943,7 @@ class TreeView {
 
           this.emitter.emit('will-delete-entry', meta);
 
-          let promise = shell.trashItem(selectedPath).then(() => {
+          let promise = atom.trashItem(selectedPath).then(() => {
             this.emitter.emit('entry-deleted', meta);
           }).catch(() => {
             this.emitter.emit('delete-entry-failed', meta);

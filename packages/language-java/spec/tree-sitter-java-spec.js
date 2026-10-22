@@ -1,5 +1,17 @@
+const path = require('path');
+const { TextEditor } = require('atom');
 
-const {TextEditor} = require('atom');
+describe('WASM Tree-sitter JavaScript grammar', () => {
+
+  beforeEach(async () => {
+    await atom.packages.activatePackage('language-java');
+  });
+
+  it('passes grammar tests', async () => {
+    await runGrammarTests(path.join(__dirname, 'fixtures', 'sample.java'), /\/\//)
+  });
+
+});
 
 // Skipping this suite because legacy Tree-sitter grammars no longer exist.
 // Keeping it around so that the logic can be adapted later.

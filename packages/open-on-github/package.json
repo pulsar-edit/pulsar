@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "fs-plus": "^3.0.1",
-    "temp": "^0.8.3"
+    "temp": "^0.9.0"
   },
   "configSchema": {
     "includeLineNumbersInUrls": {

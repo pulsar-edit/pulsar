@@ -1,5 +1,6 @@
 /* eslint-env jasmine */
 
+const { TextEditor } = require('atom')
 const { conditionPromise } = require('./spec-helper')
 const path = require('path')
 
@@ -439,5 +440,49 @@ describe('SubsequenceProvider', () => {
     }
 
     await Promise.all(promises)
+  })
+
+  describe('when using a non-workspace editor', () => {
+    it('does not crash when getting suggestions for an editor not in watchedBuffers', async () => {
+      // Create a TextEditor that is NOT part of the workspace
+      // (e.g., like watch pane editors in hydrogen-next)
+      const nonWorkspaceEditor = new TextEditor()
+      nonWorkspaceEditor.setText('function testWord() {}')
+
+      // The buffer of this editor is not tracked in watchedBuffers,
+      // so getSuggestions should handle this gracefully without crashing
+      const suggestions = await suggestionsForPrefix(provider, nonWorkspaceEditor, 'test')
+
+      // Should return empty array instead of crashing
+      expect(Array.isArray(suggestions)).toBe(true)
+    })
+
+    it('does not crash when includeCompletionsFromAllBuffers includes untracked buffers', async () => {
+      atom.config.set('autocomplete-plus.includeCompletionsFromAllBuffers', true)
+
+      // Create a non-workspace editor
+      const nonWorkspaceEditor = new TextEditor()
+      nonWorkspaceEditor.setText('untrackedWord')
+
+      // Get suggestions from the workspace editor - this should not crash
+      // even though there's a non-workspace editor with an untracked buffer
+      const suggestions = await suggestionsForPrefix(provider, editor, 'quick')
+
+      expect(suggestions).toContain('quicksort')
+
+      atom.config.set('autocomplete-plus.includeCompletionsFromAllBuffers', false)
+    })
+
+    it('handles bufferToSubsequenceMatches gracefully for an untracked buffer', async () => {
+      const nonWorkspaceEditor = new TextEditor()
+      nonWorkspaceEditor.setText('function anotherTestWord() {}')
+
+      // Directly call the internal method with an untracked buffer
+      const matches = await provider.bufferToSubsequenceMatches('another', '', nonWorkspaceEditor.getBuffer())
+
+      // Should return empty array instead of throwing
+      expect(Array.isArray(matches)).toBe(true)
+      expect(matches.length).toBe(0)
+    })
   })
 })

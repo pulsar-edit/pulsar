@@ -1,5 +1,10 @@
 // @ts-nocheck
 /* eslint-disable */
+
+import json from './test.json' with { type: 'json' };
+//                             ^^^^ keyword.control.with.js
+
+
 function diff(obj1, obj2, pathConverter) {
 // ^ storage.type.function
       // ^ entity.name.function.definition

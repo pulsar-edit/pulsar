@@ -42,3 +42,39 @@
 @syntax-color-attribute: #FF73FD;
 @syntax-color-import: @syntax-color-keyword;
 @syntax-color-snippet: @syntax-color-constant;
+
+// Terminal Variables ----------------------------------------
+
+// The ordinary text color of the terminal.
+@terminal-text-color: @syntax-text-color;
+// The background color of the terminal.
+@terminal-background-color: @syntax-background-color;
+// The background color of a selected text block.
+@terminal-selection-background-color: @syntax-selection-color;
+// The text color of selected text.
+@terminal-selection-text-color: @syntax-text-color;
+// The color of the cursor.
+@terminal-cursor-color: @syntax-cursor-color;
+
+// The color of the outline around a “find” result when it is inactive.
+@terminal-result-marker-color: @syntax-result-marker-color;
+// The color of the outline around a “find” result when it is active.
+@terminal-result-marker-color-selected: @syntax-result-marker-color-selected;
+
+@terminal-color-black: lighten(@syntax-background-color, 15%);
+@terminal-color-red: #CC6666;
+@terminal-color-green: #99CC99;
+@terminal-color-yellow: #DAD085;
+@terminal-color-blue: #62B1FE;
+@terminal-color-magenta: #FF73FD;
+@terminal-color-cyan: #96CBFE;
+@terminal-color-white: @syntax-text-color;
+
+@terminal-color-bright-black: lighten(@terminal-color-black, 10%);
+@terminal-color-bright-red: lighten(@terminal-color-red, 10%);
+@terminal-color-bright-green: lighten(@terminal-color-green, 10%);
+@terminal-color-bright-yellow: #F9EE98; //lighten(@terminal-color-yellow, 10%);
+@terminal-color-bright-blue: #96CBFE; // lighten(@terminal-color-blue, 10%);
+@terminal-color-bright-magenta: #C6C5FE; // lighten(@terminal-color-magenta, 10%);
+@terminal-color-bright-cyan: lighten(@terminal-color-cyan, 10%);
+@terminal-color-bright-white: lighten(@terminal-color-white, 10%);

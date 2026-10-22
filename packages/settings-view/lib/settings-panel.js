@@ -490,6 +490,7 @@ function elementForOptions (namespace, name, value, {radio = false}) {
 
   const label = document.createElement('label')
   label.classList.add('control-label')
+  label.dataset.settingKey = keyPath
 
   const titleDiv = document.createElement('div')
   titleDiv.classList.add('setting-title')
@@ -515,6 +516,7 @@ function elementForCheckbox (namespace, name, value) {
 
   const label = document.createElement('label')
   label.for = keyPath
+  label.dataset.settingKey = keyPath
 
   const input = document.createElement('input')
   input.id = keyPath
@@ -544,6 +546,7 @@ function elementForColor (namespace, name, value) {
 
   const label = document.createElement('label')
   label.for = keyPath
+  label.dataset.settingKey = keyPath
 
   const input = document.createElement('input')
   input.id = keyPath
@@ -572,6 +575,7 @@ function elementForEditor (namespace, name, value) {
 
   const label = document.createElement('label')
   label.classList.add('control-label')
+  label.dataset.settingKey = keyPath
 
   const titleDiv = document.createElement('div')
   titleDiv.classList.add('setting-title')
@@ -607,6 +611,7 @@ function elementForArray (namespace, name, value) {
 
   const label = document.createElement('label')
   label.classList.add('control-label')
+  label.dataset.settingKey = keyPath
 
   const titleDiv = document.createElement('div')
   titleDiv.classList.add('setting-title')

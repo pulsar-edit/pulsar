@@ -6,6 +6,306 @@
 
 ## [Unreleased]
 
+* Fix an issue where opening up git worktree doesn't show any git info on the editor
+* Add a branded sidebar image to the Windows installer and improve icon
+
+## 1.132.1
+
+* Fix an issue where missing theme variables prevented the project window from initializing.
+
+### Pulsar
+
+- Fix: Add UI scrollbar variable fallbacks [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/1566)
+
+## 1.132.0
+
+* New `terminal` package! [@savetheclocktower]
+* New `editor.largeFileThreshold` setting that allows the user to configure the file-size threshold of the “large file mode” present in TextMate-style grammars. [@asiloisad]
+* New experimental setting: `core.promptOnConflict`. When enabled, Pulsar will ask for confirmation if you try to save an item while it’s in a “conflicted” state. You may decide whether to cancel or proceed with overwriting the file on disk. (For an editor, the “conflicted” state occurs if you open a file and make changes, but another program writes different contents to the file on disk before you can save your changes in Pulsar.) Since this setting is experimental, it is disabled by default… but we encourage users to enable it and help us test it!  [@savetheclocktower]
+* Minor Electron version increase to v30.5.1.
+
+### Pulsar
+
+- Bump `@pulsar-edit/fuzzy-native` to 1.3.1 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1551)
+- Tree-sitter fixes, bonus 1.132 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1545)
+- [find-and-replace] Ensure a pattern without any path separators will be applied against only the filename rather than the entire path. [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1544)
+- Bump our versions of `atom-keymap` and `underscore-plus`… including pointing all usages of `underscore-plus` to our new fork at `@pulsar-edit/underscore-plus` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1543)
+- Bump `terminal` to `0.3.2` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1539)
+- feat: Add `editor.largeFileThreshold` config for TextMate large file mode [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1413)
+- Cirrus: Update Rolling release token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1542)
+- Resolve keyBindingCommand tooltip label lazily instead of at registration time [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1536)
+- fix: clamp cursor column during rendering to prevent display at invalid positions [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1414)
+- Hide empty file-info element in status bar [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1415)
+- Honor `activatePane: false` when `workspace.open` split creates a new pane [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1532)
+- Fix language-gfm setext header symbol queries [@bwanders](https://github.com/pulsar-edit/pulsar/pull/1537)
+- Cirrus: bump node from v16 to v20 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1538)
+- Fix keyBindingCommand breaking function-based tooltip titles [@asiloisad](github.com/pulsar-edit/pulsar/pull/1516)
+- [find-and-replace] Fix project search regression when searching modified buffers. [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1499)
+- Guard against a user saving while the text buffer is conflicted by alerting them to the problem and giving them a choice between cancelling and overwriting the contents on disk. [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1478)
+- Chore: Restore org templates to repo [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/1527)
+- CI: Bump 'nick-fields/retry' to v4.0.0 (exact SHA) due to Node 20 Actions deprecation [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1528)
+- Add the new `terminal` package to core [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1373)
+- [ci] Run Package tests more appropriately [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1508)
+- Use SHA256 Digest for RPM Build [@ChrisLeinbach](https://github.com/pulsar-edit/pulsar/pull/1522)
+- fix(deps): update dependency temp to ^0.9.0 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1519)
+- chore(deps): update dependency temp to ^0.9.0 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1518)
+- chore(deps): update dependency temp to ^0.9.0 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1515)
+- chore(deps): update actions/upload-artifact action to v7 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1514)
+- chore(deps): update actions/checkout action to v6 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1513)
+- chore(deps): update actions/cache action to v5 [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1510)
+- fix(deps): update dependency minimatch to v3.1.4 [security] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1500)
+- chore(deps): update dependency dompurify to v3.3.2 [security] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1503)
+- [exception-reporting] Remove core package [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1486)
+- Improve "Project does not exist" popup [@kiskoza](https://github.com/pulsar-edit/pulsar/pull/954)
+- Bump Electron version to v30.5.1 [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1452)
+- Change timing of window focus when a new project is opened [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1492)
+- Ensure NodeJS version matches what we actually use [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1436)
+- [build] Check Windows version during install [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1489)
+- Fix crashes in measureHorizontalPositions and updateBlockDecorations for non-rendered rows [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1490)
+- [archive-view] Bump `ls-archive` => `@pulsar-edit/ls-archive` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1447)
+- [autocomplete-plus] Allow matching suggestions to stay in the list after filtering… even if the first character of the suggestion does not match the first character of what the user typed. [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1428)
+- Remove unmaintained Dockerfile [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1479)
+- Tree-sitter rolling fixes, 1.132 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1429)
+
+### @pulsar-edit/atom-keymap
+
+- feat: add CmdOrCtrl modifier alias for cross-platform keybindings [@asiloisad](https://github.com/pulsar-edit/atom-keymap/pull/8)
+- Remove reference to old package in readme [@Daeraxa](https://github.com/pulsar-edit/atom-keymap/pull/11)
+
+### @pulsar-edit/fuzzy-native
+
+- Explicitly include `cstdint` to make GCC happy [@savetheclocktower](https://github.com/pulsar-edit/fuzzy-native/pull/9)
+
+### @pulsar-edit/ls-archive
+
+- PR from before Pulsar's fork:
+  - Support bzip2 [@YtvwlD](https://github.com/atom/node-ls-archive/pull/14)
+- PRs since Pulsar's fork began:
+  - Adds Testing GH Actions [@confused-Techie](https://github.com/pulsar-edit/node-ls-archive/pull/2)
+  - Rebrand Repository [@confused-Techie](https://github.com/pulsar-edit/node-ls-archive/pull/3)
+  - Manual decaf source [@confused-Techie](https://github.com/pulsar-edit/node-ls-archive/pull/4)
+  - Manual decaf specs [@confused-Techie](https://github.com/pulsar-edit/node-ls-archive/pull/6)
+  - Get tests to run w/ our latest version of NodeJS [@confused-Techie](https://github.com/pulsar-edit/node-ls-archive/pull/5)
+  - Bump almost all dependencies [@confused-Techie](https://github.com/pulsar-edit/node-ls-archive/pull/7)
+  - Bump `tar` dependency [@confused-Techie](https://github.com/pulsar-edit/node-ls-archive/pull/8)
+  - Make this repository publishable to NPM [@confused-Techie](https://github.com/pulsar-edit/node-ls-archive/pull/9)
+
+### @pulsar-edit/text-buffer
+
+- Fix incorrect `isInConflict` logic [@savetheclocktower](https://github.com/pulsar-edit/text-buffer/pull/11)
+
+### terminal
+
+- New package by @savetheclocktower; "Uses XTerm and node-pty." "Based heavily on atomic-terminal, x-terminal-reloaded, and all their predecessors."
+  - See [package README](https://github.com/pulsar-edit/terminal#terminal) for details
+- Fixes terminal:set-selection-as-find-pattern keybind [@Daeraxa](https://github.com/pulsar-edit/terminal/pull/14)
+- Fix context menu commands [@Daeraxa](https://github.com/pulsar-edit/terminal/pull/16)
+- Fix: update keymap selector to work correctly on linux [@Daeraxa](https://github.com/pulsar-edit/terminal/pull/5)
+
+### @pulsar-edit/underscore-plus
+
+- PRs from before Pulsar's fork:
+  - Only decaffeinate [@aminya](https://github.com/atom/underscore-plus/pull/22)
+  - Migrate to Github actions [@darangi](https://github.com/atom/underscore-plus/pull/23)
+- PRs since Pulsar's fork began:
+  - Add cmdorctrl to modifier key maps [@asiloisad](https://github.com/pulsar-edit/underscore-plus/pull/1)
+  - Update all GHA [@confused-Techie](https://github.com/pulsar-edit/underscore-plus/pull/2)
+  - Manually define a default export in order to play better with transpiled code in the Pulsar codebase. [@savetheclocktower](https://github.com/pulsar-edit/underscore-plus/pull/5)
+  - Opt into "loose" mode for transpiling to CommonJS so that the exports can be mocked in specs. [@savetheclocktower](https://github.com/pulsar-edit/underscore-plus/commit/79eb75a068ee98d65ec233acfb90fa2dd72fc159)
+
+### ppm
+
+- Bump bundled Node to 20.16.0, to sync with Electron 30.5.1 in Pulsar core repo [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/168)
+
+
+## 1.131.3
+
+* [settings-view] Fix regression with rendering badges on package search results.
+* Fix failure to include localization files in the built application.
+
+### Pulsar
+
+- [build] Ensure `locales` dir is included when building Pulsar [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1488)
+- [settings-view] Don't try to attach a listener if the ref doesn't exist [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1493)
+
+## 1.131.2
+
+* [settings-view] Fix issue that closes project windows when the user clicks on a badge in a package card.
+* [find-and-replace] Fix issue that prevents searches with patterns from working properly in projects with multiple roots.
+* Fix issue affecting keybinding interpretation on non-QWERTY keyboards in Linux/X11 environments.
+* Fix Linux issue causing the menu bar to hide immediately after a project window opens.
+* Fix macOS issue causing buffer contents to fail to update for some users when modified by another program.
+* Fix issue causing the `.deb` installation to refuse to launch because of improper permissions/AppArmor profile.
+* Fix issue causing the `.rpm` installation to run the wrong script when upgrading (restore pulsar and ppm to PATH).
+* Fix issue causing the `--package` switch not to work correctly when invoked directly on the Pulsar binary, rather than on `pulsar.sh`/`pulsar.cmd`.
+* Fix issue that prevents `ppm` from being symlinked or un-symlinked correctly in Linux install/uninstall scripts.
+* Add `atom.project.addPaths` method for adding multiple project roots at once.
+
+### Pulsar
+
+- script: Fix pulsar and ppm removal from PATH during upgrade with .rpms [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1482)
+- Fix `pulsar --package` usage when `APM_PATH` is not set [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1388)
+- [settings-view] Prevent weird half-crash when clicking on a badge such as an "Archived" badge next to a package card [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1481)
+- [find-and-replace] Fix project search path pattern interpretation when the project has more than one root directory [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1455)
+- Update to a version of `pathwatcher` that uses `kqueue` on macOS instead of `FSEvents` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1471)
+- Fix inability to use `require('clipboard')` and its other deprecated siblings [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1474)
+- Re-assert `core.setAutoHideMenuBar` after a call to `setFullScreen` so that the menu bar isn't automatically hidden on Linux [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1472)
+- settings-view: rebrand README and Restart notification [@catb0t](https://github.com/pulsar-edit/pulsar/pull/1476)
+- Bump `atom-keymap` to v9.0.3 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1475)
+- Update the `post-install.sh` script to set permissions properly after `.deb` and `.rpm` installations [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1466)
+- Cirrus: Update Rolling release token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1470)
+- script: Fix ppm symlinking issues in Linux install/uninstall scripts [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1464)
+- Cirrus: Update `brew uninstall node@20` to `brew uninstall node@24` [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1465)
+- Fix deprecated electron.remote usage in reopen-project-menu-manager [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1424)
+- Add Project.addPaths to batch multiple root folders with a single event [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1454)
+- [meta] Exclude blockmaps again [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1443)
+- Migrate Renovate config [@renovate](https://github.com/pulsar-edit/pulsar/pull/1444)
+- Update whitespace package [@renovate](https://github.com/pulsar-edit/pulsar/pull/1445)
+
+### @pulsar-edit/pathwatcher
+
+- Introduce an alternative macOS implementation that uses `kqueue` to better match this library's pre-v9 behavior [@savetheclocktower](https://github.com/pulsar-edit/node-pathwatcher/pull/4)
+
+### @pulsar-edit/atom-keymap
+
+- Bump @pulsar-edit/keyboard-layout to 3.0.5 [@savetheclocktower](https://github.com/pulsar-edit/atom-keymap/commit/37a68fe1cf4d66174b8dd16f75ebf017e55a6d83)
+
+### @pulsar-edit/keyboard-layout
+
+- Stop considering `XInputContext` in X11 when translating keys to characters [@savetheclocktower](https://github.com/pulsar-edit/keyboard-layout/pull/5)
+
+## 1.131.1
+
+* Fix an issue in `superstring` that occasionally caused crashes while editing text.
+* Add support for additional image formats in Pulsar's Markdown renderer.
+* Minor reduction of binary size through various means.
+
+### Pulsar
+
+- Bump `@pulsar-edit/superstring` to `3.0.5` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1441)
+- [core] Add support for `data:image/svg+xml` in `ui.renderMarkdown` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1439)
+- Remove abandoned fstream dependency [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1418)
+- Bump `async` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1406)
+- Add exclusions borrowed from `node-prune` [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1405)
+
+### superstring
+
+- Fix a crash caused by improper management of async workers [@savetheclocktower](https://github.com/pulsar-edit/superstring/pull/21)
+
+## 1.131.0
+
+Because this is such a huge upgrade to Pulsar, some of your community packages may be affected!
+If you handle distributions for Pulsar as a community maintainer make sure to read this changelog carefully to make things compatible!
+For more information, read [Pulsar on Electron 30: what it means for you](https://blog.pulsar-edit.dev/posts/20251202-savetheclocktower-pulsar-on-electron-30/).
+
+* Update Electron to version 30!
+  * Node is now version 20.11.1
+  * Chromium is now version 124
+  * This means better performance, better Node library compatibility, and ability for community packages to use newer features of Chromium.
+  * It should also vastly improve the Pulsar experience for Linux users in Wayland environments.
+  * Because this is such a big upgrade, some of your community packages might be affected!
+* Bump `ppm` to use Node 20.11.1
+  * For the first time in a long time, both `ppm` and Pulsar are using the same version of Node; this should avoid some rare bugs encountered when installing certain packages.
+* Fix handling when opening files to certain line numbers via CLI - e.g. `pulsar foo.txt:30`.
+* Prevent packages from spawning new background tasks if the environment is unloading (as would happen during a window reload or while quitting Pulsar).
+* [find-and-replace] Fix an issue where certain files would show results in a project-wide search even when they would be excluded by the file/directory pattern.
+* [markdown-preview] Fix situations where "Save as HTML" and "Copy as HTML" silently failed with certain kinds of content.
+* [autocomplete-plus] Prevent certain kinds of suggestions from being incorrectly filtered out of the result set.
+* [language-java] Update to the latest `tree-sitter-java` parser, adding support for multiline strings, among other things.
+* [language-python] Better highlighting of `except` clauses; fixed folding of certain `if` blocks.
+* [language-typescript] Better highlighting of template literals; adding folding of `interface` and `enum` blocks.
+* [language-javascript] Proper highlighting of JSX with namespaced attributes.
+
+### Pulsar
+
+- Enhance documentation for `atom.commands.dispatch()` method [@trusktr](https://github.com/pulsar-edit/pulsar/pull/1411)
+- Fix autocomplete-plus crash with non-workspace editors [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1381)
+- Fix tree-view crash when dock pane is split [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1409)
+- Tree-sitter rolling fixes, 1.131.0 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1377)
+- Always show suggestions with `textEdit`s instead of filtering them out [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1422)
+- Fix incorrect interpretation of a line-number spec on the command line [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1400)
+- Prevent task spawning during unload [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1387)
+- [markdown-preview] Fix failure to serialize to HTML when the document contains certain kinds of code blocks [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1374)
+- Bump to latest `ppm` after fixing the `force-process-config` issue in ppm#162 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1396)
+- Remove reliance on `title` key of a setting to avoid using locale labels [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1391)
+- Bump CI runners to `macos-14` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1389)
+- Fix text-editor-component annoying bug [@Psychosynthesis](https://github.com/pulsar-edit/pulsar/pull/1336)
+- Migrate to python3 style super for new class snippets in language-python [@bridgetjs](https://github.com/pulsar-edit/pulsar/pull/1385)
+- Update to Electron 30 [@mauricioszabo and @savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1367)
+- Cirrus: Update Rolling upload token [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1382)
+- [find-and-replace] Prevent addition of project results from editors whose paths are not matched by the current path inclusions [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1380)
+- Tree-sitter rolling fixes, 1.130.0 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1320)
+- Update actions/setup-python action to v6 [@renovate](https://github.com/pulsar-edit/pulsar/pull/1365)
+- Update actions/setup-node action to v6 [@renovate](https://github.com/pulsar-edit/pulsar/pull/1364)
+- [meta] Add new and missing packages to our renovate config [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1359)
+- Update pulsar-updater package [@renovate](https://github.com/pulsar-edit/pulsar/pull/1356)
+- Update actions/checkout action to v5 [@renovate](https://github.com/pulsar-edit/pulsar/pull/1357)
+- Add "Regular Release Checklist" issue template [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1346)
+
+#### Changes for Electron 30
+> Internals of 'Update to Electron 30' PR
+
+- Remove all support for legacy Tree-sitter
+- Prefer `@electron/remote`, deprecate direct usage of `electron.remote` and switch all internal usages to `@electron/remote`.
+- Decaffeinate `tree-view`
+- Fix a failing `autocomplete-plus` spec
+- Get `dev-live-reload` specs passing
+- Get `image-view` specs passing
+- [language-ruby] Add a basic grammar test spec
+- [markdown-preview] Get specs passing
+- [settings-view] Get specs passing
+- Point to Electron `30.0.9` and point our dependencies to the NPM-published versions under the `@pulsar-edit` namespace that are compatible with Electron 30.0.9.
+- Fix some `TextEditorComponent` issues related to changes in Chromium sometime between Electron 12 and Electron 30.
+- Eliminate reliance on `typescript-simple` in favor of a custom solution that uses the `typescript` package directly.
+- Consume `get-scrollbar-style` to replace the deprecated `scrollbar-style` module
+- Additional changes related to device pixel ratio that probably should have gone in the earlier commit.
+- Add the ability to report crashes via Electron's standard `crashReporter` interface.
+- Delete deprecated "app.allowRendererProcessReuse = false"
+- Enable `@electron-remote` for the given window during startup and disable a Blink experimental feature that was causing trouble with package compatibility (because it added an `on` method to all DOM nodes!).
+- Be more paranoid about release channels in a handful of places in case we want to maintain a `next` (or `nightly` or `preview`) release channel on an ongoing basis.
+- Cache `Language` instances in `web-tree-sitter` so that the specs don't run out of memory.
+- Preserve an `ATOM_CHANNEL` environment variable if it exists and other changes related to release-channel agnosticism.
+- [snippets] Get specs passing
+- [spell-check] Get specs passing and abandon `atom-pathspec` in favor of an internal implementation.
+- [tabs] Fix an exception that can happen in unusual scenarios when the browser can't give us an element under a given X/Y coordinate.
+- [update-package-dependencies] Get specs passing
+- [symbol-provider-tree-sitter] Unmock clock in the standard way
+- Remove outdated Tree-sitter documentation
+- Update GitHub Actions CI jobs to include Wayland-related keyboard dependencies.
+- Update CirrusCI build job to include Wayland-related keyboard dependencies.
+- Revert to a single `entitlements.plist` now that we're no longer affected by the awful `libuv` bug that was present in Electron 12.
+- Update `script/electron-builder.js` to support a couple of command-line switches and to build correctly for Electron 30.
+- Fix `ThemeManager` specs
+- Define two methods on the `atom` global to work around `tree-view` issues related to trashing and revealing items in `electron.shell`.
+- Comment reformatting
+- Some integration test fixes
+- Fix `PackageManager` specs
+- Use `yarn.lock` from `updated-latest-electron` branch
+- Swallow exceptions raised by pending tests
+- Disallow `if(` and the like in `.eslitrc`
+- Add `submodules: true` back into certain workflows
+- Remove `atom.trashItem` and `atom.showItemInFolder` since they weren't even being used. The equivalent functions from the `shell` module of `@electron/remote` have been performing the same task in PulsarNext for a while now.
+- Update ppm to commit d288b0978b35f7c0ffb3dc5c1e50c
+- Update ppm to commit 07faba10096ee4239ce671218d9953fb2e40ecbf
+- Remove unnecessary `Promise.all`
+
+### ppm
+
+- Fix CI [@DeeDeeG](https://github.com/pulsar-edit/ppm/pull/154)
+- Fix misnamed variable in `rebuild` command [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/155)
+- Upgrade Node to version 20.11.1 [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/156)
+- Add TypeScript template [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/152)
+- Revert setting of `--force-process-config` now that we’re on Electron 30 [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/162)
+
+## 1.130.1
+
+Hotfix: Restore Windows app to working condition, after it was mis-built in v1.130.0.
+
+### Pulsar
+
+- CI: Split 'yarn build' and 'yarn build:apm' into separate steps [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1353)
+- [ci] Fix Windows Builds by manually installing the Win10 SDK [@confused-Techie](https://github.com/pulsar-edit/pulsar/pull/1351)
+
 ## 1.130.0
 
 - `autocomplete-plus` can now make other text edits to the buffer when a suggestion is accepted - for instance, adding an `import` for that suggestion.

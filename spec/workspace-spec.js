@@ -7,7 +7,6 @@ const Workspace = require('../src/workspace');
 const Project = require('../src/project');
 const platform = require('./helpers/platform');
 const _ = require('underscore-plus');
-const fstream = require('fstream');
 const fs = require('fs-plus');
 const AtomEnvironment = require('../src/atom-environment');
 const { conditionPromise, timeoutPromise } = require('./helpers/async-spec-helpers');
@@ -690,6 +689,36 @@ describe('Workspace', () => {
           });
         });
       });
+
+      describe("when 'activatePane' is false and the split creates a new pane", () => {
+        it("leaves the original pane active when splitting right", async () => {
+          const pane1 = workspace.getActivePane();
+
+          const editor = await workspace.open('a', {
+            split: 'right',
+            activatePane: false
+          });
+
+          const pane2 = workspace.getPanes().filter(p => p !== pane1)[0];
+          expect(pane2).toBeDefined();
+          expect(pane2.items).toEqual([editor]);
+          expect(workspace.getActivePane()).toBe(pane1);
+        });
+
+        it("leaves the original pane active when splitting down", async () => {
+          const pane1 = workspace.getActivePane();
+
+          const editor = await workspace.open('a', {
+            split: 'down',
+            activatePane: false
+          });
+
+          const pane2 = workspace.getPanes().filter(p => p !== pane1)[0];
+          expect(pane2).toBeDefined();
+          expect(pane2.items).toEqual([editor]);
+          expect(workspace.getActivePane()).toBe(pane1);
+        });
+      });
     });
 
     describe('when an initialLine and initialColumn are specified', () => {
@@ -732,6 +761,41 @@ describe('Workspace', () => {
         expect(
           workspace.getActiveTextEditor().getCursorBufferPosition()
         ).toEqual([2, 11])
+
+        await workspace.open('a', { initialLine: null, initialColumn: 4 });
+
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([0, 4])
+
+        await workspace.open('a', { initialLine: 2, initialColumn: null });
+
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([2, 0])
+      });
+
+      it('does not throw when opened without position options', async () => {
+        await workspace.open('a', {});
+        await workspace.open('a', { initialLine: null, initialColumn: null });
+        await workspace.open('a', {
+          initialLine: undefined,
+          initialColumn: undefined
+        });
+      });
+
+      it('does not throw when opening a file outside the project with null position options', async () => {
+        // atom-application.js parsePathToOpen() sets initialLine/initialColumn to null
+        // for files opened without a line:column suffix (e.g. via recent files or drag-and-drop)
+        const dir = temp.mkdirSync('outside-project');
+        const filePath = path.join(dir, 'outside.txt');
+        fs.writeFileSync(filePath, 'content outside project\n');
+
+        await workspace.open(filePath, { initialLine: null, initialColumn: null });
+
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([0, 0]);
       });
 
       it('unfolds the fold containing the line', async () => {
@@ -1733,6 +1797,63 @@ describe('Workspace', () => {
     });
   });
 
+  describe('when an editor becomes active', () => {
+    let filePath;
+
+    // Resolves with the next value the buffer reports for its deleted status.
+    const nextDeletedStatus = buffer =>
+      new Promise(resolve => {
+        const disposable = buffer.onDidChangeDeleted(status => {
+          disposable.dispose();
+          resolve(status);
+        });
+      });
+
+    beforeEach(() => {
+      // Outside of any project root, so that no project watcher will notice
+      // when the file is restored.
+      const dir = temp.mkdirSync('atom-spec-workspace-resurrect');
+      filePath = path.join(dir, 'restored.txt');
+      fs.writeFileSync(filePath, 'original\n');
+    });
+
+    it('resurrects its buffer if the buffer’s file was deleted and has been restored', async () => {
+      const editor = await workspace.open(filePath);
+      const buffer = editor.getBuffer();
+      await workspace.open('a');
+      expect(workspace.getActiveTextEditor()).not.toBe(editor);
+
+      let deleted = nextDeletedStatus(buffer);
+      fs.unlinkSync(filePath);
+      expect(await deleted).toBe(true);
+
+      // Nothing else should notice the file's return.
+      fs.writeFileSync(filePath, 'restored\n');
+      await timeoutPromise(500);
+      expect(atom.project.deletedBuffers.has(buffer)).toBe(true);
+
+      deleted = nextDeletedStatus(buffer);
+      workspace.getActivePane().activateItem(editor);
+      expect(await deleted).toBe(false);
+
+      await conditionPromise(
+        () => buffer.getText() === 'restored\n',
+        'buffer to reload restored file'
+      );
+      expect(buffer.isDeleted()).toBe(false);
+    });
+
+    it('does not resurrect its buffer if the buffer was never deleted', async () => {
+      const editor = await workspace.open(filePath);
+      spyOn(editor.getBuffer(), 'resurrect').and.callThrough();
+      await workspace.open('a');
+
+      workspace.getActivePane().activateItem(editor);
+      expect(workspace.getActiveTextEditor()).toBe(editor);
+      expect(editor.getBuffer().resurrect).not.toHaveBeenCalled();
+    });
+  });
+
   describe('when an editor is copied because its pane is split', () => {
     it('sets up the new editor to be configured by the text editor registry', async () => {
       await atom.packages.activatePackage('language-javascript');
@@ -2242,12 +2363,26 @@ describe('Workspace', () => {
       expect(
         atom.workspace.filePathMatchesPatterns(pathA1, ['', ''])
       ).toBe(true);
-      
+
       expect(
         atom.workspace.filePathMatchesPatterns(pathB1, ['b-dir/*.js'])
       ).toBe(true);
       expect(
         atom.workspace.filePathMatchesPatterns(pathB1, ['!b-dir/*.js'])
+      ).toBe(false);
+
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, ['*.js'])
+      ).toBe(true);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, ['*.js'])
+      ).toBe(true);
+
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathA1, ['!*.js'])
+      ).toBe(false);
+      expect(
+        atom.workspace.filePathMatchesPatterns(pathB1, ['!*.js'])
       ).toBe(false);
 
       expect(
@@ -2614,13 +2749,7 @@ describe('Workspace', () => {
             );
             projectPath = path.join(temp.mkdirSync('atom'));
 
-            const writerStream = fstream.Writer(projectPath);
-            fstream.Reader(sourceProjectPath).pipe(writerStream);
-
-            await new Promise(resolve => {
-              writerStream.on('close', resolve);
-              writerStream.on('error', resolve);
-            });
+            fs.cpSync(sourceProjectPath, projectPath, { recursive: true });
 
             fs.renameSync(
               path.join(projectPath, 'git.git'),
@@ -2689,13 +2818,7 @@ describe('Workspace', () => {
             );
             projectPath = path.join(temp.mkdirSync('atom'));
 
-            const writerStream = fstream.Writer(projectPath);
-            fstream.Reader(sourceProjectPath).pipe(writerStream);
-
-            await new Promise(resolve => {
-              writerStream.on('close', resolve);
-              writerStream.on('error', resolve);
-            });
+            fs.cpSync(sourceProjectPath, projectPath, { recursive: true });
 
             fs.symlinkSync(
               path.join(__dirname, 'fixtures', 'dir', 'b'),
@@ -2744,13 +2867,7 @@ describe('Workspace', () => {
             );
             projectPath = path.join(temp.mkdirSync('atom'));
 
-            const writerStream = fstream.Writer(projectPath);
-            fstream.Reader(sourceProjectPath).pipe(writerStream);
-
-            await new Promise(resolve => {
-              writerStream.on('close', resolve);
-              writerStream.on('error', resolve);
-            });
+            fs.cpSync(sourceProjectPath, projectPath, { recursive: true });
 
             // Note: This won't create a hidden file on Windows, in order to more
             // accurately test this behaviour there, we should either use a package
@@ -2830,9 +2947,13 @@ describe('Workspace', () => {
             // * a-dir/sample1.js ("smapdi" exists in the modified buffer, but
             //   this path doesn't match our glob!)
             expect(paths.length).toBe(2, glob);
-            expect(paths.includes('b-dir/sample1.js')).toBe(true, glob);
-            expect(paths.includes('b-dir/sample2.js')).toBe(true, glob);
-            expect(paths.includes('a-dir/sample1.js')).toBe(false, glob);
+
+            // Be sure to construct these paths with `path.join` so that the
+            // separator is appropriate for the platform. Without this, specs
+            // fail on Windows.
+            expect(paths.includes(path.join('b-dir', 'sample1.js'))).toBe(true, glob);
+            expect(paths.includes(path.join('b-dir', 'sample2.js'))).toBe(true, glob);
+            expect(paths.includes(path.join('a-dir', 'sample1.js'))).toBe(false, glob);
           }
 
           for (let glob of negativeGlobs) {
@@ -2852,9 +2973,9 @@ describe('Workspace', () => {
             // * b-dir/sample2.js ("smapdi" exists on disk, but should fail our
             //   negated glob!)
             expect(paths.length).toBe(1, glob);
-            expect(paths.includes('b-dir/sample1.js')).toBe(false, glob);
-            expect(paths.includes('b-dir/sample2.js')).toBe(false, glob);
-            expect(paths.includes('a-dir/sample1.js')).toBe(true, glob);
+            expect(paths.includes(path.join('b-dir', 'sample1.js'))).toBe(false, glob);
+            expect(paths.includes(path.join('b-dir', 'sample2.js'))).toBe(false, glob);
+            expect(paths.includes(path.join('a-dir', 'sample1.js'))).toBe(true, glob);
           }
         });
 
@@ -2920,6 +3041,7 @@ describe('Workspace', () => {
           let dir2;
           let file1;
           let file2;
+          let extraRootBasename;
 
           beforeEach(() => {
             dir1 = atom.project.getPaths()[0];
@@ -2932,6 +3054,7 @@ describe('Workspace', () => {
             fs.writeFileSync(file2, 'ccc aaaa');
 
             atom.project.addPath(dir2);
+            extraRootBasename = path.basename(dir2);
           });
 
           it("searches matching files in all of the project's root directories", async () => {
@@ -2995,6 +3118,44 @@ describe('Workspace', () => {
               expect(resultPaths).toEqual([file2]);
             });
           });
+
+          describe('when an exclusion path starts with the basename of a root directory', () => {
+            it('interprets the exclusion as applying only to that root', async () => {
+              let resultPaths = [];
+              await scan(/aaaa/, { paths: [`!${extraRootBasename}`] }, ({ filePath }) => {
+                if (!resultPaths.includes(filePath)) {
+                  resultPaths.push(filePath);
+                }
+              });
+
+              expect(resultPaths).toEqual([file1]);
+            });
+          });
+
+          describe('when inclusion paths mix inclusions and exclusions', () => {
+            it('filters out a wholesale exclusion of another root', async () => {
+              let resultPaths = [];
+              await scan(/aaaa/, { paths: ['dir', `!${extraRootBasename}`] }, ({ filePath }) => {
+                if (!resultPaths.includes(filePath)) {
+                  resultPaths.push(filePath);
+                }
+              });
+
+              expect(resultPaths).toEqual([file1]);
+            });
+
+            it('does not apply an exclusion that targets a different root', async () => {
+              let resultPaths = [];
+              await scan(/aaaa/, { paths: ['dir', `!${extraRootBasename}/**/*`] }, ({ filePath }) => {
+                if (!resultPaths.includes(filePath)) {
+                  resultPaths.push(filePath);
+                }
+              });
+
+              expect(resultPaths).toEqual([file1]);
+            });
+          });
+
 
           describe('when a custom directory searcher is registered', () => {
             let fakeSearch = null;
@@ -3230,6 +3391,62 @@ describe('Workspace', () => {
               result.slice(0, 3)
             )
           });
+        });
+      });
+
+      describe('with multiple project roots', () => {
+        let projectDir1, projectDir2;
+        let projectRoot1, projectRoot2;
+
+        beforeEach(() => {
+          projectDir1 = temp.mkdirSync('atom');
+          projectDir2 = temp.mkdirSync('atom');
+
+          // Within each of these two directories, create another directory so
+          // we can control the exact basename.
+          projectRoot1 = path.resolve(projectDir1, 'alpha');
+          projectRoot2 = path.resolve(projectDir2, 'beta');
+          fs.mkdirSync(projectRoot1);
+          fs.mkdirSync(projectRoot2);
+
+          let fixturesDirA = path.resolve(
+            __dirname,
+            'fixtures',
+            'workspace-scan',
+            'a-dir'
+          );
+          let fixturesDirB = path.resolve(
+            __dirname,
+            'fixtures',
+            'workspace-scan',
+            'b-dir'
+          );
+
+          fs.cpSync(fixturesDirA, projectRoot1, { recursive: true });
+          fs.cpSync(fixturesDirB, projectRoot2, { recursive: true });
+
+          atom.project.setPaths([projectRoot1, projectRoot2]);
+        });
+
+        it('should search both roots when no paths are given', async () => {
+          let results = [];
+          await scan(
+            /ipsum/,
+            {
+              leadingContextLineCount: 1,
+              trailingContextLineCount: 1
+            },
+            result => results.push(result.filePath)
+          );
+
+          results.sort((a, b) => a.localeCompare(b));
+
+          let sortedExpectedFilePaths = [
+            path.join(projectRoot1, 'sample1.js'),
+            path.join(projectRoot2, 'sample1.js')
+          ].sort()
+
+          expect(results).toEqual(sortedExpectedFilePaths);
         });
       });
     }); // Cancels other ongoing searches

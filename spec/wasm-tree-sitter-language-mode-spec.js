@@ -56,6 +56,9 @@ let cConfig = CSON.readFileSync(cGrammarPath);
 let rubyConfig = CSON.readFileSync(rubyGrammarPath);
 let htmlConfig = CSON.readFileSync(htmlGrammarPath);
 
+// Grammars created by `prepareTSLanguageMode`, disposed of after each spec.
+const preparedGrammars = [];
+
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -73,33 +76,32 @@ describe('WASMTreeSitterLanguageMode', () => {
 
   afterEach(() => {
     if (grammar) { grammar?.subscriptions?.dispose(); }
+    for (let preparedGrammar of preparedGrammars) {
+      preparedGrammar.subscriptions?.dispose();
+    }
+    preparedGrammars.length = 0;
   });
 
   describe('highlighting', () => {
     it('applies the most specific scope mapping to each node in the syntax tree', async () => {
-      jasmine.useRealClock();
-      grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      await grammar.setQueryForTest('highlightsQuery', `
-        (member_expression object: (identifier) @support)
-
-        (call_expression
-          function: (identifier) @support)
-
-        (assignment_expression
-          left: (member_expression
-            property: (property_identifier) @variable))
-
-        ["="] @keyword
-
-        ["." "(" ")" ";"] @punctuation
-      `);
-
       buffer.setText('aa.bbb = cc(d.eee());');
 
-      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        jsQuery: `
+          (member_expression object: (identifier) @support)
+
+          (call_expression
+            function: (identifier) @support)
+
+          (assignment_expression
+            left: (member_expression
+              property: (property_identifier) @variable))
+
+          ["="] @keyword
+
+          ["." "(" ")" ";"] @punctuation
+        `
+      });
 
       await wait(0);
 
@@ -125,38 +127,31 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     it('can start or end multiple scopes at the same position', async () => {
-      jasmine.useRealClock();
-      grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      await grammar.setQueryForTest('highlightsQuery', `
-        (member_expression object: (identifier) @support)
-
-        (call_expression
-          function: (identifier) @call)
-
-        (call_expression
-          function: (member_expression
-            property: (property_identifier) @call))
-
-        (assignment_expression left: (identifier) @variable)
-        (assignment_expression
-          left: (member_expression
-            property: (property_identifier) @variable))
-
-        (member_expression object: (identifier) @object
-          property: (_) @member)
-
-        "(" @open-paren
-        ")" @close-paren
-      `)
-
       buffer.setText('a = bb.ccc();');
 
-      const languageMode = new WASMTreeSitterLanguageMode({
-        grammar, buffer
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        jsQuery: `
+          (member_expression object: (identifier) @support)
+
+          (call_expression
+            function: (identifier) @call)
+
+          (call_expression
+            function: (member_expression
+              property: (property_identifier) @call))
+
+          (assignment_expression left: (identifier) @variable)
+          (assignment_expression
+            left: (member_expression
+              property: (property_identifier) @variable))
+
+          (member_expression object: (identifier) @object
+            property: (_) @member)
+
+          "(" @open-paren
+          ")" @close-paren
+        `
       });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
       await wait(0);
 
       expectTokensToEqual(editor, [
@@ -255,19 +250,14 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     it("updates lines' highlighting when they are affected by distant changes", async () => {
-      jasmine.useRealClock();
-      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      await grammar.setQueryForTest('highlightsQuery', `
-        (call_expression (identifier) @function)
-        (property_identifier) @member
-      `);
-
       buffer.setText('a(\nb,\nc\n');
 
-      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        jsQuery: `
+          (call_expression (identifier) @function)
+          (property_identifier) @member
+        `
+      });
       await wait(0);
 
       // missing closing paren
@@ -295,18 +285,6 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     it('updates the range of the current node in the tree when highlight.invalidateOnChange is set', async () => {
-      jasmine.useRealClock();
-      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      await grammar.setQueryForTest('highlightsQuery', `
-        ((template_string) @lorem
-          (#match? @lorem "lorem")
-          (#set! highlight.invalidateOnChange true))
-        ((template_string) @ipsum
-          (#not-match? @ipsum "lorem")
-          (#set! highlight.invalidateOnChange true))
-      `);
-
       buffer.setText(dedent`\`
 
 
@@ -315,11 +293,16 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       \``);
 
-
-
-      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        jsQuery: `
+          ((template_string) @lorem
+            (#match? @lorem "lorem")
+            (#set! highlight.invalidateOnChange true))
+          ((template_string) @ipsum
+            (#not-match? @ipsum "lorem")
+            (#set! highlight.invalidateOnChange true))
+        `
+      });
       await wait(0);
 
       expectTokensToEqual(editor, [
@@ -373,21 +356,15 @@ describe('WASMTreeSitterLanguageMode', () => {
     })
 
     it('handles edits after tokens that end between CR and LF characters (regression)', async () => {
-      jasmine.useRealClock();
-      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-
-      await grammar.setQueryForTest('highlightsQuery', `
-        (comment) @comment
-        (string) @string
-        (property_identifier) @property
-      `);
-
       buffer.setText(['// abc', '', 'a("b").c'].join('\r\n'));
 
-      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        jsQuery: `
+          (comment) @comment
+          (string) @string
+          (property_identifier) @property
+        `
+      });
       await wait(0);
 
       expectTokensToEqual(editor, [
@@ -419,19 +396,14 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     it('handles multi-line nodes with children on different lines (regression)', async () => {
-      jasmine.useRealClock();
-      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      await grammar.setQueryForTest('highlightsQuery', `
-        (template_string) @string
-        ["\${" "}"] @interpolation
-      `);
-
       buffer.setText('`\na${1}\nb${2}\n`;');
 
-      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        jsQuery: `
+          (template_string) @string
+          ["\${" "}"] @interpolation
+        `
+      });
       await wait(0);
 
       expectTokensToEqual(editor, [
@@ -453,14 +425,6 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     it('handles folds inside of highlighted tokens', async () => {
-      jasmine.useRealClock();
-      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      await grammar.setQueryForTest('highlightsQuery', `
-        (comment) @comment
-        (call_expression (identifier) @function)
-      `);
-
       buffer.setText(dedent`
         /*
          * Hello
@@ -469,9 +433,12 @@ describe('WASMTreeSitterLanguageMode', () => {
         hello();
       `);
 
-      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        jsQuery: `
+          (comment) @comment
+          (call_expression (identifier) @function)
+        `
+      });
       await wait(0);
 
       editor.foldBufferRange([[0, 2], [2, 0]]);
@@ -2351,6 +2318,69 @@ describe('WASMTreeSitterLanguageMode', () => {
       `);
     });
 
+    it('allows fold adjustments to be applied to @fold.end markers', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, cGrammarPath, cConfig);
+
+      // In addition to nudging the fold ending position forward one character,
+      // it also precludes the automatic “adjust to end of previous line”
+      // behavior. So the fold will expand by one row and one column.
+      await grammar.setQueryForTest('foldsQuery', `
+      ["#ifndef" "#ifdef" "#elif" "#else"] @fold.start
+      (["#elif" "#else" "#endif"] @fold.end
+       (#set! fold.offsetEnd 1))
+      `);
+
+      buffer.setText(dedent`
+        #ifndef FOO_H_
+        #define FOO_H_
+
+        #ifdef _WIN32
+
+        #include <windows.h>
+        const char *path_separator = "\\";
+
+        #elif defined MACOS
+
+        #include <carbon.h>
+        const char *path_separator = "/";
+
+        #else
+
+        #include <dirent.h>
+        const char *path_separator = "/";
+
+        #endif
+
+        #endif
+      `);
+
+      const languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      expect(editor.isFoldableAtBufferRow(0)).toBe(true);
+
+      editor.foldBufferRow(3);
+      expect(getDisplayText(editor)).toBe(dedent`
+        #ifndef FOO_H_
+        #define FOO_H_
+
+        #ifdef _WIN32…elif defined MACOS
+
+        #include <carbon.h>
+        const char *path_separator = "/";
+
+        #else
+
+        #include <dirent.h>
+        const char *path_separator = "/";
+
+        #endif
+
+        #endif
+      `);
+    });
+
     it('does not fold when the start and end parameters match the same child', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, htmlGrammarPath, htmlConfig);
 
@@ -2909,17 +2939,13 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     it('includes the root scope name even when the given position is in trailing whitespace at EOF', async () => {
-      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      await grammar.setQueryForTest('highlightsQuery', `
-        (property_identifier) @property.name
-      `);
-
       buffer.setText('a; ');
 
-      let languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        jsQuery: `
+          (property_identifier) @property.name
+        `
+      });
 
       expect(
         editor.scopeDescriptorForBufferPosition([0, 3]).getScopesArray()
@@ -2927,17 +2953,13 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     it('works when the given position is between tokens', async () => {
-      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      await grammar.setQueryForTest('highlightsQuery', `
-        (comment) @comment.block
-      `);
-
       buffer.setText('a  // b');
 
-      let languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        jsQuery: `
+          (comment) @comment.block
+        `
+      });
 
       expect(
         editor.scopeDescriptorForBufferPosition([0, 2]).getScopesArray()
@@ -2948,19 +2970,15 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     it('works when a scope range has been adjusted', async () => {
-      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      await grammar.setQueryForTest('highlightsQuery', `
-        (comment) @comment.block
-        ((comment) @punctuation.definition.comment.begin
-          (#set! adjust.startAndEndAroundFirstMatchOf "^/\\\\*"))
-      `);
-
       buffer.setText('\n/* lorem ipsum dolor sit amet */');
 
-      let languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        jsQuery: `
+          (comment) @comment.block
+          ((comment) @punctuation.definition.comment.begin
+            (#set! adjust.startAndEndAroundFirstMatchOf "^/\\\\*"))
+        `
+      });
 
       expect(
         editor.scopeDescriptorForBufferPosition([1, 0]).getScopesArray()
@@ -2974,56 +2992,23 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
 
     it('ignores a parent\'s scopes if an injection layer sets `coverShallowerScopes`', async () => {
-      jasmine.useRealClock();
-      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      let tempJsRegexConfig = {
-        ...jsRegexConfig,
-        injectionRegex: '^(js-regex-for-test)$'
-      };
-
-      const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
-
-      await regexGrammar.setQueryForTest('highlightsQuery', `
-        (pattern) @string.regexp
-        (optional "?" @keyword.operator.optional)
-      `);
-
-      jsGrammar.addInjectionPoint({
-        type: 'regex_pattern',
-        language(regex) {
-          return 'js-regex-for-test';
-        },
-        content(regex) {
-          return regex;
-        },
-        includeChildren: true,
-        languageScope: null,
-        coverShallowerScopes: true
-      });
-
-      await jsGrammar.setQueryForTest('highlightsQuery', `
-        ((regex) @gadfly
-          (#set! adjust.startAndEndAroundFirstMatchOf "lor\\\\?em"))
-        (regex) @regex-outer
-        (regex_pattern) @regex-inner
-      `);
-
-      atom.grammars.addGrammar(regexGrammar);
-      atom.grammars.addGrammar(jsGrammar);
-
       buffer.setText(dedent`
         let foo = /patt.lor?em.ern/;
       `);
-
-      const languageMode = new WASMTreeSitterLanguageMode({
-        grammar: jsGrammar,
-        buffer,
-        config: atom.config,
-        grammars: atom.grammars
-      });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        includeChildren: true,
+        coverShallowerScopes: true,
+        regexQuery: `
+          (pattern) @string.regexp
+          (optional "?" @keyword.operator.optional)
+        `,
+        jsQuery: `
+          ((regex) @gadfly
+            (#set! adjust.startAndEndAroundFirstMatchOf "lor\\\\?em"))
+          (regex) @regex-outer
+          (regex_pattern) @regex-inner
+        `
+      })
       // Wait for injections.
       await wait(100);
 
@@ -3037,55 +3022,57 @@ describe('WASMTreeSitterLanguageMode', () => {
       expect(scopes.includes('regex-inner')).toBe(false);
     });
 
-    it('arranges scopes in the proper order when scopes from several layers were already open at a given point', async () => {
-      jasmine.useRealClock();
-      const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-      let tempJsRegexConfig = {
-        ...jsRegexConfig,
-        injectionRegex: '^(js-regex-for-test)$'
-      };
-
-      const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
-
-      await regexGrammar.setQueryForTest('highlightsQuery', `
-        (pattern) @string.regexp
-      `);
-
-      jsGrammar.addInjectionPoint({
-        type: 'regex_pattern',
-        language(regex) {
-          return 'js-regex-for-test';
-        },
-        content(regex) {
-          return regex;
-        },
+    it('ignores an empty scope map from an earlier layer without a tree', async () => {
+      const languageMode = await prepareTSLanguageMode(buffer, {
         includeChildren: true,
-        languageScope: null
-      });
+        coverShallowerScopes: true,
+        regexQuery: ` (pattern) @string.regexp `,
+        jsQuery: ` (regex) @regex-outer (regex_pattern) @regex-inner `
+      })
 
-      await jsGrammar.setQueryForTest('highlightsQuery', `
-        ((regex_pattern) @gadfly
-          (#set! adjust.startAndEndAroundFirstMatchOf "lor\\\\?em"))
-        (regex) @regex-outer
-        (regex_pattern) @regex-inner
-      `);
+      buffer.setText('let foo = /pattern/;');
+      // Wait for all trees to be clean, including the injection layer's.
+      await languageMode.atTransactionEnd();
 
-      atom.grammars.addGrammar(regexGrammar);
-      atom.grammars.addGrammar(jsGrammar);
+      const rootLayer = languageMode.rootLanguageLayer;
+      const rootTree = rootLayer.tree;
+      rootLayer.tree = null;
 
+      try {
+        const rootIterator = rootLayer.buildHighlightIterator();
+        const [hasBoundaries, openScopes] = rootIterator.seek(new Point(0, 15), 0);
+        expect(hasBoundaries).toBe(false);
+        expect(openScopes.size).toBe(0);
+
+        let scopes = languageMode
+          .scopeDescriptorForPosition(new Point(0, 15))
+          .getScopesArray();
+        // With the root tree gone, only the injection layer contributes
+        // scopes; this fails if the injection layer was never built.
+        expect(scopes).toContain('string.regexp');
+        expect(scopes).not.toContain('regex-outer');
+      } finally {
+        rootLayer.tree = rootTree;
+      }
+    });
+
+    it('arranges scopes in the proper order when scopes from several layers were already open at a given point', async () => {
       buffer.setText(dedent`
         let foo = /patt.lor?em.ern/;
       `);
 
-      const languageMode = new WASMTreeSitterLanguageMode({
-        grammar: jsGrammar,
-        buffer,
-        config: atom.config,
-        grammars: atom.grammars
+      const languageMode = await prepareTSLanguageMode(buffer, {
+        includeChildren: true,
+        regexQuery: `
+          (pattern) @string.regexp
+        `,
+        jsQuery: `
+          ((regex_pattern) @gadfly
+            (#set! adjust.startAndEndAroundFirstMatchOf "lor\\\\?em"))
+          (regex) @regex-outer
+          (regex_pattern) @regex-inner
+        `
       });
-      buffer.setLanguageMode(languageMode);
-      await languageMode.ready;
       // Wait for injections.
       await wait(100);
 
@@ -3277,18 +3264,14 @@ describe('WASMTreeSitterLanguageMode', () => {
 
     describe('with a selector', () => {
       it('returns the range of the smallest matching node at position', async () => {
-        const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-        await grammar.setQueryForTest('highlightsQuery', `
-          (property_identifier) @variable.other.object.property
-          (template_string) @string.quoted.template
-        `);
-
         buffer.setText('a(`${b({ccc: ddd})} eee`);');
 
-        let languageMode = new WASMTreeSitterLanguageMode({ grammar, buffer });
-        buffer.setLanguageMode(languageMode);
-        await languageMode.ready;
+        const languageMode = await prepareTSLanguageMode(buffer, {
+          jsQuery: `
+            (property_identifier) @variable.other.object.property
+            (template_string) @string.quoted.template
+          `
+        });
 
         expect(
           editor.bufferRangeForScopeAtPosition('.variable.property', [0, 9])
@@ -3356,33 +3339,21 @@ describe('WASMTreeSitterLanguageMode', () => {
       });
 
       it('reports results correctly when scope ranges have been adjusted', async () => {
-        jasmine.useRealClock();
-        const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-        await jsGrammar.setQueryForTest('highlightsQuery', `
-          ((regex) @keyword.operator.optional
-            (#set! adjust.startAndEndAroundFirstMatchOf "\\\\?"))
-          (regex) @string.regexp.js
-          ((comment) @comment.block.js)
-          ((comment) @punctuation.definition.comment.begin.js
-            (#set! adjust.endAfterFirstMatchOf "^/\\\\*"))
-        `);
-
-        atom.grammars.addGrammar(jsGrammar);
-
         buffer.setText(dedent`
           let foo = /patt?ern/;
           /* this is a block comment */
         `);
 
-        const languageMode = new WASMTreeSitterLanguageMode({
-          grammar: jsGrammar,
-          buffer,
-          config: atom.config,
-          grammars: atom.grammars
+        const languageMode = await prepareTSLanguageMode(buffer, {
+          jsQuery: `
+            ((regex) @keyword.operator.optional
+              (#set! adjust.startAndEndAroundFirstMatchOf "\\\\?"))
+            (regex) @string.regexp.js
+            ((comment) @comment.block.js)
+            ((comment) @punctuation.definition.comment.begin.js
+              (#set! adjust.endAfterFirstMatchOf "^/\\\\*"))
+          `
         });
-        buffer.setLanguageMode(languageMode);
-        await languageMode.ready;
 
         let range = languageMode.bufferRangeForScopeAtPosition('keyword', new Point(0, 15));
         expect(range.toString()).toBe(`[(0, 15) - (0, 16)]`);
@@ -3397,54 +3368,21 @@ describe('WASMTreeSitterLanguageMode', () => {
       it('ignores scopes that are not present because they are covered by a deeper layer', async () => {
         // A similar test to the one above, except now we expect not to see the
         // scope because it's being covered by the injection layer.
-        jasmine.useRealClock();
-        const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
-
-        let tempJsRegexConfig = {
-          ...jsRegexConfig,
-          injectionRegex: '^(js-regex-for-test)$'
-        };
-
-        const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
-
-        await regexGrammar.setQueryForTest('highlightsQuery', `
-          (pattern) @string.regexp
-        `);
-
-        jsGrammar.addInjectionPoint({
-          type: 'regex_pattern',
-          language(regex) {
-            return 'js-regex-for-test';
-          },
-          content(regex) {
-            return regex;
-          },
-          languageScope: null,
-          coverShallowerScopes: true
-        });
-
-        await jsGrammar.setQueryForTest('highlightsQuery', `
-          ((regex) @keyword.operator.optional
-            (#set! adjust.startAndEndAroundFirstMatchOf "\\\\?"))
-          ((regex_pattern) @string.regexp.js)
-        `);
-
-        atom.grammars.addGrammar(regexGrammar);
-        atom.grammars.addGrammar(jsGrammar);
-
         buffer.setText(dedent`
           let foo = /patt?ern/;
         `);
 
-        const languageMode = new WASMTreeSitterLanguageMode({
-          grammar: jsGrammar,
-          buffer,
-          config: atom.config,
-          grammars: atom.grammars
+        const languageMode = await prepareTSLanguageMode(buffer, {
+          coverShallowerScopes: true,
+          regexQuery: `
+            (pattern) @string.regexp
+          `,
+          jsQuery: `
+            ((regex) @keyword.operator.optional
+              (#set! adjust.startAndEndAroundFirstMatchOf "\\\\?"))
+            ((regex_pattern) @string.regexp.js)
+          `
         });
-        buffer.setLanguageMode(languageMode);
-
-        await languageMode.ready;
         await wait(100);
 
         let point = new Point(0, 15);
@@ -4982,4 +4920,60 @@ function stringFragmentsOfTemplateString(templateStringNode) {
   return templateStringNode.children.filter(
     c => c.type === 'string_fragment'
   );
+}
+
+// Builds a JavaScript language mode for `buffer` with the given highlights
+// query. If `regexQuery` is given, also registers a regex grammar with that
+// query, plus an injection point for `regex_pattern` nodes configured with
+// `includeChildren` and `coverShallowerScopes`.
+async function prepareTSLanguageMode(buffer, {
+  jsQuery,
+  regexQuery,
+  includeChildren = false,
+  coverShallowerScopes = false
+}) {
+  if (regexQuery === undefined && (includeChildren || coverShallowerScopes)) {
+    throw new Error(`includeChildren and coverShallowerScopes only apply when regexQuery is given`);
+  }
+
+  jasmine.useRealClock();
+  const jsGrammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+  preparedGrammars.push(jsGrammar);
+
+  if (regexQuery !== undefined) {
+    let tempJsRegexConfig = {
+      ...jsRegexConfig,
+      injectionRegex: '^(js-regex-for-test)$'
+    };
+    const regexGrammar = new WASMTreeSitterGrammar(atom.grammars, jsRegexGrammarPath, tempJsRegexConfig);
+    preparedGrammars.push(regexGrammar);
+    await regexGrammar.setQueryForTest('highlightsQuery', regexQuery);
+
+    jsGrammar.addInjectionPoint({
+      type: 'regex_pattern',
+      language(regex) {
+        return 'js-regex-for-test';
+      },
+      content(regex) {
+        return regex;
+      },
+      includeChildren,
+      languageScope: null,
+      coverShallowerScopes
+    });
+    atom.grammars.addGrammar(regexGrammar);
+  }
+
+  await jsGrammar.setQueryForTest('highlightsQuery', jsQuery);
+  atom.grammars.addGrammar(jsGrammar);
+
+  const languageMode = new WASMTreeSitterLanguageMode({
+    grammar: jsGrammar,
+    buffer,
+    config: atom.config,
+    grammars: atom.grammars
+  });
+  buffer.setLanguageMode(languageMode);
+  await languageMode.ready;
+  return languageMode;
 }

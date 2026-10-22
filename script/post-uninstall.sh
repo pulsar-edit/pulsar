@@ -16,7 +16,7 @@ case $executable in
     ;;
 esac
 
-PPM_SYMLINK_PATH='/usr/bin/${ppm_executable}'
+PPM_SYMLINK_PATH="/usr/bin/${ppm_executable}"
 
 if [ -L "$PPM_SYMLINK_PATH" ]
 then

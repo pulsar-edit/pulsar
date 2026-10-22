@@ -1,5 +1,5 @@
-// This is loaded by atom-environment.coffee. See
-// https://atom.io/docs/api/latest/Config for more information about config TODO: Link to Pulsar API site when documented
+// This is loaded by atom-environment.js. See
+// https://docs.pulsar-edit.dev/api/pulsar/latest/ for more information about config
 // schemas.
 const configSchema = {
   core: {
@@ -132,6 +132,12 @@ const configSchema = {
         default: true,
         description:
           "When a window with no open tabs or panes is given the 'Close Tab' command, close that window."
+      },
+      promptOnConflict: {
+        type: 'boolean',
+        title: 'Experimental: Prompt on Conflict',
+        default: false,
+        description: "Prompt before saving a file in a conflicted state, as happens when a file’s contents on disk are changed by another program while edits are pending."
       },
       fileEncoding: {
         description:
@@ -347,15 +353,30 @@ const configSchema = {
       },
       fileSystemWatcher: {
         description:
-          'Choose the underlying implementation used to watch for filesystem changes. Emulating changes will miss any events caused by applications other than Pulsar, but may help prevent crashes or freezes.',
+          'Choose the underlying implementation used to watch for filesystem changes. It’s usually best to let Pulsar handle this, but if you have issues with filesystem events, you can opt into a specific watcher that may work better for your platform.',
         type: 'string',
-        default: 'native',
+        default: 'default',
         enum: [
           {
-            value: 'native',
-            description: 'Native operating system APIs'
+            value: 'default',
+            description: 'Default (let Pulsar decide)'
+          },
+          {
+            value: 'nsfw',
+            description: 'Node Sentinel File Watcher'
+          },
+          {
+            value: 'parcel',
+            description: '@parcel/watcher'
           }
         ]
+      },
+      fileSystemWatcherLogging: {
+        title: 'File System Watcher Logging',
+        description:
+          'Log filesystem watcher activity to the developer console. Useful when troubleshooting missed or unexpected file changes.',
+        type: 'boolean',
+        default: false
       },
       useTreeSitterParsers: {
         type: 'boolean',
@@ -455,6 +476,13 @@ const configSchema = {
         type: ['string', 'null']
       },
       // These can be used as globals or scoped, thus defaults.
+      largeFileThreshold: {
+        description:
+          'Files larger than this size in megabytes will open in large file mode with syntax highlighting disabled. Only applies to TextMate grammars; Tree-sitter grammars handle large files efficiently without this limitation. Set to 0 to always enable syntax highlighting regardless of file size.',
+        type: 'number',
+        default: 2,
+        minimum: 0
+      },
       fontFamily: {
         type: 'string',
         default: 'Menlo, Consolas, DejaVu Sans Mono, monospace',
@@ -650,6 +678,20 @@ const configSchema = {
         default: true,
         description:
           'Add multiple cursors when pressing the Ctrl key (Command key on macOS) and clicking the editor.'
+      },
+      // This setting relates to the behavior of `text-buffer` specifically
+      // (not treating a buffer as modified if its backing file is deleted and
+      // the file was not already considered to be modified at time of
+      // deletion).
+      //
+      // For other types of pane item, nothing else has changed;
+      // `shouldPromptToSave` is the source of truth. That's why this setting
+      // exists in the `editor` namespace rather than the `core` namespace.
+      promptWhenAbandoningDeletedFile: {
+        type: 'boolean',
+        title: 'Experimental: Prompt When Abandoning Deleted File',
+        default: true,
+        description: "Prompt before closing a buffer whose file on disk has been deleted. If disabled, you will still be prompted to save a deleted file on closing if the file had uncommitted changes in the buffer at time of deletion."
       }
     }
   }

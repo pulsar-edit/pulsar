@@ -30,7 +30,6 @@ See [RFC 003](https://github.com/atom/atom/blob/master/docs/rfcs/003-consolidate
 | **deprecation-cop** | [`./deprecation-cop`](./deprecation-cop) | |
 | **dev-live-reload** | [`./dev-live-reload`](./dev-live-reload) | |
 | **encoding-selector** | [`./encoding-selector`](./encoding-selector) | |
-| **exception-reporting** | [`./exception-reporting`](./exception-reporting) | |
 | **find-and-replace** | [`./find-and-replace`](./find-and-replace) |  |
 | **fuzzy-finder** | [`./fuzzy-finder`](./fuzzy-finder) |  |
 | **github** | [`pulsar-edit/github`][github] |  |

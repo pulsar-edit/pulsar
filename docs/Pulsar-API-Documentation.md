@@ -182,8 +182,6 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dd></dd>
 <dt><a href="#path">path</a></dt>
 <dd></dd>
-<dt><a href="#path">path</a></dt>
-<dd></dd>
 <dt><a href="#_">_</a></dt>
 <dd></dd>
 <dt><a href="#path">path</a></dt>
@@ -262,30 +260,26 @@ An instance of this class is always available as the `atom` global.
 **Kind**: global class  
 
 * [AtomEnvironment](#AtomEnvironment)
-    * _instance_
-        * [.clipboard](#AtomEnvironment+clipboard) : [<code>Clipboard</code>](#Clipboard)
-        * [.deserializers](#AtomEnvironment+deserializers) : <code>DeserializerManager</code>
-        * [.views](#AtomEnvironment+views) : <code>ViewRegistry</code>
-        * [.notifications](#AtomEnvironment+notifications) : <code>NotificationManager</code>
-        * [.config](#AtomEnvironment+config) : <code>Config</code>
-        * [.keymaps](#AtomEnvironment+keymaps) : <code>KeymapManager</code>
-        * [.tooltips](#AtomEnvironment+tooltips) : <code>TooltipManager</code>
-        * [.commands](#AtomEnvironment+commands) : <code>CommandRegistry</code>
-        * [.grammars](#AtomEnvironment+grammars) : <code>GrammarRegistry</code>
-        * [.styles](#AtomEnvironment+styles) : <code>StyleManager</code>
-        * [.packages](#AtomEnvironment+packages) : <code>PackageManager</code>
-        * [.themes](#AtomEnvironment+themes) : <code>ThemeManager</code>
-        * [.menu](#AtomEnvironment+menu) : <code>MenuManager</code>
-        * [.contextMenu](#AtomEnvironment+contextMenu) : <code>ContextMenuManager</code>
-        * [.project](#AtomEnvironment+project) : <code>Project</code>
-        * [.textEditors](#AtomEnvironment+textEditors) : <code>TextEditorRegistry</code>
-        * [.workspace](#AtomEnvironment+workspace) : <code>Workspace</code>
-        * [.history](#AtomEnvironment+history) : <code>HistoryManager</code>
-        * _Messaging the User_
-            * [.beep()](#AtomEnvironment+beep)
-    * _static_
-        * _Event Subscription_
-            * [.onDidBeep(callback)](#AtomEnvironment.onDidBeep) ⇒ <code>Disposable</code>
+    * [.clipboard](#AtomEnvironment+clipboard) : [<code>Clipboard</code>](#Clipboard)
+    * [.deserializers](#AtomEnvironment+deserializers) : <code>DeserializerManager</code>
+    * [.views](#AtomEnvironment+views) : <code>ViewRegistry</code>
+    * [.notifications](#AtomEnvironment+notifications) : <code>NotificationManager</code>
+    * [.config](#AtomEnvironment+config) : <code>Config</code>
+    * [.keymaps](#AtomEnvironment+keymaps) : <code>KeymapManager</code>
+    * [.tooltips](#AtomEnvironment+tooltips) : <code>TooltipManager</code>
+    * [.commands](#AtomEnvironment+commands) : <code>CommandRegistry</code>
+    * [.grammars](#AtomEnvironment+grammars) : <code>GrammarRegistry</code>
+    * [.styles](#AtomEnvironment+styles) : <code>StyleManager</code>
+    * [.packages](#AtomEnvironment+packages) : <code>PackageManager</code>
+    * [.themes](#AtomEnvironment+themes) : <code>ThemeManager</code>
+    * [.menu](#AtomEnvironment+menu) : <code>MenuManager</code>
+    * [.contextMenu](#AtomEnvironment+contextMenu) : <code>ContextMenuManager</code>
+    * [.project](#AtomEnvironment+project) : <code>Project</code>
+    * [.textEditors](#AtomEnvironment+textEditors) : <code>TextEditorRegistry</code>
+    * [.workspace](#AtomEnvironment+workspace) : <code>Workspace</code>
+    * [.history](#AtomEnvironment+history) : <code>HistoryManager</code>
+    * _Messaging the User_
+        * [.beep()](#AtomEnvironment+beep)
 
 <a name="AtomEnvironment+clipboard"></a>
 
@@ -367,19 +361,6 @@ Visually and audibly trigger a beep.
 **Kind**: instance method of [<code>AtomEnvironment</code>](#AtomEnvironment)  
 **Category**: Messaging the User  
 **Emits**: <code>event:beep</code>  
-<a name="AtomEnvironment.onDidBeep"></a>
-
-### AtomEnvironment.onDidBeep(callback) ⇒ <code>Disposable</code>
-Invoke the given callback whenever [::beep](::beep) is called.
-
-**Kind**: static method of [<code>AtomEnvironment</code>](#AtomEnvironment)  
-**Returns**: <code>Disposable</code> - on which `.dispose()` can be called to unsubscribe.  
-**Category**: Event Subscription  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| callback | <code>function</code> | Function to be called whenever [::beep](::beep) is called. |
-
 <a name="Clipboard"></a>
 
 ## Clipboard
@@ -605,11 +586,6 @@ This file aims to run some short simple tests against `update.js`. Focusing
 <a name="assert"></a>
 
 ## assert
-**Kind**: global constant  
-**Babel**:   
-<a name="path"></a>
-
-## path
 **Kind**: global constant  
 **Babel**:   
 <a name="path"></a>

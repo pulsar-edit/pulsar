@@ -12,7 +12,7 @@
   "private": true,
   "dependencies": {
     "fs-plus": "^3.0.0",
-    "minimatch": "~3.0.0",
+    "minimatch": "~5.1.8",
     "temp": "~0.9.0",
     "underscore-plus": "^1.0.0"
   },
@@ -31,6 +31,10 @@
       }
     }
   },
+  "backgroundTips": [
+    "You can toggle the Tree View with {atom-workspace>tree-view:toggle}",
+    "You can focus the Tree View with {atom-workspace>tree-view:toggle-focus}"
+  ],
   "providedServices": {
     "tree-view": {
       "description": "A tree-like view of directories and files",

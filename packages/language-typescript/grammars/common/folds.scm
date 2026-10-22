@@ -5,6 +5,8 @@
   (template_string)
   (named_imports)
   (object_type)
+  (interface_body)
+  (enum_body)
 ] @fold
 
 ; When we've got

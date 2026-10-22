@@ -78,15 +78,9 @@ async function modifyMainPackageJson(
 
 // END Monkey-patch.
 
-// eslint-disable-next-line node/no-unpublished-require
 const builder = require('electron-builder');
 
 const ARGS = yargs(hideBin(process.argv))
-  .command('[platform]', 'build for a given platform', () => {
-    return yargs.positional('platform', {
-      describe: 'One of "mac", "linux", or "win".'
-    })
-  })
   .option('target', {
     alias: 't',
     type: 'string',
@@ -98,7 +92,6 @@ const ARGS = yargs(hideBin(process.argv))
     description: 'Builds a "canary" with a separate bundle identifier and app name so it can run alongside ordinary Pulsar.'
   })
   .parse();
-
 
 // The difference in base name matters for the app ID (which helps the OS
 // understand that PulsarNext is not the same as Pulsar), but also for other
@@ -119,7 +112,9 @@ const ICONS = {
   svg: `resources/app-icons/${iconName}.svg`,
   icns: `resources/app-icons/${iconName}.icns`
 };
-
+const WINDOWS_INSTALLER_SIDEBAR = ARGS.next
+  ? 'resources/win/installerSidebar-next.bmp'
+  : 'resources/win/installerSidebar.bmp';
 
 let options = {
   appId: `dev.pulsar-edit.${baseName}`,
@@ -135,6 +130,7 @@ let options = {
     "src/**/*",
     "static/**/*",
     "vendor/**/*",
+    "locales/*",
     "node_modules/**/*",
 
     // Core Repo Test Inclusions
@@ -180,7 +176,7 @@ let options = {
     "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
     "!**/node_modules/babel-core/lib/transformation/transforers/spec", // Ignore babel-core spec
     "!**/{oniguruma,dev-live-reload,deprecation-cop,one-dark-ui,incompatible-packages,git-diff,line-ending-selector}/spec",
-    "!**/{link,grammar-selector,json-schema-traverse,exception-reporting,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
+    "!**/{link,grammar-selector,json-schema-traverse,one-light-ui,autoflow,about,go-to-line,sylvester,apparatus}/spec",
     "!**/{archive-view,autocomplete-plus,autocomplete-atom-api,autocomplete-css,autosave}/spec",
 
     // Other Exclusions
@@ -189,8 +185,8 @@ let options = {
     "!**/node_modules/.bin",
     "!**/node_modules/native-mate",
     // node_modules of the fuzzy-native package are only required for building it
-    "!node_modules/fuzzy-native/node_modules",
-    "!**/node_modules/spellchecker/vendor/hunspell/.*",
+    "!node_modules/@pulsar-edit/fuzzy-native/node_modules",
+    "!**/node_modules/@pulsar-edit/spellchecker/vendor/hunspell/.*",
     "!**/git-utils/deps",
     "!**/oniguruma/deps",
     "!**/less/dist",
@@ -202,6 +198,60 @@ let options = {
     // "!node_modules/loophole", // Note: We do need these packages. Because our PegJS files _aren't_ all pre-compiled.
     // "!node_modules/pegjs",    // Note: if these files are excluded, 'snippets' package breaks.
     // "!node_modules/.bin/pegjs", // Note: https://github.com/pulsar-edit/pulsar/pull/206
+
+    // Exclusions borrowed from `node-prune`
+    // - Files
+    "!**/{Jenkinsfile}",
+    "!**/{Gulpfile.js}",
+    "!**/{Gruntfile.js}",
+    "!**/{gulpfile.js}",
+    "!**/{.tern-project}",
+    "!**/{.eslintrc.js}",
+    "!**/{.eslintrc.json}",
+    "!**/{.eslintrc.yml}",
+    "!**/{.stylelintrc}",
+    "!**/{stylelint.config.js}",
+    "!**/{stylelintrc.json}",
+    "!**/{stylelintrc.yaml}",
+    "!**/{stylelintrc.yml}",
+    "!**/{stylelintrc.js}",
+    "!**/{.htmllintrc}",
+    "!**/{htmllint.js}",
+    "!**/{.npmrc}",
+    "!**/{.documentup.json}",
+    "!**/{.gitlab-ci.yml}",
+    "!**/{.coveralls.yml}",
+    "!**/{CHANGES}",
+    "!**/{changelog}",
+    "!**/{.yarnclean}",
+    "!**/{_config.yml}",
+    "!**/{.babelrc}",
+    "!**/{.yo-rc.json}",
+    "!**/{jest.config.js}",
+    "!**/{karma.conf.js}",
+    "!**/{wallaby.js}",
+    "!**/{wallaby.conf.js}",
+    "!**/{.prettierrc}",
+    "!**/{.prettierrc.yml}",
+    "!**/{.prettierrc.toml}",
+    "!**/{.prettierrc.js}",
+    "!**/{.prettierrc.json}",
+    "!**/{.prettier.config.js}",
+    "!**/{.appveyor.yml}",
+    "!**/{tsconfig.json}",
+    "!**/{tslint.json}",
+    // - Directories
+    "!**/docs",
+    "!**/doc",
+    "!**/website",
+    "!**/images",
+    "!**/example",
+    "!**/examples",
+    "!**/coverage",
+    "!**/.circleci",
+    "!**/.github",
+    // - Extensions
+    "!**/*.{markdown,md,mkd,ts,jst,tgz,swp}",
   ],
 
   extraResources: [
@@ -234,9 +284,9 @@ let options = {
   },
   rpm: {
     afterInstall: 'script/post-install.sh',
-    afterRemove: 'script/post-uninstall.sh',
+    afterRemove: 'script/post-uninstall-rpm.sh',
     compression: 'xz',
-    fpm: ['--rpm-rpmbuild-define=_build_id_links none']
+    fpm: ['--rpm-digest', 'sha256', '--rpm-rpmbuild-define=_build_id_links none']
   },
 
   linux: {
@@ -297,10 +347,17 @@ let options = {
     extraResources: [
       { from: 'ppm/bin/ppm', to: `app/ppm/bin/${ppmBaseName}` },
       { from: 'ppm/bin/node', to: `app/ppm/bin/node` }
-    ]
+    ],
+    target: [
+      { target: 'dmg' },
+      { target: 'zip' }
+    ],
   },
 
-  dmg: { sign: false },
+  dmg: {
+    sign: false,
+    writeUpdateInfo: false
+  },
 
   // Earliest supported version of Windows is Windows 10. Electron 23 dropped
   // support for 7/8/8.1.
@@ -310,7 +367,7 @@ let options = {
       { from: ICONS.ico, to: 'pulsar.ico' },
       { from: 'resources/win/pulsar.cmd', to: `${baseName}.cmd` },
       { from: 'resources/win/pulsar.js', to: `${baseName}.js` },
-      { from: 'resources/win/modifyWindowsPath.ps1', to: 'modifyWindowsPath.ps1' },
+      { from: 'resources/win/NSIS_Licenses.txt', to: 'NSIS_Licenses.txt' },
       // Copy `ppm.cmd` to the `ppm/bin` directory, possibly renaming it
       // `ppm-next.cmd` depending on release channel.
       { from: 'ppm/bin/ppm.cmd', to: `app/ppm/bin/${ppmBaseName}.cmd` },
@@ -329,7 +386,8 @@ let options = {
     runAfterFinish: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
-    guid: "0949b555-c22c-56b7-873a-a960bdefa81f", // TODO
+    installerSidebar: WINDOWS_INSTALLER_SIDEBAR,
+    guid: "0949b555-c22c-56b7-873a-a960bdefa81f",
     // The GUID is generated from Electron-Builder based on our AppID.
     // Hardcoding it here means it will always be used as generated from the
     // AppID 'dev.pulsar-edit.pulsar'. If this value ever changes, a PR to
@@ -338,11 +396,9 @@ let options = {
     // We delete this value when building PulsarNext so that it’s regenerated
     // based on the app ID. Otherwise the OS might consider it equivalent to
     // stable Pulsar in some ways.
-    //
-    // TODO: On first look, this installer script seems not to need any
-    // updating for PulsarNext, but we should make sure.
     include: "resources/win/installer.nsh",
-    warningsAsErrors: false
+    warningsAsErrors: false,
+    differentialPackage: false
   },
 
   extraMetadata: {},
@@ -352,7 +408,7 @@ let options = {
     "node_modules/github/bin/*",
     "node_modules/github/lib/*",       // Resolves error in console
     "**/node_modules/dugite/git/**",   // Include dugite postInstall output (matching glob used for Atom)
-    "**/node_modules/spellchecker/**", // Matching Atom Glob
+    "**/node_modules/@pulsar-edit/spellchecker/**", // Matching Atom Glob
   ]
 };
 
@@ -362,10 +418,25 @@ if (ARGS.next) {
   delete options.nsis.guid;
 }
 
+const PLATFORMS = {
+  darwin: 'mac',
+  win32: 'win',
+  linux: 'linux'
+};
+
 function whatToBuild() {
-  if (!ARGS.target) return options;
-  if (!(ARGS.platform in options)) return options;
-  options[ARGS.platform] = options[ARGS.platform].filter(e => e.target === ARGS.target);
+  let platform = PLATFORMS[process.platform];
+  if (!platform) {
+    throw new Error(`Unrecognized platform: ${platform}`);
+  }
+  if (ARGS.target) {
+    let targets = ARGS.target.split(',');
+    // Replace the `target` array with the targets provided by the user. It's
+    // up to the user to ensure these are valid targets for the given platform.
+    options[platform].target = targets.map(t => {
+      return { target: t }
+    });
+  }
   return options;
 }
 

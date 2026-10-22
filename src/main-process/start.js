@@ -42,6 +42,21 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
   args.resourcePath = normalizeDriveLetterName(resourcePath);
   args.devResourcePath = normalizeDriveLetterName(devResourcePath);
 
+  // Disable Chromium's Windows-only feature for native window occlusion
+  // tracking. It stops compositing once it believes a window is covered; this
+  // in turn slows or stops `requestAnimationFrame` callbacks. Defensible for a
+  // web site, but not the right call for a desktop application.
+  //
+  // Ideally this also helps us run specs a bit faster in CI on Windows! It
+  // hasn't yet, but we hold out hope.
+  //
+  // VS Code also disables this flag unconditionally.
+  const featuresToDisable = [
+    'CalculateNativeWinOcclusion',
+    app.commandLine.getSwitchValue('disable-features')
+  ].filter(Boolean).join(',');
+  app.commandLine.appendSwitch('disable-features', featuresToDisable);
+
   const releaseChannel = getReleaseChannel(app.getVersion());
   process.env.ATOM_CHANNEL ??= releaseChannel;
   atomPaths.setAtomHome(app.getPath('home'));
@@ -105,6 +120,30 @@ module.exports = function start(resourcePath, devResourcePath, startTime) {
 
   // NB: This prevents Win10 from showing dupe items in the taskbar.
   app.setAppUserModelId(appUserModelId);
+
+  // Pulsar uses a custom mechanism for ensuring a single instance, so we don't
+  // need `app.requestSingleInstanceLock()`. But we call this method on Windows
+  // anyway in order to benefit from a side effect.
+  //
+  // Windows doesn't like it when applications try to move themselves to the
+  // front unilaterally. There are certain escape hatches, though; one process
+  // can give another process specific permission for the latter process to
+  // foreground itself while the former process is active.
+  //
+  // This happens automatically as part of the `requestSingleInstanceLock`
+  // machinery. Hence we ask for a single-instance lock on startup so that the
+  // _second_ instance, when the request is denied, will trigger the side
+  // effect that allows the original instance to foreground itself.
+  //
+  // The effects are not seen here, but rather in `atom-application.js`, where
+  // calls to `app.focus` will actually work instead of having no effect.
+  if (process.platform === 'win32') {
+    app.requestSingleInstanceLock();
+    // Add an explicit no-op listener here to ensure that this channel isn't
+    // used for communication — we already have a way for the second instance
+    // to communicate with the first.
+    app.on('second-instance', () => {});
+  }
 
   function addPathToOpen(event, pathToOpen) {
     event.preventDefault();

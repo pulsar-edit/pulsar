@@ -40,13 +40,13 @@
   (#set! symbol.prepend "······ "))
 
 ((setext_heading
-  heading_content: (_) @name) @definition.heading
-  (setext_h1_underline)
+  heading_content: (_) @name
+  (setext_h1_underline)) @definition.heading
   (#set! symbol.strip "(^\\s*|\\s*$)")
   (#set! symbol.prepend "· "))
 
 ((setext_heading
-  heading_content: (_) @name) @definition.heading
-  (setext_h2_underline)
+  heading_content: (_) @name
+  (setext_h2_underline)) @definition.heading
   (#set! symbol.strip "(^\\s*|\\s*$)")
   (#set! symbol.prepend "·· "))

@@ -4,16 +4,28 @@ const ipcHelpers = require('./ipc-helpers');
 const { Emitter, Disposable } = require('event-kit');
 const getWindowLoadSettings = require('./get-window-load-settings');
 
+// Reconstructs a failed shell operation's error on this side of the IPC
+// boundary. An `Error` sent over IPC keeps its `message` but loses custom
+// properties like `code`, so the main process sends `code` separately.
+function rejectShellFailure(error, code) {
+  if (code !== undefined) error.code = code;
+  return Promise.reject(error);
+}
+
 module.exports = class ApplicationDelegate {
   constructor() {
     this.pendingSettingsUpdateCount = 0;
     this._ipcMessageEmitter = null;
   }
 
+  async getStateKey(projectPaths, options) {
+    return await ipcHelpers.call('get-state-key', projectPaths, options);
+  }
+
   ipcMessageEmitter() {
     if (!this._ipcMessageEmitter) {
       this._ipcMessageEmitter = new Emitter();
-      ipcRenderer.on('message', (event, message, detail) => {
+      ipcRenderer.on('message', (_, message, detail) => {
         this._ipcMessageEmitter.emit(message, detail);
       });
     }
@@ -34,7 +46,7 @@ module.exports = class ApplicationDelegate {
 
   pickFolder(callback) {
     const responseChannel = 'atom-pick-folder-response';
-    ipcRenderer.on(responseChannel, function (event, path) {
+    ipcRenderer.on(responseChannel, function (_, path) {
       ipcRenderer.removeAllListeners(responseChannel);
       return callback(path);
     });
@@ -271,7 +283,7 @@ module.exports = class ApplicationDelegate {
     }
   }
 
-  showMessageDialog(params) {}
+  showMessageDialog(_params) {}
 
   showSaveDialog(options, callback) {
     if (typeof callback === 'function') {
@@ -287,6 +299,7 @@ module.exports = class ApplicationDelegate {
   }
 
   playBeepSound() {
+    // TODO: Delegate to main.
     return shell.beep();
   }
 
@@ -295,7 +308,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onApplicationMenuCommand(handler) {
-    const outerCallback = (event, ...args) => handler(...args);
+    const outerCallback = (_event, ...args) => handler(...args);
 
     ipcRenderer.on('command', outerCallback);
     return new Disposable(() =>
@@ -304,7 +317,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onContextMenuCommand(handler) {
-    const outerCallback = (event, ...args) => handler(...args);
+    const outerCallback = (_event, ...args) => handler(...args);
 
     ipcRenderer.on('context-command', outerCallback);
     return new Disposable(() =>
@@ -313,7 +326,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onURIMessage(handler) {
-    const outerCallback = (event, ...args) => handler(...args);
+    const outerCallback = (_event, ...args) => handler(...args);
 
     ipcRenderer.on('uri-message', outerCallback);
     return new Disposable(() =>
@@ -322,7 +335,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidRequestUnload(callback) {
-    const outerCallback = async (event, message) => {
+    const outerCallback = async (event, _message) => {
       const shouldUnload = await callback(event);
       ipcRenderer.send('did-prepare-to-unload', shouldUnload);
     };
@@ -334,7 +347,7 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidChangeHistoryManager(callback) {
-    const outerCallback = (event, message) => callback(event);
+    const outerCallback = (event, _message) => callback(event);
 
     ipcRenderer.on('did-change-history-manager', outerCallback);
     return new Disposable(() =>
@@ -347,7 +360,7 @@ module.exports = class ApplicationDelegate {
   }
 
   openExternal(url) {
-    return shell.openExternal(url);
+    return this.openExternalDirect(url);
   }
 
   emitWillSavePath(path) {
@@ -363,12 +376,64 @@ module.exports = class ApplicationDelegate {
   }
 
   onDidResolveProxy(callback) {
-    const outerCallback = (event, requestId, proxy) =>
+    const outerCallback = (_event, requestId, proxy) =>
       callback(requestId, proxy);
 
     ipcRenderer.on('did-resolve-proxy', outerCallback);
     return new Disposable(() =>
       ipcRenderer.removeListener('did-resolve-proxy', outerCallback)
     );
+  }
+
+  // We already have an `openExternal` method that calls `shell.openExternal`
+  // directly from the renderer. This version proxies to the main process to
+  // call the same method.
+  //
+  // We'll leave `openExternal` in place above because some existing specs
+  // rely on being able to mock it.
+  openExternalDirect(url) {
+    return ipcRenderer.invoke('openExternal', url).then(({ outcome, error, code, result }) => {
+      if (outcome === 'success') {
+        return result;
+      } else if (outcome === 'failure') {
+        return rejectShellFailure(error, code);
+      }
+    });
+  }
+
+  openPath(filePath) {
+    return ipcRenderer.invoke('openPath', filePath).then(({ outcome, error, code, result }) => {
+      if (outcome === 'success') {
+        return result;
+      } else if (outcome === 'failure') {
+        return rejectShellFailure(error, code);
+      }
+    });
+  }
+
+  trashItem(filePath) {
+    // A simple wrapper around `shell.trashItem`, since the main process is the
+    // most reliable place from which to call this method.
+    return ipcRenderer.invoke('trashItem', filePath).then(({ outcome, error, code, result }) => {
+      if (outcome === 'success') {
+        // `result` is undefined, but we might as well guard against an
+        // Electron API change in the future.
+        return result;
+      } else if (outcome === 'failure') {
+        return rejectShellFailure(error, code);
+      }
+    });
+  }
+
+  showItemInFolder(filePath) {
+    // A simple wrapper around `shell.showItemInFolder`, which currently can
+    // only be called from the main process.
+    return ipcRenderer.invoke('showItemInFolder', filePath).then(({ outcome, error, code, result }) => {
+      if (outcome === 'success') {
+        return result;
+      } else if (outcome === 'failure') {
+        return rejectShellFailure(error, code);
+      }
+    });
   }
 };

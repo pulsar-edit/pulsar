@@ -327,6 +327,9 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
     'editor:select-word': function() {
       return this.selectWordsContainingCursors();
     },
+    'editor:select-subword': function() {
+      return this.selectSubwordsContainingCursors();
+    },
     'editor:consolidate-selections': function(event) {
       if (!this.consolidateSelections()) {
         return event.abortKeyBinding();
@@ -448,6 +451,11 @@ module.exports = function({commandRegistry, commandInstaller, config, notificati
     },
     'core:paste': function() {
       return this.pasteText();
+    },
+    'editor:paste-without-reindenting': function() {
+      return this.pasteText({
+        autoIndent: false
+      });
     },
     'editor:paste-without-reformatting': function() {
       return this.pasteText({

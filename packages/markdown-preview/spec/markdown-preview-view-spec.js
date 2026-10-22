@@ -10,6 +10,7 @@ const temp = require('temp').track()
 const url = require('url')
 const { TextEditor } = require('atom')
 const MarkdownPreviewView = require('../lib/markdown-preview-view')
+const renderer = require('../lib/renderer')
 const TextMateLanguageMode = new TextEditor().getBuffer().getLanguageMode()
   .constructor
 const { conditionPromise } = require('./async-spec-helpers')
@@ -22,6 +23,18 @@ describe('MarkdownPreviewView', function () {
     jasmine.useRealClock()
 
     jasmine.unspy(TextMateLanguageMode.prototype, 'tokenizeInBackground')
+
+    // Activate packages before creating the preview. The preview starts
+    // rendering as soon as it's constructed, and `markdown-preview`'s config
+    // schema doesn't exist until the package is loaded; a render that starts
+    // too early would see `undefined` for every setting — including
+    // `useOriginalParser`, which decides which parser is used.
+    await atom.packages.activatePackage('language-ruby')
+    await atom.packages.activatePackage('language-javascript')
+    await atom.packages.activatePackage('markdown-preview')
+
+    // Specs never go through startup, so the preview would otherwise wait
+    // forever for initial packages to activate before rendering.
     spyOn(atom.packages, 'hasActivatedInitialPackages').andReturn(true)
 
     const filePath = atom.project
@@ -30,10 +43,6 @@ describe('MarkdownPreviewView', function () {
 
     preview = new MarkdownPreviewView({ filePath })
     jasmine.attachToDOM(preview.element)
-
-    await atom.packages.activatePackage('language-ruby')
-    await atom.packages.activatePackage('language-javascript')
-    await atom.packages.activatePackage('markdown-preview')
   })
 
   afterEach(() => preview.destroy())
@@ -61,6 +70,136 @@ describe('MarkdownPreviewView', function () {
 
       await preview.renderMarkdown()
       expect(preview.element.scrollTop).toBe(24)
+    })
+  })
+
+  describe('in-page anchor links', function () {
+    it('uses GitHub-compatible heading ids with the original parser', async function () {
+      atom.config.set('markdown-preview.useOriginalParser', true)
+      const html = await renderer.toHTML(
+        [
+          '[Launch](#-launch)',
+          '',
+          '## 🚀 Launch',
+          '',
+          '[Title](#title)',
+          '',
+          '## Title',
+          '',
+          '[HTML](#hello-world)',
+          '',
+          '## Hello<span>world</span>',
+          '',
+          '[Café](#caf%C3%A9)',
+          '',
+          '## Caf&eacute;'
+        ].join('\n')
+      )
+      preview.element.innerHTML = html
+
+      const launchLink = preview.element.querySelector('a[href="#-launch"]')
+      const launchTarget = preview.element.querySelector(
+        '#user-content--launch'
+      )
+      const titleTarget = preview.element.querySelector('#user-content-title')
+      const htmlTarget = preview.element.querySelector(
+        '#user-content-hello-world'
+      )
+      const entityLink = preview.element.querySelector(
+        'a[href="#caf%C3%A9"]'
+      )
+      const entityTarget = preview.element.querySelector('#user-content-café')
+      spyOn(launchTarget, 'scrollIntoView')
+      spyOn(entityTarget, 'scrollIntoView')
+
+      launchLink.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true })
+      )
+      entityLink.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true })
+      )
+
+      expect(launchTarget.scrollIntoView).toHaveBeenCalled()
+      expect(entityTarget.scrollIntoView).toHaveBeenCalled()
+      expect(titleTarget).not.toBeNull()
+      expect(htmlTarget).not.toBeNull()
+    })
+
+    it('resets original parser heading ids between renders', async function () {
+      atom.config.set('markdown-preview.useOriginalParser', true)
+      const markdown = ['## Repeated', '', '## Repeated'].join('\n')
+
+      const firstRender = await renderer.toHTML(markdown)
+      const secondRender = await renderer.toHTML(markdown)
+
+      for (const html of [firstRender, secondRender]) {
+        expect(html).toContain('id="user-content-repeated"')
+        expect(html).toContain('id="user-content-repeated-1"')
+        expect(html).not.toContain('id="user-content-repeated-2"')
+      }
+    })
+
+    it('prefers the generated prefixed id over a colliding raw id', function () {
+      preview.element.innerHTML = [
+        '<a href="#user-content-foo">User content foo</a>',
+        '<h2 id="user-content-foo">Foo</h2>',
+        '<h2 id="user-content-user-content-foo">User content foo</h2>'
+      ].join('')
+      const anchor = preview.element.querySelector(
+        'a[href="#user-content-foo"]'
+      )
+      const rawTarget = preview.element.querySelector('#user-content-foo')
+      const prefixedTarget = preview.element.querySelector(
+        '#user-content-user-content-foo'
+      )
+      spyOn(rawTarget, 'scrollIntoView')
+      spyOn(prefixedTarget, 'scrollIntoView')
+
+      anchor.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true })
+      )
+
+      expect(prefixedTarget.scrollIntoView).toHaveBeenCalled()
+      expect(rawTarget.scrollIntoView).not.toHaveBeenCalled()
+    })
+
+    it('scrolls to the matching heading when a fragment link is clicked', function () {
+      preview.element.innerHTML =
+        '<p><a href="#install">Install</a></p><h2 id="install">Install</h2>'
+      const anchor = preview.element.querySelector('a[href="#install"]')
+      const target = preview.element.querySelector('#install')
+      spyOn(target, 'scrollIntoView')
+
+      anchor.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true })
+      )
+
+      expect(target.scrollIntoView).toHaveBeenCalled()
+    })
+
+    it('scrolls to a safely prefixed GitHub heading', function () {
+      preview.element.innerHTML =
+        '<p><a href="#title">Title</a></p><h2 id="user-content-title">Title</h2>'
+      const anchor = preview.element.querySelector('a[href="#title"]')
+      const target = preview.element.querySelector('#user-content-title')
+      spyOn(target, 'scrollIntoView')
+
+      anchor.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true })
+      )
+
+      expect(target.scrollIntoView).toHaveBeenCalled()
+    })
+
+    it('does nothing when the fragment has no matching target', function () {
+      preview.element.innerHTML = '<p><a href="#missing">Missing</a></p>'
+      const anchor = preview.element.querySelector('a[href="#missing"]')
+
+      expect(() =>
+        anchor.dispatchEvent(
+          new MouseEvent('click', { bubbles: true, cancelable: true })
+        )
+      ).not.toThrow()
     })
   })
 
@@ -284,6 +423,52 @@ end\
     })
   })
 
+  describe('with the built-in Markdown parser', function () {
+    // The specs above use the original parser, since it's the default. These
+    // exercise the `atom.ui.markdown` code path instead. (Unlike the original
+    // parser, it resolves relative image paths only when the file exists.)
+    beforeEach(async () => {
+      atom.config.set('markdown-preview.useOriginalParser', false)
+      await preview.renderMarkdown()
+    })
+
+    it('renders the document', function () {
+      expect(preview.element.textContent).not.toMatch('Previewing Markdown Failed')
+      expect(preview.element.querySelector('p')).not.toBeNull()
+    })
+
+    it('resolves images that exist and leaves the rest alone', async () => {
+      preview.destroy()
+
+      const dir = temp.mkdirSync('atom')
+      const filePath = path.join(dir, 'images.md')
+      const imagePath = path.join(dir, 'exists.png')
+      fs.writeFileSync(imagePath, '')
+      fs.writeFileSync(
+        filePath,
+        [
+          '![Relative](exists.png)',
+          '![DotRelative](./exists.png)',
+          '![Missing](missing.png)',
+          '![MissingAbsolute](/no/such/dir/missing.png)',
+          '![Web](http://github.com/image3.png)'
+        ].join('\n\n')
+      )
+      preview = new MarkdownPreviewView({ filePath })
+      jasmine.attachToDOM(preview.element)
+      await preview.renderMarkdown()
+
+      const srcFor = alt =>
+        preview.element.querySelector(`img[alt=${alt}]`).getAttribute('src')
+
+      expect(srcFor('Relative')).toBe(imagePath)
+      expect(srcFor('DotRelative')).toBe(imagePath)
+      expect(srcFor('Missing')).toBe('missing.png')
+      expect(srcFor('MissingAbsolute')).toBe('/no/such/dir/missing.png')
+      expect(srcFor('Web')).toBe('http://github.com/image3.png')
+    })
+  })
+
   describe('gfm newlines', function () {
     describe('when gfm newlines are not enabled', function () {
       it('creates a single paragraph with <br>', async () => {
@@ -333,7 +518,7 @@ end\
     it('adds the `has-selection` class to the preview depending on if there is a text selection', async () => {
       jasmine.useRealClock();
       expect(preview.element.classList.contains('has-selection')).toBe(false)
-      await conditionPromise(() => document.querySelector('atom-text-editor'));
+      await preview.renderMarkdown()
       const selection = window.getSelection()
       selection.removeAllRanges()
       selection.selectAllChildren(document.querySelector('atom-text-editor'))

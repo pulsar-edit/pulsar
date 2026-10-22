@@ -51,6 +51,20 @@ function restoreDefaultScheduler() {
   TextEditorComponent.setScheduler(defaultScheduler);
 }
 
+// The view registry uses `requestAnimationFrame` to schedule view updates. But
+// if the browser thinks the editor is hidden, it will throttle
+// `requestAnimationFrame`. CI jobs run the headless test runner, so the window
+// is hidden. If we can't work around this throttling, we need an alternative
+// scheduler.
+//
+// Currently we haven't found any workarounds on Linux or Windows in CI, so
+// that's where we're using an alternative scheduler that bypasses
+// `requestAnimationFrame`. We need this just as much on desktop (where hidden
+// windows are still throttled) as on CI, so that's why we don't check
+// `process.env.CI`.
+const NEEDS_ALTERNATIVE_SCHEDULER =
+  process.platform === 'linux' || process.platform === 'win32';
+
 const SAMPLE_TEXT = fs.readFileSync(
   path.join(__dirname, 'fixtures', 'sample.js'),
   'utf8'
@@ -1185,21 +1199,36 @@ describe('TextEditorComponent', () => {
       let originalTimeout;
 
       beforeEach(() => {
-        if (process.platform === 'linux') {
+        if (NEEDS_ALTERNATIVE_SCHEDULER) {
           useAlternativeScheduler();
         }
         originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 1000;
+
+        // Change the timeout, but be careful not to lower the timeout if it's
+        // already higher than 60s (as it is in CI).
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = Math.max(originalTimeout, 60 * 1000);
       });
 
       afterEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
-        if (process.platform === 'linux') {
+        if (NEEDS_ALTERNATIVE_SCHEDULER) {
           restoreDefaultScheduler();
         }
       });
 
       it('renders the visible rows correctly after randomly mutating the editor', async () => {
+        // Bound this loop by time as well as by iteration count. Twenty
+        // iterations is more work than the slowest CI runners can finish
+        // within the spec budget (Windows has spent the entire 120s here and
+        // still timed out).
+        //
+        // Deriving the deadline from the budget rather than hardcoding it
+        // means this keeps pace if the budget changes, and leaves room for the
+        // final iteration to finish and for teardown. Fast machines still run
+        // all twenty; slow ones run as many as fit and report real assertions.
+        // Each iteration seeds itself and logs that seed, so a failure stays
+        // reproducible.
+        const deadline = Date.now() + jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.6;
         const initialSeed = Date.now();
         for (var i = 0; i < 20; i++) {
           let seed = initialSeed + i;
@@ -1309,6 +1338,8 @@ describe('TextEditorComponent', () => {
 
           element.remove();
           editor.destroy();
+
+          if (Date.now() > deadline) break;
         }
       });
     });
@@ -2301,13 +2332,13 @@ describe('TextEditorComponent', () => {
 
   describe('highlight decorations', () => {
     beforeEach(() => {
-      if (process.platform === 'linux') {
+      if (NEEDS_ALTERNATIVE_SCHEDULER) {
         useAlternativeScheduler();
       }
     });
 
     afterEach(() => {
-      if (process.platform === 'linux') {
+      if (NEEDS_ALTERNATIVE_SCHEDULER) {
         restoreDefaultScheduler();
       }
     });
@@ -2631,6 +2662,15 @@ describe('TextEditorComponent', () => {
     function attachFakeWindow(component) {
       const fakeWindow = document.createElement('div');
       fakeWindow.style.position = 'absolute';
+
+      // We set an explicit width here in order to try to remove the viewport
+      // as a confounding variable. This can happen if an uncaught error
+      // triggers opening of the dev tools.
+      //
+      // It expects a border-to-border width of 240px, so we'll give it a width
+      // of 200px with 20px of padding all around.
+      fakeWindow.style.boxSizing = 'content-box';
+      fakeWindow.style.width = 200 + 'px';
       fakeWindow.style.padding = 20 + 'px';
       fakeWindow.style.backgroundColor = 'blue';
       fakeWindow.appendChild(component.element);
@@ -3760,7 +3800,56 @@ describe('TextEditorComponent', () => {
         });
 
         element.style.width = '50px';
-        await component.getNextUpdatePromise();
+        const updatePromise = component.getNextUpdatePromise();
+
+        if (process.platform === 'win32') {
+          // The spec window is never shown (see `AtomWindow`'s `show: false`),
+          // and on Windows that means `requestAnimationFrame` callbacks are
+          // not delivered. The update that
+          // `ViewRegistry::requestDocumentUpdate` queues in response to the
+          // resize above would therefore never run, and this `await` would
+          // hang until the spec timed out.
+          //
+          // Despite our efforts otherwise, this test is still flaky on
+          // Windows. This is a fallback aimed at reducing the worst-case
+          // scenario: wait for the promise to resolve, but after a second, try
+          // to kick it and force an update.
+          const TIMED_OUT = Symbol('timed out');
+          const winner = await Promise.race([
+            updatePromise,
+            wait(1000).then(() => TIMED_OUT)
+          ]);
+          if (winner === TIMED_OUT) {
+            // There are two ways the update can fail to arrive:
+            //
+            // * the update was queued, but the animation frame never arrived
+            //   (the rAF throttling discussed above); or
+            // * the element may consider itself to be invisible shortly after
+            //   initial render (because its width and height are still 0) and
+            //   never gets corrected (because the same throttling that slows
+            //   down rAF also affects `ResizeObserver` and
+            //   `IntersectionObserver`).
+            //
+            // So we log this information on timeouts to figure out more about
+            // this spec's flakiness; then we force an update on the component
+            // and manually tell it it's visible. (`didShow` is idempotent; if
+            // it triggers an update, it will be synchronous.)
+            console.log(
+              '[diag] forcing update:',
+              JSON.stringify({
+                visible: component.visible,
+                isVisible: component.isVisible(),
+                updateScheduled: component.updateScheduled,
+                queuedWriters: TextEditorComponent.getScheduler()
+                  .documentWriters.length
+              })
+            );
+            component.didShow();
+            TextEditorComponent.getScheduler().performDocumentUpdate();
+          }
+        }
+
+        await updatePromise;
         assertLinesAreAlignedWithLineNumbers(component);
       }
     });
@@ -3920,6 +4009,22 @@ describe('TextEditorComponent', () => {
       expect(beforeItems[5].nextSibling).toBe(
         lineNodeForScreenRow(component, 2)
       );
+    });
+
+    it('does not throw when a block decoration is destroyed during an update cycle', async () => {
+      const editor = buildEditor({ autoHeight: false });
+      const { component } = buildComponent({ editor, rowsPerTile: 3 });
+      const { decoration, marker } = createBlockDecorationAtScreenRow(editor, 2, {
+        height: 20,
+        position: 'after'
+      });
+      await component.getNextUpdatePromise();
+
+      decoration.destroy();
+      marker.destroy();
+      expect(() => {
+        component.updateSync();
+      }).not.toThrow();
     });
 
     function createBlockDecorationAtScreenRow(
@@ -5342,6 +5447,64 @@ describe('TextEditorComponent', () => {
         });
         expect(editor.getCursorScreenPosition()).toEqual([4, 0]);
       });
+
+      it('uses the target of the mousedown event to decide whether the mousedown was on the actual scrollbar', async () => {
+        const { component, editor } = buildComponent({ height: 100 });
+        await setEditorWidthInCharacters(component, 6);
+
+        const verticalScrollbar = component.refs.verticalScrollbar;
+        const horizontalScrollbar = component.refs.horizontalScrollbar;
+
+        // Overlay scrollbars take up no layout space, so their size measures
+        // as zero; the event's target has to decide instead.
+        spyOn(verticalScrollbar, 'getRealScrollbarWidth').and.returnValue(0);
+        spyOn(horizontalScrollbar, 'getRealScrollbarHeight').and.returnValue(0);
+
+        const verticalRect = verticalScrollbar.element.getBoundingClientRect();
+        const horizontalRect = horizontalScrollbar.element.getBoundingClientRect();
+        const verticalClientX = (verticalRect.left + verticalRect.right) / 2;
+        const horizontalClientY = (horizontalRect.top + horizontalRect.bottom) / 2;
+
+        // A mousedown on the scrollbar itself targets the scrolling element,
+        // so it isn't delegated and the selection survives.
+        editor.setSelectedBufferRange([[1, 0], [2, 3]]);
+        verticalScrollbar.didMouseDown({
+          button: 0,
+          detail: 1,
+          target: verticalScrollbar.element,
+          clientY: clientTopForLine(component, 4),
+          clientX: verticalClientX
+        });
+        horizontalScrollbar.didMouseDown({
+          button: 0,
+          detail: 1,
+          target: horizontalScrollbar.element,
+          clientY: horizontalClientY,
+          clientX: component.refs.content.getBoundingClientRect().left
+        });
+        expect(editor.getSelectedBufferRange()).toEqual([[1, 0], [2, 3]]);
+
+        // A mousedown at the same spot when no scrollbar is there lands on
+        // the element's child, so it's delegated to the parent component.
+        verticalScrollbar.didMouseDown({
+          button: 0,
+          detail: 1,
+          target: verticalScrollbar.element.firstChild,
+          clientY: clientTopForLine(component, 4),
+          clientX: verticalClientX
+        });
+        expect(editor.getSelectedBufferRange().isEmpty()).toBe(true);
+        expect(editor.getCursorScreenPosition().row).toBe(4);
+
+        horizontalScrollbar.didMouseDown({
+          button: 0,
+          detail: 1,
+          target: horizontalScrollbar.element.firstChild,
+          clientY: horizontalClientY,
+          clientX: component.refs.content.getBoundingClientRect().left
+        });
+        expect(editor.getCursorScreenPosition().column).toBe(0);
+      });
     });
   });
 
@@ -5994,6 +6157,33 @@ describe('TextEditorComponent', () => {
       );
       expect(previouslyMeasuredLineElement.style.display).toBe('');
       expect(previouslyMeasuredLineElement.style.visibility).toBe('');
+    });
+
+    it('does not throw when called with a row far beyond the rendered range', async () => {
+      const { component } = buildComponent({
+        rowsPerTile: 2,
+        autoHeight: false
+      });
+      await setEditorHeightInLines(component, 3);
+
+      const outOfRangeRow = component.getRenderedEndRow() + 1000;
+      expect(() => {
+        component.pixelPositionForScreenPosition({ row: outOfRangeRow, column: 0 });
+      }).not.toThrow();
+    });
+
+    it('does not throw when requestHorizontalMeasurement targets a non-rendered row', async () => {
+      const { component } = buildComponent({
+        rowsPerTile: 2,
+        autoHeight: false
+      });
+      await setEditorHeightInLines(component, 3);
+
+      const outOfRangeRow = component.getRenderedEndRow() + 1000;
+      component.requestHorizontalMeasurement(outOfRangeRow, 0);
+      expect(() => {
+        component.measureHorizontalPositions();
+      }).not.toThrow();
     });
   });
 

@@ -33,9 +33,19 @@ export default class ChangeLogView {
     };
   }
 
+  openUri (event) {
+    let anchor = event.target.closest('[href]');
+    if (!anchor) return;
+
+    let uri = anchor.getAttribute('href');
+    if (!uri?.startsWith('atom://')) return;
+
+    atom.workspace.open(uri);
+  }
+
   render() {
     return (
-      <div className="welcome">
+      <div className="welcome" on={{ click: this.openUri }}>
         <div className="welcome-container">
           <div className="header">
             <a title="Full Change Log" href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">
@@ -50,19 +60,19 @@ export default class ChangeLogView {
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
               <li>
-                <code>autocomplete-plus</code> can now make other text edits to the buffer when a suggestion is accepted - for instance, adding an <code>import</code> for that suggestion.
+                Fix an issue where missing theme variables prevented the project window from initializing.
               </li>
               <li>
-                Experimental localization support is now being added into the editor, allowing the editor, core packages and even community packages to localize their interface for any language.
+                New <code>terminal</code> package! For more information, consult the package’s <a href="atom://config/packages/terminal">settings and README</a>, or read <a href="https://blog.pulsar-edit.dev/posts/20260510-savetheclocktower-terminal-package/">the introductory blog post</a>.
               </li>
               <li>
-                <code>autocomplete-css</code> has gotten significantly updated completions.
+                New <code>editor.largeFileThreshold</code> setting that allows the user to configure the file-size threshold of the “large file mode” present in TextMate-style grammars.
               </li>
               <li>
-                Various documentation and UI links updated after website update.
+                New experimental setting: <code>core.promptOnConflict</code>. When enabled, Pulsar will ask for confirmation if you try to save an item while it’s in a “conflicted” state. You may decide whether to cancel or proceed with overwriting the file on disk. (For an editor, the “conflicted” state occurs if you open a file and make changes, but another program writes different contents to the file on disk before you can save your changes in Pulsar.) Since this setting is experimental, it is disabled by default… but we encourage users to enable it and help us test it!
               </li>
               <li>
-                Changed some returns in a backwards compatible way to ensure the community package <code>emmet</code> will work again.
+                Minor Electron version increase to v30.5.1.
               </li>
             </ul>
 

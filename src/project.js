@@ -10,6 +10,14 @@ const DefaultDirectoryProvider = require('./default-directory-provider');
 const Model = require('./model');
 const GitRepositoryProvider = require('./git-repository-provider');
 
+function safeRealPath(filePath) {
+  try {
+    return fs.realpathSync(filePath);
+  } catch (error) {
+    return null;
+  }
+}
+
 // Extended: Represents a project that's opened in Pulsar.
 //
 // An instance of this class is always available as the `atom.project` global.
@@ -32,6 +40,7 @@ module.exports = class Project extends Model {
 
     this.emitter = new Emitter();
     this.buffers = [];
+    this.deletedBuffers = new Set();
     this.rootDirectories = [];
     this.repositories = [];
     this.directoryProviders = [];
@@ -54,9 +63,7 @@ module.exports = class Project extends Model {
       if (repository != null) repository.destroy();
     }
     for (let path in this.watcherPromisesByPath) {
-      this.watcherPromisesByPath[path].then(watcher => {
-        watcher.dispose();
-      });
+      this.disposeWatcherPromise(this.watcherPromisesByPath[path]);
     }
     this.rootDirectories = [];
     this.repositories = [];
@@ -73,6 +80,7 @@ module.exports = class Project extends Model {
       if (buffer != null) buffer.destroy();
     }
     this.buffers = [];
+    this.deletedBuffers = new Set();
     this.setPaths([]);
     this.loadPromisesByPath = {};
     this.retiredBufferIDs = new Set();
@@ -235,7 +243,7 @@ module.exports = class Project extends Model {
   // disposable.dispose()
   // ```
   //
-  // To watch paths outside of open projects, use the `watchPaths` function instead; see {PathWatcher}.
+  // To watch paths outside of open projects, use the `watchPath` function instead; see {PathWatcher}.
   //
   // When writing tests against functionality that uses this method, be sure to wait for the
   // {Promise} returned by {::getWatcherPromise} before manipulating the filesystem to ensure that
@@ -375,9 +383,7 @@ module.exports = class Project extends Model {
     this.repositories = [];
 
     for (let path in this.watcherPromisesByPath) {
-      this.watcherPromisesByPath[path].then(watcher => {
-        watcher.dispose();
-      });
+      this.disposeWatcherPromise(this.watcherPromisesByPath[path]);
     }
     this.watcherPromisesByPath = {};
 
@@ -443,25 +449,31 @@ module.exports = class Project extends Model {
 
     const didChangeCallback = events => {
       // Stop event delivery immediately on removal of a rootDirectory, even if its watcher
-      // promise has yet to resolve at the time of removal
+      // promise has yet to resolve at the time of removal.
       if (this.rootDirectories.includes(directory)) {
+        this.resurrectDeletedBuffers(events);
         this.emitter.emit('did-change-files', events);
       }
     };
 
-    // We'll use the directory's custom onDidChangeFiles callback, if available.
-    // CustomDirectory::onDidChangeFiles should match the signature of
-    // Project::onDidChangeFiles below (although it may resolve asynchronously)
-    this.watcherPromisesByPath[directory.getPath()] =
+    // We'll use the directory's custom `onDidChangeFiles` callback, if
+    // available. `CustomDirectory::onDidChangeFiles` should match the
+    // signature of `Project::onDidChangeFiles` below (although it may resolve
+    // asynchronously).
+    const watcherPromise =
       directory.onDidChangeFiles != null
         ? Promise.resolve(directory.onDidChangeFiles(didChangeCallback))
         : watchPath(directory.getPath(), {}, didChangeCallback);
 
+    // A watcher that can't start reports itself — to the console always, and
+    // to the user through a notification when the failure is fatal. We only
+    // have to keep the rejection from going unhandled.
+    watcherPromise.catch(() => {});
+    this.watcherPromisesByPath[directory.getPath()] = watcherPromise;
+
     for (let watchedPath in this.watcherPromisesByPath) {
       if (!this.rootDirectories.find(dir => dir.getPath() === watchedPath)) {
-        this.watcherPromisesByPath[watchedPath].then(watcher => {
-          watcher.dispose();
-        });
+        this.disposeWatcherPromise(this.watcherPromisesByPath[watchedPath]);
       }
     }
 
@@ -480,6 +492,21 @@ module.exports = class Project extends Model {
     }
 
     if (options.emitEvent !== false) {
+      this.emitter.emit('did-change-paths', this.getPaths());
+    }
+  }
+
+  // Public: Add multiple paths to the project's list of root paths,
+  // emitting a single `did-change-paths` event after all paths are added.
+  //
+  // * `projectPaths` An {Array} of {String} paths to add.
+  // * `options` An optional {Object} passed to {::addPath} for each path.
+  addPaths(projectPaths, options = {}) {
+    const pathsBefore = this.getPaths().length;
+    for (const projectPath of projectPaths) {
+      this.addPath(projectPath, { ...options, emitEvent: false });
+    }
+    if (this.getPaths().length !== pathsBefore) {
       this.emitter.emit('did-change-paths', this.getPaths());
     }
   }
@@ -504,6 +531,69 @@ module.exports = class Project extends Model {
       );
     }
     return directory;
+  }
+
+  // Private: Given a batch of filesystem events, find any buffers whose
+  // backing files were deleted but have since reappeared, and tell them so. (A
+  // buffer can't detect this on its own; see `TextBuffer::resurrect`.)
+  resurrectDeletedBuffers(events) {
+    if (this.deletedBuffers.size === 0) return;
+    let changedPaths = new Set();
+    for (let { action, path: eventPath } of events) {
+      if (action !== 'deleted') changedPaths.add(eventPath);
+    }
+    if (changedPaths.size === 0) return;
+
+    for (let buffer of this.deletedBuffers) {
+      // The default call to `watchPath` that powers `onDidChangeFiles` (which
+      // we leverage for this resurrection detection) uses `realPaths: true`.
+      // We don't want to change that for backward-compatibility reasons, so we
+      // must do our own realpath normalization. (Also, if a custom directory
+      // watcher is used, it could report events with or without realpaths.)
+      let bufferPath = buffer.getPath();
+      if (changedPaths.has(bufferPath) || changedPaths.has(safeRealPath(bufferPath))) {
+        this.resurrectBufferIfDeleted(buffer);
+      }
+    }
+  }
+
+  // Private: Attempts to "resurrect" the given buffer if the buffer is in the
+  // "deleted" state. Async; resolves when resurrection is completed or
+  // skipped.
+  //
+  // Never rejects; failures are logged instead. Some callers can't handle a
+  // rejection — e.g., a rejection during `prepareToUnloadEditorWindow` would
+  // prevent the window from closing.
+  resurrectBufferIfDeleted(buffer) {
+    if (!this.deletedBuffers.has(buffer)) return Promise.resolve();
+    return buffer.resurrect().catch(error => {
+      console.error(`Failed to resurrect buffer for ${buffer.getPath()}:`, error);
+    });
+  }
+
+  // Private: Resurrect any deleted buffers whose files have since reappeared.
+  // (`TextBuffer::resurrect` is idempotent.) Async; resolves when all such
+  // buffers have completed or skipped their resurrections. Never rejects.
+  resurrectAllDeletedBuffers() {
+    let promises = [];
+    for (let buffer of this.deletedBuffers) {
+      promises.push(this.resurrectBufferIfDeleted(buffer));
+    }
+    return Promise.all(promises);
+  }
+
+  // Private: Dispose of the watcher a promise resolves to, once it resolves.
+  //
+  // A rejected promise means there was never a watcher to dispose of, and
+  // whatever went wrong has already been reported by the watcher layer — so
+  // there's nothing to do but keep the rejection from going unhandled.
+  disposeWatcherPromise(promise) {
+    promise.then(
+      watcher => {
+        watcher.dispose();
+      },
+      () => {}
+    );
   }
 
   // Extended: Access a {Promise} that resolves when the filesystem watcher associated with a project
@@ -549,7 +639,7 @@ module.exports = class Project extends Model {
         if (removedRepository) removedRepository.destroy();
       }
       if (this.watcherPromisesByPath[projectPath] != null) {
-        this.watcherPromisesByPath[projectPath].then(w => w.dispose());
+        this.disposeWatcherPromise(this.watcherPromisesByPath[projectPath]);
       }
       delete this.watcherPromisesByPath[projectPath];
       this.emitter.emit('did-change-paths', this.getPaths());
@@ -856,10 +946,20 @@ module.exports = class Project extends Model {
     buffer.onDidSave(({ path }) =>
       this.applicationDelegate.emitDidSavePath(path)
     );
-    buffer.onDidDestroy(() => this.removeBuffer(buffer));
+    buffer.onDidDestroy(() => {
+      this.deletedBuffers.delete(buffer);
+      this.removeBuffer(buffer);
+    });
     buffer.onDidChangePath(() => {
       if (!(this.getPaths().length > 0)) {
         this.setPaths([path.dirname(buffer.getPath())]);
+      }
+    });
+    buffer.onDidChangeDeleted(isDeleted => {
+      if (isDeleted) {
+        this.deletedBuffers.add(buffer);
+      } else {
+        this.deletedBuffers.delete(buffer);
       }
     });
     buffer.onWillThrowWatchError(({ error, handle }) => {
