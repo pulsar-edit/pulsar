@@ -24,6 +24,20 @@ env:
   # worth investigating.)
   MAX_GLIBC_VERSION: '2.31'
   MAX_GLIBCXX_VERSION: '3.4.28'
+  # `playwright`'s postinstall downloads browsers (and its own `ffmpeg`) on
+  # every `yarn install`. Workflows that don't run our Playwright tests set
+  # `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` to skip that entirely. This one can't:
+  # the tests never launch a Playwright-managed browser (they drive the
+  # packaged app through `_electron`), but in CI they set `recordVideo`, which
+  # needs that `ffmpeg`.
+  #
+  # Instead, we point the download at `cdn.playwright.dev`, which serves the
+  # same builds. Our version of Playwright defaults to
+  # `playwright.azureedge.net`, which now just redirects to an ESRP CDN host
+  # that has been known to stop resolving and take CI down with it. Newer
+  # versions of Playwright fall back to `cdn.playwright.dev` on their own, so
+  # this override can go once we upgrade.
+  PLAYWRIGHT_DOWNLOAD_HOST: 'https://cdn.playwright.dev'
   ROLLING_UPLOAD_TOKEN: ${{ secrets.ROLLING_RELEASE_UPLOAD_TOKEN }}
   # Below variables allow us to quickly control visual tests for each platform
   RUN_WINDOWS_VT: false

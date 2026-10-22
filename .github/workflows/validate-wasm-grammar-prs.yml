@@ -8,6 +8,11 @@ on:
     paths:
       - '**.wasm'
 
+env:
+  # Skip Playwright's browser download during `yarn install`; see the comment
+  # in `build.yml`.
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
 jobs:
   validate:
     runs-on: ubuntu-latest
