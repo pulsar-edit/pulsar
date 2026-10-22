@@ -6,6 +6,9 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ATOM_JASMINE_REPORTER: list
+  # Skip Playwright's browser download during `yarn install`; see the comment
+  # in `build.yml`.
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
 
 jobs:
   tests:
