@@ -76,11 +76,12 @@ exports.appName = appName;
 
 // NOTE: The uninstaller (`resources/win/installer.nsh`) removes these entries
 // by key name, but only after confirming that each entry's `command` value
-// launches the installation being removed. It does so by reconstructing the
-// exact value written below (`"<path to exe>" "%1"`, or `"%V"` for the folder
-// background entry). If you change the key names or the format of the
-// command values, update the uninstaller to match — otherwise it will
-// silently stop removing these entries.
+// launches the installation being removed (or is empty, as it is for entries
+// written by versions that used `winreg` to write these values). It does so by
+// reconstructing the exact value written below (`"<path to exe>" "%1"`, or
+// `"%V"` for the folder background entry). If you change the key names or the
+// format of the command values, update the uninstaller to match — otherwise
+// it will silently stop removing these entries.
 exports.fileHandler = new ShellOption(
   `\\Software\\Classes\\Applications\\${exeName}`,
   [
