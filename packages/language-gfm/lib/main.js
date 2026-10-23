@@ -23,6 +23,19 @@ exports.activate = () => {
     languageScope: null
   });
 
+
+  // Table cells can hold inline content, but don't have `inline` nodes.
+  atom.grammars.addInjectionPoint('source.gfm', {
+    type: 'pipe_table_cell',
+    language: () => {
+      return 'markdown-inline-internal';
+    },
+    content: (node) => node,
+    includeChildren: true,
+    languageScope: null
+  });
+
+
   // A separate injection layer for each block-level HTML node.
   atom.grammars.addInjectionPoint('source.gfm', {
     type: 'html_block',
