@@ -50,7 +50,7 @@ export default class SystemPanel {
                           onclick={(e) => { this.setRegistration(WinShell.fileHandler, e.target.checked) }} />
                         <div className='setting-title'>Register as file handler</div>
                         <div className='setting-description'>
-                          Show {WinShell.appName} in the "Open with" application list for easy association with file types.
+                          Show {WinShell.appName} in the “Open with” application list for easy association with file types.
                         </div>
                       </label>
                     </div>
@@ -68,7 +68,7 @@ export default class SystemPanel {
                           onclick={(e) => { this.setRegistration(WinShell.fileContextMenu, e.target.checked) }} />
                         <div className='setting-title'>Show in file context menus</div>
                         <div className='setting-description'>
-                          Add "Open with {WinShell.appName}" to the File Explorer context menu for files.
+                          Add “Open with {WinShell.appName}” to the File Explorer context menu for files.
                         </div>
                       </label>
                     </div>
@@ -89,7 +89,7 @@ export default class SystemPanel {
                           }} />
                         <div className='setting-title'>Show in folder context menus</div>
                         <div className='setting-description'>
-                          Add "Open with {WinShell.appName}" to the File Explorer context menu for folders.
+                          Add “Open with {WinShell.appName}” to the File Explorer context menu for folders.
                         </div>
                       </label>
                     </div>
@@ -122,8 +122,7 @@ export default class SystemPanel {
             <label for='system.windows.add-to-path'>
               <div className='setting-title'>Add Pulsar to PATH</div>
               <div className='setting-description'>
-                Settings for adding Pulsar to the PATH have now been exclusively moved to the Pulsar windows installer.
-                If you'd like to change your PATH addition options please rerun your original, or a new installer.
+                Settings for adding Pulsar to the PATH have moved to the Windows installer. If you’d like to add or remove PATH entries, please re-run your original installer or the most recent one from the Pulsar site.
               </div>
             </label>
           </div>
