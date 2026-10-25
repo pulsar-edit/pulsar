@@ -4765,6 +4765,95 @@ describe('WASMTreeSitterLanguageMode', () => {
     })
 
   });
+
+  describe('.destroy', () => {
+    beforeEach(() => {
+      jasmine.useRealClock();
+    });
+
+    it('releases the buffer text, emitter, layers, and parsers', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+      buffer.setText('let x = 1;');
+      const languageMode = new WASMTreeSitterLanguageMode({ buffer, grammar });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      expect(languageMode.cachedCurrentBufferText).toBe('let x = 1;');
+      let layer = languageMode.rootLanguageLayer;
+
+      buffer.setLanguageMode(null);
+
+      expect(languageMode.cachedCurrentBufferText).toBe('');
+      expect(languageMode.emitter.disposed).toBe(true);
+      expect(languageMode.parsersByLanguage.size).toBe(0);
+      expect(layer.destroyed).toBe(true);
+      expect(layer.tree).toBeNull();
+    });
+
+    it('cancels an in-progress async parse when the language mode is destroyed', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+      buffer.setText('let x = 1;\n'.repeat(20000));
+      const languageMode = new WASMTreeSitterLanguageMode({
+        buffer,
+        grammar,
+        syncTimeoutMicros: 10
+      });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      let layer = languageMode.rootLanguageLayer;
+      let parseSpy = spyOn(languageMode, 'parseAsync').and.callThrough();
+      buffer.setTextInRange([[0, 0], [0, 0]], 'const y = 2;\n');
+
+      // If the reparse finished synchronously, this spec proves nothing.
+      expect(parseSpy.calls.mostRecent().returnValue.then).toBeDefined();
+      let parsePromise = layer.currentParsePromise;
+
+      buffer.setLanguageMode(null);
+
+      // The next batch must not run against the deleted `Parser`.
+      await parsePromise;
+      expect(layer.tree).toBeNull();
+    });
+
+    it('cancels an in-progress async parse when only the layer is destroyed', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+      buffer.setText('let x = 1;\n'.repeat(20000));
+      const languageMode = new WASMTreeSitterLanguageMode({
+        buffer,
+        grammar,
+        syncTimeoutMicros: 10
+      });
+      buffer.setLanguageMode(languageMode);
+      await languageMode.ready;
+
+      let layer = languageMode.rootLanguageLayer;
+      let parseSpy = spyOn(languageMode, 'parseAsync').and.callThrough();
+      buffer.setTextInRange([[0, 0], [0, 0]], 'const y = 2;\n');
+      expect(parseSpy.calls.mostRecent().returnValue.then).toBeDefined();
+      let parsePromise = layer.currentParsePromise;
+
+      layer.destroy();
+
+      // The finished parse must not assign a new (and never-deleted) tree to
+      // the destroyed layer.
+      await parsePromise;
+      expect(layer.tree).toBeNull();
+    });
+
+    it('creates no layers or parsers if destroyed before it is ready', async () => {
+      const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
+      buffer.setText('let x = 1;');
+      const languageMode = new WASMTreeSitterLanguageMode({ buffer, grammar });
+      buffer.setLanguageMode(languageMode);
+      let ready = languageMode.ready;
+      buffer.setLanguageMode(null);
+
+      await ready;
+      expect(languageMode.rootLanguageLayer).toBeNull();
+      expect(languageMode.parsersByLanguage.size).toBe(0);
+    });
+  });
 });
 
 async function nextHighlightingUpdate(languageMode) {
