@@ -199,6 +199,7 @@ class WASMTreeSitterLanguageMode {
     this.grammar = grammar;
     this.config = config ?? atom.config;
     this.grammarRegistry = grammars;
+    this.destroyed = false;
 
     this.syncTimeoutMicros = syncTimeoutMicros ?? PARSE_JOB_LIMIT_MICROS;
     this.useAsyncParsing = FEATURE_ASYNC_PARSE;
@@ -269,22 +270,38 @@ class WASMTreeSitterLanguageMode {
 
     this.ready = this.grammar.getLanguage()
       .then(language => {
+        // This language mode may have been destroyed while the language was
+        // loading. If so, we shouldn't create anything that would need to be
+        // cleaned up.
+        if (this.destroyed) { return; }
         this.rootLanguage = language;
         this.rootLanguageLayer = new LanguageLayer(null, this, grammar, 0);
         return this.getOrCreateParserForLanguage(language);
       })
-      .then(() => this.rootLanguageLayer.update(null, { id: 0 }))
+      .then(() => this.rootLanguageLayer?.update(null, { id: 0 }))
       .then(() => this.emitter.emit('did-tokenize'));
   }
 
   destroy() {
+    this.destroyed = true;
+    // Clear the memory we used to hold the buffer text, but keep this a string
+    // in case something tries to call string methods on it.
+    this.cachedCurrentBufferText = '';
+    this.isFoldableCache = [];
     let layers = this.getAllLanguageLayers();
     for (let layer of layers) {
-      layer?.destroy();
+      let description = '';
+      try {
+        description = layer?.inspect();
+        layer?.destroy();
+      } catch (err) {
+        console.error('Error destroying layer:', description, err);
+      }
     }
     this.injectionsMarkerLayer?.destroy();
     this.rootLanguageLayer = null;
     this.subscriptions?.dispose();
+    this.emitter.dispose();
 
     // Clean up all `Parser` instances created during the lifetime of this
     // buffer.
@@ -791,7 +808,7 @@ class WASMTreeSitterLanguageMode {
   // Returns either a {Tree} (if parsing was able to be achieved synchronously)
   // or a {Promise} that eventually resolves with a {Tree}.
   //
-  parseAsync(language, oldTree, includedRanges, { tag = null } = {}) {
+  parseAsync(language, oldTree, includedRanges, { tag = null, isCancelled = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     parser.reset();
@@ -837,6 +854,7 @@ class WASMTreeSitterLanguageMode {
 
     const cleanup = () => {
       parseDone = true;
+      text = null; // (or else this closure retains a full text copy)
       if (devMode && tag) {
         console.timeEnd(tag);
         if (batchCount > 0) {
@@ -882,6 +900,15 @@ class WASMTreeSitterLanguageMode {
         // we're doing now, so it might also be worth it to increase X.
         //
         const parseJob = () => {
+          // This language mode, or the language layer associated with this
+          // parse, may have been deleted in between batches. If so, the parser
+          // and/or `oldTree` may already be deleted, so stop before touching
+          // either.
+          if (this.destroyed || isCancelled?.()) {
+            cleanup();
+            resolve(null);
+            return;
+          }
           try {
             batchCount++;
             tree = parser.parse(callback, oldTree, { includedRanges, progressCallback });
@@ -2874,6 +2901,8 @@ class LanguageLayer {
   destroy() {
     if (this.destroyed) { return; }
     this.destroyed = true;
+    this.nodesToInvalidateOnChange.clear();
+    this.foldNodesToInvalidateOnChange.clear();
 
     // Clean up all Tree-sitter trees.
     let temporaryTrees = this.temporaryTrees ?? [];
@@ -3536,7 +3565,10 @@ class LanguageLayer {
         language,
         this.tree,
         includedRanges,
-        // { tag: `Parsing ${this.inspect()} (async) ${params.id}` }
+        {
+          // tag: `Parsing ${this.inspect()} (async) ${params.id}`,
+          isCancelled: () => this.destroyed
+        }
       );
       if (tree.then) {
         params.async = true;
@@ -3549,6 +3581,11 @@ class LanguageLayer {
         includedRanges,
         // { tag: `Parsing ${this.inspect()} (sync) ${params.id}` }
       );
+    }
+    if (this.destroyed || !tree) {
+      this.patchSinceCurrentParseStarted = null;
+      tree?.delete();
+      return;
     }
 
     let changes = this.patchSinceCurrentParseStarted.getChanges();
