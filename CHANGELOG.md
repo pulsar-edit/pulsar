@@ -6,8 +6,133 @@
 
 ## [Unreleased]
 
-* Fix an issue where opening up git worktree doesn't show any git info on the editor
-* Add a branded sidebar image to the Windows installer and improve icon
+## 1.133.0
+
+### Pulsar
+
+- Dispose more thoroughly when a `WASMTreeSitterLanguageMode` is destroyed [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1676)
+- Update dependency dompurify to v3.4.17 [SECURITY] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1651)
+- Update dependency joi to v17.13.8 [SECURITY] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1657)
+- [language-gfm] Add inline injection for table cells [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1674)
+- [language-clojure] Inject `cpp/raw` in Clojure dialect Jank [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/1670)
+- Remove context menu and shell entries for Pulsar during uninstallation [@VeryUsual](https://github.com/pulsar-edit/pulsar/pull/1403)
+- [welcome] Add macOS-specific guidance for installing shell commands [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1671)
+- Skip downloading Chromium on test-and-upload CI jobs [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1672)
+- Fix Invalid Point error when opening files without position [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1412)
+- Fix behavior of `atom.openPath` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1667)
+- [background-tips] Add `package.json` convention for tip registration and redistribute tips [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1417)
+- Fix Windows context menu options not persisting across restarts [redux] [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1666)
+- Implement `editor:paste-without-reindenting` [@icecream17](https://github.com/pulsar-edit/pulsar/pull/1229)
+- Ensure clicks on overlay scrollbars are not forwarded to the editor [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1665)
+- [autocomplete-html] Update completion data [@catscarlet](https://github.com/pulsar-edit/pulsar/pull/1660)
+- Fix `Cannot read properties of undefined (reading 'languageScopeId')` [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/1640)
+- Bump the `terminal` package to v0.4.0 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1663)
+- Add new behaviors and appearance around deleted files [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1588)
+- Fix markdown image `src` transformation in some usages [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1375)
+- Tree-sitter fixes, 1.133.0 edition [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1577)
+- Add missing `shell` methods on `atom` global [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1564)
+- Bump `ppm` to latest version [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1659)
+- Restore configurability to filesystem watchers… and add `@parcel/watcher` as an option [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1572)
+- Ensure uniqueness of window state keys [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1509)
+- Bump `@pulsar-edit/keyboard-layout` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1653)
+- fix: add new and old class syntax to perl grammar [@rawleyfowler](https://github.com/pulsar-edit/pulsar/pull/1648)
+- Add back Windows editor tests [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1645)
+- Bump Electron to 32.3.3 [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1600)
+- Fix some outdated links to atom api and old pulsar docs [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/1548)
+- Update notification issue template [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/1550)
+- Fix the `--target`/`-t` option of `yarn dist`… and eliminate the positional `[platform]` argument [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1593)
+- Update dependency postcss to v8.5.23 [SECURITY] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1631)
+- Update dependency minimatch to v5.1.8 [SECURITY] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1642)
+- Update dependency @babel/core to v7.29.6 [SECURITY] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1628)
+- Update dependency dompurify to v3.4.13 [SECURITY] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1629)
+- Update dependency markdown-it to v14 [SECURITY] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1633)
+- Update dependency joi to v17.13.6 [SECURITY] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1641)
+- [autocomplete-plus] Resolve an automatically-inserted suggestion… before insertion so that all its metadata is known (like `additionalTextEdits`) [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1638)
+- Update dependency minimatch to v5 [SECURITY] [renovate (bot)](https://github.com/pulsar-edit/pulsar/pull/1634)
+- Change `Pane::saveItems` to return a promise… that resolves when all items have been saved [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1596)
+- Grab Linux binaries from artifacts rather than putting them in the cache [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1637)
+- Add a branded sidebar image to the Windows installer and improve icon [@hovancik](https://github.com/pulsar-edit/pulsar/pull/1617)
+- [autocomplete-plus] Ensure editor is re-focused… after the user selects a suggestion via the mouse [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1552)
+- [settings-view] Fix rendering of setting descriptions with line breaks… so that each section is wrapped in a P tag when appropriate [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1620)
+- Fix Markdown table-of-contents links [@hovancik](https://github.com/pulsar-edit/pulsar/pull/1613)
+- settings-view: Improve search accuracy with native fuzzyMatcher [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1416)
+- 📝 Update docs: replace Atom references with Pulsar [ci skip] [@hovancik](https://github.com/pulsar-edit/pulsar/pull/1607)
+- Pin to specific `node-gyp` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1608)
+- Pin to `windows-2022` when building binaries [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1599)
+- Fixed opening up diffs for a worktree [@mauricioszabo](https://github.com/pulsar-edit/pulsar/pull/1556)
+- Remove deprecated keyword from atom-ui styles [@Daeraxa](https://github.com/pulsar-edit/pulsar/pull/1549)
+- Add `editor:select-subword` command [@asiloisad](https://github.com/pulsar-edit/pulsar/pull/1547)
+- Set up ARM64 bin building in GitHub Actions [@DeeDeeG](https://github.com/pulsar-edit/pulsar/pull/1589)
+
+### document-register-element
+
+- Remove broken symlink [@DeeDeeG](https://github.com/pulsar-edit/document-register-element/pull/3)
+
+### @pulsar-edit/fuzzy-native
+
+- Rewrite in N-API [@savetheclocktower](https://github.com/pulsar-edit/fuzzy-native/pull/14)
+- CI: Update Node, and use matrix with org var to set Node version for `tests` workflow [@DeeDeeG](https://github.com/pulsar-edit/fuzzy-native/pull/12)
+- CI: Update `checkout` and `setup-node` actions to v6 [@DeeDeeG](https://github.com/pulsar-edit/fuzzy-native/pull/11)
+- Use C++20 [@savetheclocktower](https://github.com/pulsar-edit/fuzzy-native/pull/13)
+
+### @pulsar-edit/git-utils
+
+- Add a `.d.ts` file… and some tests to ensure the `.d.ts` document everything in the `Repository` interface (and nothing that isn't there) [@savetheclocktower](https://github.com/pulsar-edit/git-utils/pull/9)
+- Fix case sensitivity and realpath issues on Windows [@savetheclocktower](https://github.com/pulsar-edit/git-utils/pull/8)
+- Add `Repository::getSymbolicRefTarget` and `Repository::getRemoteHead` [@savetheclocktower](https://github.com/pulsar-edit/git-utils/pull/7)
+- Rewrite in N-API and update `libgit2` [@savetheclocktower](https://github.com/pulsar-edit/git-utils/pull/6)
+
+### @pulsar-edit/keyboard-layout
+
+- Fix crash on quit under X11 from uninitialized `waylandPoll` [@savetheclocktower](https://github.com/pulsar-edit/keyboard-layout/pull/8)
+
+### @pulsar-edit/pathwatcher
+
+- Introduce an alternative Linux implementation using `inotify`… _and_ an alternative Windows implementation! Both fit our feature set better than EFSW’s does and don't have the complexity of recursive watching [@savetheclocktower](https://github.com/pulsar-edit/node-pathwatcher/pull/7)
+- Fix the atomic-save bug [@savetheclocktower](https://github.com/pulsar-edit/node-pathwatcher/pull/6)
+
+### @pulsar-edit/spellchecker
+
+- Add NPM publishing workflow [@savetheclocktower](https://github.com/pulsar-edit/node-spellchecker/pull/5)
+- Decaf specs [@savetheclocktower](https://github.com/pulsar-edit/node-spellchecker/pull/4)
+- Rewrite in N-API [@savetheclocktower](https://github.com/pulsar-edit/node-spellchecker/pull/3)
+
+### @pulsar-edit/superstring
+
+- Add ASan in CI and fix some bugs [@savetheclocktower](https://github.com/pulsar-edit/superstring/pull/23)
+- Fix some bugs that cause minor annoyances… during the build process [@savetheclocktower](https://github.com/pulsar-edit/superstring/pull/22)
+
+### terminal
+
+- Define alternative `core:(copy|paste)` bindings on Windows/Linux… and notify the user about them the first time they use a keybinding that would ordinarily trigger one of those commands (so they know about the alternative keybindings!) [@savetheclocktower](https://github.com/pulsar-edit/terminal/pull/46)
+- Run Playwright tests in CI for shell integration [@savetheclocktower](https://github.com/pulsar-edit/terminal/pull/45)
+- Implement local path detection… including jumping to line/column when appropriate and interpreting relative paths in the context of `cwd` [@savetheclocktower](https://github.com/pulsar-edit/terminal/pull/42)
+- Integrate with common shells in order to track `cwd`… and support some other future features [@savetheclocktower](https://github.com/pulsar-edit/terminal/pull/41)
+- Support OSC 8 hyperlinks (and add tooltips) [@savetheclocktower](https://github.com/pulsar-edit/terminal/pull/25)
+- Ensure `open-*-dock` commands open in the correct locations [@savetheclocktower](https://github.com/pulsar-edit/terminal/pull/39)
+
+### @pulsar-edit/text-buffer
+
+- Make `resurrect` idempotent in more scenarios… so that it's safer to call when you don't know much about the buffer [@savetheclocktower](https://github.com/pulsar-edit/text-buffer/pull/20)
+- Make `resurrect` async… and make it behave more regularly with regard to pre-deletion state and post-deletion state [@savetheclocktower](https://github.com/pulsar-edit/text-buffer/pull/19)
+- Add the ability to trigger “resurrection” logic… to make it easier for other tools to tell us when one of our `isDeleted()` buffers has been resurrected [@savetheclocktower](https://github.com/pulsar-edit/text-buffer/pull/17)
+- Fix issue where `isDeleted` incorrectly returned `true`… when a buffer is newly created and set to a path that does not yet exist on disk [@savetheclocktower](https://github.com/pulsar-edit/text-buffer/pull/15)
+- Enhance deleted state [@savetheclocktower](https://github.com/pulsar-edit/text-buffer/pull/13)
+- Remove orphaned dependencies [@confused-Techie](https://github.com/pulsar-edit/text-buffer/pull/14)
+
+### ppm
+
+- Bump `ppm` to Node 20.18.1… and Electron 32.3.3 [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/182)
+- Use `proxy-agent` directly rather than via `superagent-proxy` [@UberNick](https://github.com/pulsar-edit/ppm/pull/181)
+- Fix `mv` not being able to move across volumes [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/180)
+- Chore: Update ppm licence file [@Daeraxa](https://github.com/pulsar-edit/ppm/pull/177)
+- Report errors from backend when a request fails (attempt 2) [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/148)
+- Add “transpiled JavaScript” template [@savetheclocktower](https://github.com/pulsar-edit/ppm/pull/161)
+- Support branches other than "master" [@idleberg](https://github.com/pulsar-edit/ppm/pull/175)
+- Eliminate mv, ncp, wrench dependencies [@2colours](https://github.com/pulsar-edit/ppm/pull/164)
+- refactor: replace node url parser [@idleberg](https://github.com/pulsar-edit/ppm/pull/173)
+- Fix specs on Windows [Clean] [@confused-Techie](https://github.com/pulsar-edit/ppm/pull/171)
+
 
 ## 1.132.1
 
