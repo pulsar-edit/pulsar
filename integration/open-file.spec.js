@@ -16,17 +16,6 @@ test.describe('Opening an existing file', () => {
   test.beforeAll(async () => {
     fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pulsar-open-file-'))
     editor = await openAtom("atom-home-open-file", "opening-existing-file")
-    // A renderer crash doesn't make pending Playwright calls fail, and
-    // Playwright's own `crash` event doesn't fire for Electron windows; Pulsar
-    // just puts up its "editor has crashed" dialog and the test times out. The
-    // main process survives the crash, though, so we have it keep a record
-    // that `step()` below can poll.
-    await editor.app.evaluate(({ app }) => {
-      global.__rendererGone = null
-      app.on('render-process-gone', (_event, _webContents, details) => {
-        global.__rendererGone = { reason: details.reason, exitCode: details.exitCode }
-      })
-    })
   })
 
   test.afterAll(async () => {
@@ -80,29 +69,53 @@ test.describe('Opening an existing file', () => {
 
 // Runs `body` as a named test step, failing within about half a second if the
 // renderer crashes while it runs.
+//
+// A crash can't be detected by asking Pulsar: pending Playwright calls just
+// wait until the test times out, Playwright's `crash` event doesn't fire for
+// Electron windows, and the main process stops answering `app.evaluate`. But
+// Pulsar's crash reporter writes a dump to `$ATOM_HOME/crashdumps` within a
+// second of the crash, so we watch for that instead. (Pulsar doesn't start the
+// crash reporter on macOS; there, a crash still shows up as a timeout.)
 function step(title, body) {
   return test.step(title, async () => {
+    const existingDumps = new Set(findCrashDumps())
     let finished = false
     const crashed = (async () => {
       while (!finished) {
-        const gone = await editor.app.evaluate(() => global.__rendererGone)
-        if (gone) return gone
+        const newDump = findCrashDumps().find((dump) => !existingDumps.has(dump))
+        if (newDump) return newDump
         await new Promise((resolve) => setTimeout(resolve, 500))
       }
     })()
     try {
       await Promise.race([
         body(),
-        crashed.then((gone) => {
-          // `gone` is empty if polling stopped because `body` finished first.
-          if (gone) {
-            throw new Error(`The renderer crashed during: ${title} (reason: ${gone.reason}, exit code: ${gone.exitCode})`)
+        crashed.then((dump) => {
+          // `dump` is empty if polling stopped because `body` finished first.
+          if (dump) {
+            throw new Error(`Pulsar crashed during: ${title} (crash dump: ${dump})`)
           }
         })
       ])
     } finally {
       finished = true
     }
+  })
+}
+
+// Every `.dmp` file under `$ATOM_HOME/crashdumps`, at any depth (Crashpad
+// moves them between `new`, `pending`, and `completed`).
+function findCrashDumps(dir = path.resolve(process.env.ATOM_HOME, 'crashdumps')) {
+  let entries
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true })
+  } catch (_) {
+    return []
+  }
+  return entries.flatMap((entry) => {
+    const entryPath = path.join(dir, entry.name)
+    if (entry.isDirectory()) return findCrashDumps(entryPath)
+    return entry.name.endsWith('.dmp') ? [entryPath] : []
   })
 }
 
