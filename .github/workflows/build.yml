@@ -44,11 +44,10 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ macos-14, ubuntu-24.04-arm, ubuntu-latest, windows-2022 ]
-        node-architecture: [ '' ]
+        # `macos-15` is Apple Silicon; `macos-15-intel` builds the Intel binary
+        # natively.
+        os: [ macos-15, macos-15-intel, ubuntu-24.04-arm, ubuntu-latest, windows-2022 ]
         include:
-          - os: macos-14
-            node-architecture: x64
           - os: ubuntu-24.04-arm
             image: "quay.io/pypa/manylinux_2_28_aarch64"
           - os: ubuntu-latest
@@ -141,7 +140,6 @@ jobs:
       uses: actions/setup-node@v6
       with:
         node-version-file: '.nvmrc'
-        architecture: ${{ matrix.node-architecture }}
 
     - name: Setup Python
       # actions/setup-python's copy of Python is compiled for too-new `glibc`,
@@ -366,11 +364,11 @@ jobs:
       run: node ./script/rename.js "Linux"
 
     - name: Rename Pulsar Binaries for Regular release (ARM64 macOS)
-      if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' && matrix.node-architecture != 'x64' }}
+      if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' }}
       run: node ./script/rename.js "Silicon.Mac"
 
     - name: Rename Pulsar Binaries for Regular release (x64 macOS)
-      if: ${{ runner.os == 'macOS' && ( runner.arch == 'X64' || matrix.node-architecture == 'x64' ) }}
+      if: ${{ runner.os == 'macOS' && runner.arch == 'X64' }}
       run: node ./script/rename.js "Intel.Mac"
 
     - name: Rename Pulsar Binaries for Regular release (Windows)
@@ -400,7 +398,7 @@ jobs:
     - name: Upload Binary Artifacts
       uses: actions/upload-artifact@v7
       with:
-        name: ${{ matrix.os }} ${{ matrix.node-architecture }} Binaries
+        name: ${{ matrix.os }} Binaries
         path: ./binaries/*
 
     - name: Test Binary - Windows
@@ -414,11 +412,18 @@ jobs:
     - name: Test Binary - macOS
       if: runner.os == 'macOS' && env.RUN_MACOS_VT == true
       run: |
-        export PATH="/usr/local/opt/node@16/bin:/usr/local/bin:$PATH"
         rm -R node_modules/electron; yarn install --check-files
         hdiutil mount binaries/*Pulsar*dmg
         export BINARY_NAME=`ls /Volumes/Pulsar*/Pulsar.app/Contents/MacOS/Pulsar`
-        PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml arch -x86_64 npx playwright test --reporter=junit,list
+        # TEMPORARY: diagnostics after the move to `macos-15`, and after
+        # dropping `arch -x86_64` and a `PATH` override that put
+        # `/usr/local/opt/node@16/bin:/usr/local/bin` first.
+        echo "node: $(node -p process.arch); under arch -x86_64: $(arch -x86_64 node -p process.arch 2>&1)"
+        file "$BINARY_NAME"
+        ls -d /usr/local/opt/node@16/bin 2>&1 || true
+        echo "node on PATH: $(command -v node) ($(node --version))"
+        ls -l /usr/local/bin/node 2>&1 && /usr/local/bin/node --version || true
+        PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
     - name: Add binaries to Rolling Release Repo
       if: ${{ github.event_name == 'push' && runner.os != 'Linux' }}
@@ -470,29 +475,21 @@ jobs:
 
     # Download the artifact rather than restoring from cache. We only get so
     # much cache space!
-    #
-    # `pattern` rather than `name` because the uploading step interpolates an
-    # empty `matrix.node-architecture` into the name, leaving a double space
-    # that's easy to get wrong by hand. Only one artifact per run matches each
-    # of these patterns.
     - name: Download Pulsar Binaries - Linux
       if: ${{ runner.os == 'Linux' }}
       uses: actions/download-artifact@v7
       with:
-        pattern: ${{ matrix.os }}*Binaries
-        merge-multiple: true
+        name: ${{ matrix.os }} Binaries
         path: ./binaries
 
-    # `download-artifact` only errors on a missing artifact when it's given an
-    # exact `name`. With a `pattern` it filters to an empty list and exits
-    # happily. Check explicitly so that a missing binary is reported here
-    # rather than as an inscrutable glob failure in the middle of the test step
-    # below.
+    # Check that the artifact actually contains an AppImage, so that a missing
+    # binary is reported here rather than as an inscrutable glob failure in the
+    # middle of the test step below.
     - name: Verify binaries were downloaded - Linux
       if: ${{ runner.os == 'Linux' }}
       run: |
         if ! ls ./binaries/*AppImage > /dev/null 2>&1; then
-          echo "::error::No AppImage in ./binaries — the '${{ matrix.os }}*Binaries' artifact from the build job is missing or empty."
+          echo "::error::No AppImage in ./binaries — the '${{ matrix.os }} Binaries' artifact from the build job is empty."
           exit 1
         fi
         # Artifacts are zipped for transport, and zip doesn't carry the Unix
