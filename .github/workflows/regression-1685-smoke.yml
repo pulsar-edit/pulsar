@@ -45,7 +45,7 @@ jobs:
         PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
       run: |
         mkdir smoke
-        cp -R integration playwright.config.js smoke/
+        cp -R integration playwright.config.ts smoke/
         cd smoke
         echo '{ "private": true }' > package.json
         npm install --no-audit --no-fund playwright@1.22.2 @playwright/test@1.22.2
