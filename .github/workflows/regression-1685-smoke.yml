@@ -60,10 +60,13 @@ jobs:
         BINARY_NAME: ${{ github.workspace }}/squashfs-root/pulsar
       run: xvfb-run -a npx playwright test integration/open-file.spec.js --reporter=list
 
+      # Pulsar writes crash dumps to `$ATOM_HOME/crashdumps`
+      # (`src/main-process/start.js`), and `integration/helpers.js` sets
+      # `ATOM_HOME` to `tmp/<profile>` relative to where the tests run.
     - name: Upload crash dumps, if any
       if: ${{ !cancelled() }}
       uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.version }} crash dumps
-        path: ~/.config/Pulsar/Crashpad/**
+        path: smoke/tmp/*/crashdumps/**
         if-no-files-found: ignore
