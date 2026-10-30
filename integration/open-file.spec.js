@@ -52,7 +52,10 @@ test.describe('Opening an existing file', () => {
     // A crashed renderer fails any further `evaluate` with "Target crashed",
     // but say so explicitly in case the crash lands between our steps.
     expect(crashed).toBe(false)
-    expect(await editor.page.evaluate(() => atom.workspace.getTextEditors().length)).toBe(1)
+    // `realpathSync` on both sides, since on macOS the temp directory lives
+    // behind a symlink (`/var` → `/private/var`).
+    const activePath = await editor.page.evaluate(() => atom.workspace.getActiveTextEditor().getPath())
+    expect(fs.realpathSync(activePath)).toBe(fs.realpathSync(filePath))
   })
 })
 
