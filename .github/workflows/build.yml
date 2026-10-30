@@ -552,3 +552,30 @@ jobs:
       with:
         name: ${{ matrix.os }} Videos
         path: ./tests/videos/**
+
+      # Pulsar writes crash dumps to `$ATOM_HOME/crashdumps`
+      # (`src/main-process/start.js`), and `integration/helpers.js` sets
+      # `ATOM_HOME` to `tmp/<profile>`. Upload any dumps for inspection, then
+      # fail the job if there were any. (Linux only: Pulsar doesn't start its
+      # crash reporter on macOS.)
+    - name: Upload Crash Dumps - Linux
+      if: ${{ !cancelled() && runner.os == 'Linux' }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ matrix.os }} Crash Dumps
+        path: tmp/*/crashdumps/**
+        if-no-files-found: ignore
+
+      # A crash usually fails a test on its own, but not always: an
+      # intermittent one can be hidden by a passing retry, and one in teardown
+      # or in a process the tests don't depend on (e.g., the GPU process) fails
+      # nothing. Any crash is a bug, so fail the job regardless.
+    - name: Fail on Crash Dumps - Linux
+      if: ${{ !cancelled() && runner.os == 'Linux' }}
+      run: |
+        dumps="$(find tmp -path '*/crashdumps/*' -name '*.dmp' 2>/dev/null || true)"
+        if [ -n "$dumps" ]; then
+          echo "::error::Pulsar crashed during the visual tests; see the '${{ matrix.os }} Crash Dumps' artifact."
+          echo "$dumps"
+          exit 1
+        fi
