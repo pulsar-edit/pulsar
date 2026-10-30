@@ -1,24 +1,30 @@
 #!/usr/bin/env bash
 #
-# Verifies that the native modules we've just built don't reference `glibc` or
-# `libstdc++` symbols newer than the floor we promise to support.
+# Verifies two things about the native modules we've just built:
 #
-# We build our Linux binaries in an old Debian image specifically so that they
-# keep working on old distros. But the compiler we use for the
-# `electron-rebuild` step is *not* the one that ships with that image — it's a
-# much newer GCC, vendored from conda-forge, because Electron's V8 requires a
-# compiler that understands C++20. (See `.github/workflows/build.yml` for the
-# full story.)
+# 1. They don't reference `glibc` or `libstdc++` symbols newer than the floor
+#    we promise to support.
+# 2. None of them carries its own copy of the C++ runtime.
 #
-# That combination is exactly the kind of thing that fails silently: the build
-# goes green, the tests pass on the modern runner we test on, and then the
-# binary refuses to load on the older distro it was supposed to support, with
-# an error like:
+# We build our Linux binaries in an old OS image (`manylinux_2_28`) so that
+# they keep working on old distros, with a much newer GCC from Red Hat's
+# `gcc-toolset`, because Electron's V8 requires a compiler that understands
+# C++20. (See `.github/workflows/build.yml` for the full story.)
 #
-#     /lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.29' not found
+# Both checks guard against failures that are invisible in CI. The build goes
+# green and the tests pass on the modern runner we test on, and then:
 #
-# So instead of trusting that our `-static-libstdc++` and `-I/usr/include`
-# flags did their job, we check.
+# * if (1) is violated, the binary refuses to load on the older distro it was
+#   supposed to support, with an error like
+#
+#       /lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.29' not found
+#
+# * if (2) is violated, the module loads fine but its private C++ runtime
+#   fights with the system one that GTK, Mesa, etc. have already loaded, and
+#   the renderer segfaults the first time the module uses an iostream. Pulsar
+#   1.133.0 shipped like this (pulsar-edit/pulsar#1685), having passed (1)
+#   with flying colors — a statically linked runtime has no version
+#   requirements to violate.
 #
 # Usage:
 #   script/check-linux-abi-floor.sh [root-directory]
@@ -55,6 +61,16 @@ violations=0
 
 while IFS= read -r -d '' binary; do
   checked=$((checked + 1))
+
+  # A module that _defines_ the C++ exception personality routine or the
+  # internals of `std::locale` has a C++ runtime linked into it; a module that
+  # uses the system's `libstdc++` merely references them (`*UND*`).
+  if objdump -T "$binary" 2>/dev/null | grep -v '\*UND\*' | grep -qE '__gxx_personality_v0|_ZNSt6locale'; then
+    violations=$((violations + 1))
+    echo "FAIL ${binary}"
+    echo "    contains its own copy of the C++ runtime (statically linked libstdc++)"
+    continue
+  fi
 
   # Undefined symbols in the dynamic table carry the version of the library
   # they expect, e.g. `GLIBC_2.34` or `GLIBCXX_3.4.29`. Those versions are the
@@ -107,19 +123,22 @@ fi
 if [ "$violations" -gt 0 ]; then
   cat >&2 <<'EOF'
 
-error: one or more native modules require a newer C/C++ runtime than we
-support. These binaries would fail to load on older Linux distributions.
+error: one or more native modules either require a newer C/C++ runtime than
+we support (they would fail to load on older Linux distributions) or contain
+their own copy of the C++ runtime (they would crash Pulsar's renderer).
 
 The usual causes:
 
-  * The vendored conda-forge toolchain was used without
-    `-static-libstdc++ -static-libgcc` in LDFLAGS, so the module now wants
-    that toolchain's newer libstdc++ at runtime.
-  * A build step compiled against the conda environment's headers instead of
-    the system ones in /usr/include, raising the glibc requirement.
-  * A dependency grew a new build configuration that ignores our CFLAGS.
+  * Something linked a module with `-static-libstdc++`. Don't: our toolchain
+    (`gcc-toolset`) already reconciles a new compiler with the system
+    `libstdc++`, and a second runtime in the process crashes it.
+  * A build step used a compiler other than the image's `gcc-toolset` — e.g.,
+    because CC/CXX were overridden — so the module wants that compiler's newer
+    `libstdc++` at runtime.
+  * A third-party prebuilt binary was built against a newer `glibc` or
+    `libstdc++` than we support.
 
-Fix the flags rather than raising MAX_GLIBC_VERSION / MAX_GLIBCXX_VERSION —
+Fix the build rather than raising MAX_GLIBC_VERSION / MAX_GLIBCXX_VERSION —
 raising them drops support for distros we currently ship to.
 EOF
   exit 1

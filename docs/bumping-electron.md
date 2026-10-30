@@ -99,31 +99,31 @@ We pin the versions we’ve actually shipped CI-green builds with, not the bare 
 
 `.github/workflows/build.yml` carries a long comment explaining the mechanism; this is the summary and the maintenance checklist.
 
-#### Why there are two compilers
+#### Old OS, new compiler
 
-We build Linux binaries inside an old Debian container so that the resulting binaries keep working on old distributions. That way the `glibc` version of the build host becomes the floor for every user.
+We build Linux binaries inside an old OS image so that the resulting binaries keep working on old distributions. That way the `glibc` version of the build image becomes the floor for every user.
 
-But V8 now (first encountered in Electron 32.2.3) requires a compiler that understands C++20, and old Debian’s `gcc` doesn’t. Those two requirements pull in opposite directions.
+But V8 now (first encountered in Electron 32.2.3) requires a compiler that understands C++20, and old distros’ stock compilers don’t. Those two requirements pull in opposite directions.
 
-The resolution: keep the old Debian image for its `glibc`, but install a newer `gcc` from conda-forge (via a pinned `micromamba`) and point it back at the *system* headers and libraries with `-I/usr/include` and `-L/usr/lib/...`. That gives us a modern compiler targeting an old `glibc`.
+The resolution is the PyPA’s `manylinux_2_28` image (`quay.io/pypa/manylinux_2_28_x86_64` and `_aarch64`): AlmaLinux 8, so `glibc` 2.28, with a modern GCC from Red Hat’s `gcc-toolset` first on `PATH`. It’s the image Python projects use to build C++ extension wheels for old distros. No compiler overrides are needed; every step that compiles anything just uses `gcc`/`g++`.
 
-The vendored toolchain is currently used **only** for the `electron-rebuild` step, since Electron is the only thing demanding C++20. Everything else still builds with Debian’s stock `gcc`. To widen it, point the relevant step’s `CC`/`CXX`/`CFLAGS`/`CXXFLAGS`/`LDFLAGS` at the `PULSAR_*` variables the “Configure Modern GCC Toolchain” step exports.
+#### Why `gcc-toolset`, and never `-static-libstdc++`
 
-But we will need it everywhere eventually! The V8 that first forced this on us was 12.8, and Node itself didn’t ship a V8 that new until 23.0.0. Once we’re on an Electron that bundles Node 24, the stock compiler probably won’t build anything. (But then it’s possible that that Electron release will have bumped to a newer `glibc` and a newer Debian!)
+A modern GCC emits code that references symbols from its own, newer `libstdc++` (`GLIBCXX_3.4.29` and up), which old distros don’t have. There are two ways to deal with that:
 
-#### `-static-libstdc++` is not optional
+1. **Link `libstdc++` statically** with `-static-libstdc++`. *This crashes Pulsar.* Every native module gets its own private C++ runtime, while GTK, Mesa and friends have already loaded the system’s `libstdc++.so.6` into the renderer. The dynamic linker merges some of the module runtime’s symbols with the system copy (notably `STB_GNU_UNIQUE` ones like `std::locale::id` instances), the two runtimes end up disagreeing about locale facet indices, and the renderer segfaults the first time a module touches an iostream. Pulsar 1.133.0 shipped exactly this way, using conda-forge’s GCC; see [#1685](https://github.com/pulsar-edit/pulsar/issues/1685).
+2. **Use `gcc-toolset`.** Its `libstdc++.so` is a linker script — `INPUT ( /usr/lib64/libstdc++.so.6 -lstdc++_nonshared )` — so modules link dynamically against the *system* `libstdc++`, and only the symbols newer than the system library come statically from `libstdc++_nonshared.a`. One C++ runtime per process, and no `GLIBCXX` requirement beyond what the build image ships.
 
-Targeting an old `glibc` is only half the job. GCC 12 will happily emit code referencing symbols from *its own* much newer `libstdc++` (`GLIBCXX_3.4.29` and up) — and we don’t ship the conda environment to users. Without `-static-libstdc++ -static-libgcc` in `LDFLAGS`, you get binaries that build clean, test green, and then fail to load on exactly the older distros this whole arrangement exists to support:
-
-```
-/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.29' not found
-```
-
-Because that failure is invisible in CI (the test job runs on `ubuntu-latest`, which has a new enough `libstdc++` for anything) we verify it explicitly.
+The “Verify toolchain - Linux” step fails the build if `g++` ever stops resolving `libstdc++.so` to that linker script.
 
 #### The ABI floor check
 
-`script/check-linux-abi-floor.sh` disassembles every `*.node` under `node_modules` and fails the build if any of them requires a `glibc` or `libstdc++` newer than our declared floor. It runs as the “Verify Linux ABI Floor” step, right after the Linux rebuild.
+`script/check-linux-abi-floor.sh` inspects every `*.node` under `node_modules` and fails the build if any of them
+
+* requires a `glibc` or `libstdc++` newer than our declared floor, or
+* defines C++ runtime internals (`__gxx_personality_v0`, `std::locale`) — i.e., has a C++ runtime statically linked into it.
+
+It runs as the “Verify Linux ABI Floor” step, right after the Linux rebuild. Both failures are invisible in CI otherwise: the test job runs on `ubuntu-latest`, which has a new enough `libstdc++` for anything, and the static-runtime crash didn’t reproduce there either.
 
 The floor lives in `build.yml`’s top-level `env` block:
 
@@ -132,7 +132,7 @@ MAX_GLIBC_VERSION: '2.31'
 MAX_GLIBCXX_VERSION: '3.4.28'
 ```
 
-Those correspond to the Debian image we build in. If the check fails, **fix the compiler flags rather than raising these numbers** — raising them silently drops support for distros we currently ship to. You can run it locally against a Linux build tree:
+That’s the support pledge on our website, not the build image. The image itself targets `glibc` 2.28 / `GLIBCXX_3.4.25`, so anything we compile comes in well under; the slack is there for third-party prebuilt binaries we ship as-is. If the check fails, **fix the build rather than raising these numbers** — raising them silently drops support for distros we currently ship to. You can run it locally against a Linux build tree:
 
 ```bash
 MAX_GLIBC_VERSION=2.31 MAX_GLIBCXX_VERSION=3.4.28 script/check-linux-abi-floor.sh node_modules
@@ -142,24 +142,19 @@ It also fails if it finds zero `.node` files, so that a wrong path can’t masqu
 
 This is a… _thorough_ step. We could choose to run it only selectively if we wanted to speed up most builds; once we get a positive result, it should be good until the next time we bump a dependency.
 
-#### Choosing the Debian image
+#### Choosing the build image
 
-**Track whatever Debian version Electron itself uses to build its Linux binaries.** Targeting a *higher* `glibc` than Electron does needlessly drops users; targeting a *lower* one buys nothing, since Electron’s own binaries won’t run there anyway. Electron 32 builds on Debian 11, hence `glibc` 2.31.
+**Don’t target a higher `glibc` than Electron itself requires.** Doing so needlessly drops users. Targeting a lower one is harmless but buys nothing, since Electron’s own binaries won’t run there anyway.
 
-When you change the image, update `MAX_GLIBC_VERSION` and `MAX_GLIBCXX_VERSION` to match it. For reference, Debian 11 ships `glibc` 2.31 / `GLIBCXX_3.4.28`; Debian 12 ships `glibc` 2.36.
-
-Note also that Debian releases go EOL and their packages move to `archive.debian.org`, at which point `apt-get update` starts 404ing inside the container. Debian 11’s LTS ended 2026-08-31. The first step of the Linux build detects this and rewrites `apt`’s sources automatically, so it should heal itself — but if a build suddenly fails at `apt-get update`, that’s the first place to look.
-
-### Pinned toolchain versions
-
-`micromamba` is pinned by version *and* by SHA-256 in `build.yml`, because it’s the root of trust for the entire compiler toolchain. To bump it, change `MICROMAMBA_VERSION` and paste in the new hashes from the release’s published `micromamba-<arch>.sha256` files. The toolchain itself is cached under a key derived from `GCC_VERSION` and `MICROMAMBA_VERSION`, so changing either gets you a fresh one automatically.
+If you change images, keep to the `manylinux` family (or anything else whose compiler is a `gcc-toolset`/`devtoolset`), and update `MAX_GLIBC_VERSION` and `MAX_GLIBCXX_VERSION` if our support pledge changes with it. `manylinux_2_28` is based on AlmaLinux 8, which is supported until 2029.
 
 ## Troubleshooting
 
 | Symptom | Likely cause |
 | --- | --- |
 | `no member named '...' in 'v8::...'` during `electron-rebuild`, but the initial `yarn install` succeeded | `nan` is too old. Electron’s V8 is much newer than the V8 in the Node version it bundles, so a module can build fine on standalone Node and still fail here. |
-| Rebuild fails only on Linux, with C++20 complaints | The vendored toolchain isn’t being used for that step. Point it at the `PULSAR_*` variables. |
-| “Verify Linux ABI Floor” fails | Missing `-static-libstdc++ -static-libgcc`, or a dependency ignored our `CFLAGS` and compiled against the conda environment’s headers. |
+| Rebuild fails only on Linux, with C++20 complaints | Something overrode `CC`/`CXX`, or the image’s `gcc-toolset` is too old. Check the output of “Verify toolchain - Linux.” |
+| “Verify Linux ABI Floor” fails with “contains its own copy of the C++ runtime” | Something linked that module with `-static-libstdc++`, or it’s a third-party prebuild that was. Shipping it risks a renderer crash; see above. |
+| “Verify Linux ABI Floor” fails with a `GLIBC_*`/`GLIBCXX_*` version | Usually a third-party prebuilt binary built against a newer distro. |
 | Prebuilds download for the wrong ABI, or none is found | `node-abi` is too old to know about X.Y.Z. |
-| Linux build fails at `apt-get update` | The Debian release has gone EOL and moved to `archive.debian.org`. |
+| Linux build fails at “Install build dependencies” | A package was renamed or moved between EL8 repositories (`baseos`, `appstream`, `powertools`). |
