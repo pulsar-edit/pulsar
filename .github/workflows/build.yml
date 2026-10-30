@@ -93,6 +93,20 @@ jobs:
         dnf install -y git make file wget zstd rpm-build squashfs-tools \
           libX11-devel libxkbfile-devel pkgconf-pkg-config libsecret-devel \
           wayland-devel libxkbcommon-devel libxkbcommon-x11-devel
+        # `electron-builder` makes our `.deb` and `.rpm` with `fpm`. By default
+        # it downloads its own portable `fpm`, whose Ruby wrapper puts the
+        # bundled `libcrypto.so.1.1`, `libz.so.1`, etc. on `LD_LIBRARY_PATH`.
+        # Every child process inherits that, including this image's
+        # `rpmbuild`, which links Red Hat's builds of those same libraries and
+        # fails to load (exit code 127) against the bundled ones. So we install
+        # `fpm` from the distro's Ruby instead and tell `electron-builder` to
+        # use it. Pinned to the `fpm` version `electron-builder` would have
+        # used.
+        dnf module enable -y ruby:3.1
+        dnf install -y ruby rubygems
+        gem install --no-document fpm -v 1.16.0
+        fpm --version
+        echo "USE_SYSTEM_FPM=true" >> "$GITHUB_ENV"
 
       # Fail fast if the image ever stops giving us the toolchain described
       # above, rather than finding out from a crash report.

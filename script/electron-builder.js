@@ -280,13 +280,17 @@ let options = {
   deb: {
     afterInstall: 'script/post-install.sh',
     afterRemove: 'script/post-uninstall.sh',
-    packageName: baseName
+    packageName: baseName,
+    // `fpm` logs the output of the tools it runs (`rpmbuild`, `tar`, etc.) at
+    // `info` level, which it hides by default. Without `--verbose`, a failure
+    // tells us only that a tool exited non-zero, not why.
+    fpm: ['--verbose']
   },
   rpm: {
     afterInstall: 'script/post-install.sh',
     afterRemove: 'script/post-uninstall-rpm.sh',
     compression: 'xz',
-    fpm: ['--rpm-digest', 'sha256', '--rpm-rpmbuild-define=_build_id_links none']
+    fpm: ['--verbose', '--rpm-digest', 'sha256', '--rpm-rpmbuild-define=_build_id_links none']
   },
 
   linux: {

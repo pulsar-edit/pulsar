@@ -157,4 +157,5 @@ If you change images, keep to the `manylinux` family (or anything else whose com
 | “Verify Linux ABI Floor” fails with “contains its own copy of the C++ runtime” | Something linked that module with `-static-libstdc++`, or it’s a third-party prebuild that was. Shipping it risks a renderer crash; see above. |
 | “Verify Linux ABI Floor” fails with a `GLIBC_*`/`GLIBCXX_*` version | Usually a third-party prebuilt binary built against a newer distro. |
 | Prebuilds download for the wrong ABI, or none is found | `node-abi` is too old to know about X.Y.Z. |
+| Linux `rpm` target fails with `rpmbuild failed (exit code 127)` | `electron-builder` is using its bundled `fpm`, whose Ruby puts its own `libcrypto`/`libz` on `LD_LIBRARY_PATH`. Make sure `USE_SYSTEM_FPM=true` is set and the system `fpm` is installed (see “Install build dependencies - Linux”). |
 | Linux build fails at “Install build dependencies” | A package was renamed or moved between EL8 repositories (`baseos`, `appstream`, `powertools`). |
