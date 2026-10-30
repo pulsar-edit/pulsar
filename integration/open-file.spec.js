@@ -11,19 +11,22 @@ const { test, expect } = require('@playwright/test')
 // This one opens, edits, and saves a real file.
 let editor
 let fixtureDir
-// Resolves if the renderer crashes. A crash doesn't make pending Playwright
-// calls fail; Pulsar puts up its "editor has crashed" dialog and they just
-// wait until the test times out. So each step races against this instead.
-let rendererCrashed
 
 test.describe('Opening an existing file', () => {
   test.beforeAll(async () => {
     fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pulsar-open-file-'))
     editor = await openAtom("atom-home-open-file", "opening-existing-file")
-    rendererCrashed = new Promise((resolve) => editor.page.on('crash', resolve))
-    // Chromium reports renderer deaths on the main process's stderr; without
-    // this, the only trace of a crash in CI is a timeout.
-    editor.app.process().stderr.on('data', (data) => process.stderr.write(data))
+    // A renderer crash doesn't make pending Playwright calls fail, and
+    // Playwright's own `crash` event doesn't fire for Electron windows; Pulsar
+    // just puts up its "editor has crashed" dialog and the test times out. The
+    // main process survives the crash, though, so we have it keep a record
+    // that `step()` below can poll.
+    await editor.app.evaluate(({ app }) => {
+      global.__rendererGone = null
+      app.on('render-process-gone', (_event, _webContents, details) => {
+        global.__rendererGone = { reason: details.reason, exitCode: details.exitCode }
+      })
+    })
   })
 
   test.afterAll(async () => {
@@ -75,15 +78,32 @@ test.describe('Opening an existing file', () => {
   })
 })
 
-// Runs `body` as a named test step, failing immediately if the renderer
-// crashes while it runs.
+// Runs `body` as a named test step, failing within about half a second if the
+// renderer crashes while it runs.
 function step(title, body) {
-  return test.step(title, () => Promise.race([
-    body(),
-    rendererCrashed.then(() => {
-      throw new Error(`The renderer crashed during: ${title}`)
-    })
-  ]))
+  return test.step(title, async () => {
+    let finished = false
+    const crashed = (async () => {
+      while (!finished) {
+        const gone = await editor.app.evaluate(() => global.__rendererGone)
+        if (gone) return gone
+        await new Promise((resolve) => setTimeout(resolve, 500))
+      }
+    })()
+    try {
+      await Promise.race([
+        body(),
+        crashed.then((gone) => {
+          // `gone` is empty if polling stopped because `body` finished first.
+          if (gone) {
+            throw new Error(`The renderer crashed during: ${title} (reason: ${gone.reason}, exit code: ${gone.exitCode})`)
+          }
+        })
+      ])
+    } finally {
+      finished = true
+    }
+  })
 }
 
 function syntaxElement(kind, text) {
