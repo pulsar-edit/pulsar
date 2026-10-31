@@ -18,7 +18,7 @@ jobs:
       !startsWith(github.event.pull_request.title, '[skip-editor-ci]')
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-14, windows-2022]
+        os: [ubuntu-latest, macos-15, windows-2022]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
