@@ -6,6 +6,15 @@
 
 ## [Unreleased]
 
+## 1.133.1
+
+* Fix a crash when opening a file on Linux caused by two conflicting versions of `libstdc++` being loaded at once.
+
+### Pulsar
+
+- Rework Linux builds to use a `manylinux_2_28` image with `gcc-toolset` [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1686)
+- Ensure Playwright tests run serially [@savetheclocktower](https://github.com/pulsar-edit/pulsar/pull/1689)
+
 ## 1.133.0
 
 ### Pulsar
