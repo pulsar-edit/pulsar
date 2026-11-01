@@ -1679,6 +1679,11 @@
   dependencies:
     minipass "^7.0.4"
 
+"@isaacs/nonrecursive-glob-match@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@isaacs/nonrecursive-glob-match/-/nonrecursive-glob-match-1.0.3.tgz#7f6724fd8a6ca315d6bb7f63f0e4d079060da246"
+  integrity sha512-SI7kyKHq4XXDRozw+r9GlRZkia1ZkFrpLW98r2IC2Bpr8YkFGE3fvjzmxCG0x78A++69HmDNrDvSMYBZmHGpKA==
+
 "@jridgewell/gen-mapping@^0.3.12", "@jridgewell/gen-mapping@^0.3.5":
   version "0.3.13"
   resolved "https://registry.yarnpkg.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.13.tgz#6342a19f44347518c93e43b1ac69deb3c4656a1f"
@@ -2795,7 +2800,7 @@ atom-slick@^2, atom-slick@^2.0.0:
   dependencies:
     atom-slick "^2.0.0"
     grim "^2.0.1"
-    minimatch "^5.1.8"
+    minimatch "^11.0.0"
     selector-kit "^0.1.0"
     stable "^0.1.8"
     underscore-plus "^1.7.0"
@@ -3063,6 +3068,13 @@ brace-expansion@^2.0.2:
   integrity sha512-WR1cURNjuvBLMZBMbqM0UoE+WAfdUcEV1ccD8PVBVOI+Z3ND4+SZbN8RsfT2bMuG1qwz5RFvPukSZm5fF2D5eA==
   dependencies:
     balanced-match "^1.0.0"
+
+brace-expansion@^5.0.12:
+  version "5.0.12"
+  resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-5.0.12.tgz#995fbb4750a77c4d16a7dc942ff2ca6ef8e675ec"
+  integrity sha512-YovQ3rzhaLMIrDjNDMkNS01tea93qhEhG5xy8f6+R0l+dw3Ki+5sCoIoI942iuLZTHWogWktgwVDhU09iNEimQ==
+  dependencies:
+    balanced-match "^4.0.2"
 
 brace-expansion@^5.0.5:
   version "5.0.6"
@@ -5234,7 +5246,7 @@ fuzzaldrin@^2.1.0:
   dependencies:
     atom-select-list "^0.7.0"
     fs-plus "^3.0.0"
-    minimatch "~5.1.0"
+    minimatch "~11.0.0"
     underscore-plus "^1.7.0"
     vscode-ripgrep "^1.2.5"
     wrench "^1.5"
@@ -7182,6 +7194,14 @@ minimatch@^10.0.3:
   dependencies:
     brace-expansion "^5.0.5"
 
+minimatch@^11.0.0, minimatch@~11.0.0:
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-11.0.3.tgz#d794539f77c0a98ea4adca473768d1e1357204f5"
+  integrity sha512-iny/40PEGkNJQ5/Pv6z3nm6FbRAby32GeZRjCUJk2WnNDbgPSTcdI+DDvLqsgBdD4cD5sMtMheqPPnehCCa8Nw==
+  dependencies:
+    "@isaacs/nonrecursive-glob-match" "^1.0.3"
+    brace-expansion "^5.0.12"
+
 minimatch@^2.0.9:
   version "2.0.10"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-2.0.10.tgz#8d087c39c6b38c001b97fca7ce6d0e1e80afbac7"
@@ -7189,7 +7209,7 @@ minimatch@^2.0.9:
   dependencies:
     brace-expansion "^1.0.0"
 
-minimatch@^5.0.0, minimatch@^5.0.1, minimatch@^5.1.0, minimatch@^5.1.8, minimatch@~5.1.0, minimatch@~5.1.8:
+minimatch@^5.0.0, minimatch@^5.0.1, minimatch@^5.1.0:
   version "5.1.9"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.9.tgz#1293ef15db0098b394540e8f9f744f9fda8dee4b"
   integrity sha512-7o1wEA2RyMP7Iu7GNba9vc0RWWGACJOCZBJX2GJWip0ikV+wcOsgVuY9uE8CPiyQhkGFSlhuSkZPavN7u1c2Fw==
@@ -9732,7 +9752,7 @@ tree-kill@1.2.2:
   version "0.229.1"
   dependencies:
     fs-plus "^3.0.0"
-    minimatch "~5.1.8"
+    minimatch "~11.0.0"
     temp "~0.9.0"
     underscore-plus "^1.0.0"
 
