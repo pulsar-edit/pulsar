@@ -59,21 +59,11 @@ export default class ChangeLogView {
             <p>Take a look at some of the awesome things {atom.branding.name} has changed:</p>
             <p>Feel free to read our <a href="https://github.com/pulsar-edit/pulsar/blob/master/CHANGELOG.md">Full Change Log</a>.</p>
             <ul>
-              <li>
-                Fix an issue where missing theme variables prevented the project window from initializing.
-              </li>
-              <li>
-                New <code>terminal</code> package! For more information, consult the package’s <a href="atom://config/packages/terminal">settings and README</a>, or read <a href="https://blog.pulsar-edit.dev/posts/20260510-savetheclocktower-terminal-package/">the introductory blog post</a>.
-              </li>
-              <li>
-                New <code>editor.largeFileThreshold</code> setting that allows the user to configure the file-size threshold of the “large file mode” present in TextMate-style grammars.
-              </li>
-              <li>
-                New experimental setting: <code>core.promptOnConflict</code>. When enabled, Pulsar will ask for confirmation if you try to save an item while it’s in a “conflicted” state. You may decide whether to cancel or proceed with overwriting the file on disk. (For an editor, the “conflicted” state occurs if you open a file and make changes, but another program writes different contents to the file on disk before you can save your changes in Pulsar.) Since this setting is experimental, it is disabled by default… but we encourage users to enable it and help us test it!
-              </li>
-              <li>
-                Minor Electron version increase to v30.5.1.
-              </li>
+              <li>New <code>terminal</code> package features: hyperlink support, clickable file paths, and shell integration in order to track the terminal’s working directory.</li>
+              <li>Project-wide recursive file-watching now runs in a separate worker process and has two implementations: <code>nsfw</code> (the default) and <code>@parcel/watcher</code>. You may use the <strong>Core → File System Watcher</strong> setting to switch implementations.</li>
+              <li>Pane items have a new “deleted” state to represent (for instance) buffers whose backing file is no longer present on disk. New settings <code>editor.promptWhenAbandoningDeletedFile</code> and <code>tabs.enableItemStatusColoring</code> control the new behavior and appearance around deleted items.</li>
+              <li>Bug fixes and performance improvements — especially around syntax highlighting of large files.</li>
+              <li>Updated Electron to v32.3.3.</li>
             </ul>
 
             <section className="welcome-panel">
