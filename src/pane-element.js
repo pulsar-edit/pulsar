@@ -1,4 +1,5 @@
 const path = require('path');
+const { webUtils } = require('electron');
 const { CompositeDisposable } = require('event-kit');
 
 // The HTMLElement corresponding to a {Pane}.
@@ -62,7 +63,9 @@ class PaneElement extends HTMLElement {
       event.preventDefault();
       event.stopPropagation();
       this.getModel().activate();
-      const pathsToOpen = [...event.dataTransfer.files].map(file => file.path);
+      let pathsToOpen = [...event.dataTransfer.files].map((file) => {
+        return webUtils.getPathForFile(file);
+      });
       if (pathsToOpen.length > 0) {
         this.applicationDelegate.open({ pathsToOpen, here: true });
       }
