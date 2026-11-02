@@ -1628,7 +1628,7 @@ class TreeView {
       // tree view. This is probably the user dragging a folder into the tree
       // view in order to add a new folder to the project.
       for (let entry of event.dataTransfer.files) {
-        atom.project.addPath(entry.path);
+        atom.project.addPath(webUtils.getPathForFile(entry));
       }
     }
   }

@@ -3576,23 +3576,23 @@ describe("TreeView", function () {
           // outside of Atom by the time the deletion is confirmed, do not error
           atom.notifications.clear();
 
-          spyOn(fs, 'existsSync').andCallThrough();
-
           fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
           treeView.focus();
 
+          // Don't count `fs.existsSync` calls to detect when the deletion has
+          // happened; opening the file makes `TextBuffer` call it too (via
+          // `pathwatcher`). Instead, wait on the confirm callback itself.
+          let deletion;
           spyOn(atom, 'confirm').andCallFake(function (_, callback) {
-            // Remove the directory before confirming the deletion
+            // Remove the file before confirming the deletion
             fs.unlinkSync(filePath);
-            return callback(0);
+            deletion = callback(0);
+            return deletion;
           });
 
           atom.commands.dispatch(treeView.element, 'tree-view:remove');
-
-          await conditionPromise(
-            () => fs.existsSync.callCount === 1,
-            'the entry to attempt to be deleted'
-          );
+          expect(deletion).toBeDefined();
+          await deletion;
 
           expect(atom.notifications.getNotifications().length).toBe(0);
         });
