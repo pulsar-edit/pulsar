@@ -72,12 +72,10 @@ const IGNORED_ERROR_MESSAGES = [
   /ResizeObserver loop limit exceeded/
 ];
 
-/**
- * @class AtomEnvironment
- * @classdesc Pulsar global for dealing with packages, themes, menus, and the window.
- *
- * An instance of this class is always available as the `atom` global.
- */
+// Essential: Pulsar global for dealing with packages, themes, menus, and the
+// window.
+//
+// An instance of this class is always available as the `atom` global.
 class AtomEnvironment {
 
   constructor(params = {}) {
