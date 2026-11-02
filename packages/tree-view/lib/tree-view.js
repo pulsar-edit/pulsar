@@ -1,6 +1,7 @@
 const path = require('path');
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
+const { webUtils } = require('electron');
 const { CompositeDisposable, Emitter } = require('atom');
 
 const {
@@ -1614,9 +1615,10 @@ class TreeView {
         // Drop event from OS
         entry.classList.remove('selected');
         for (let file of event.dataTransfer.files) {
+          let filePath = webUtils.getPathForFile(file);
           if ((process.platform === 'darwin' && event.metaKey) || event.ctrlKey) {
-            this.copyEntry(file.path, newDirectoryPath);
-          } else if (!this.moveEntry(file.path, newDirectoryPath)) {
+            this.copyEntry(filePath, newDirectoryPath);
+          } else if (!this.moveEntry(filePath, newDirectoryPath)) {
             break;
           }
         }
@@ -1626,7 +1628,7 @@ class TreeView {
       // tree view. This is probably the user dragging a folder into the tree
       // view in order to add a new folder to the project.
       for (let entry of event.dataTransfer.files) {
-        atom.project.addPath(entry.path);
+        atom.project.addPath(webUtils.getPathForFile(entry));
       }
     }
   }
