@@ -1,4 +1,5 @@
 const PaneContainer = require('../src/pane-container');
+const { webUtils } = require('electron');
 
 describe('PaneElement', function() {
   let [paneElement, container, containerElement, pane] = [];
@@ -277,6 +278,24 @@ describe('PaneElement', function() {
     }));
 
   describe('drag and drop', function() {
+    // Electron 32 removed `File::path`; the only way to get a dropped file's
+    // path is `webUtils.getPathForFile`. These fakes deliberately lack a
+    // `path` property so that a regression to `file.path` fails these specs.
+    let fakePaths;
+
+    beforeEach(function() {
+      fakePaths = new Map();
+      spyOn(webUtils, 'getPathForFile').and.callFake(
+        file => fakePaths.get(file) ?? ''
+      );
+    });
+
+    const fakeFile = function(filePath) {
+      const file = {};
+      fakePaths.set(file, filePath);
+      return file;
+    };
+
     const buildDragEvent = function(type, files) {
       const dataTransfer = {
         files,
@@ -297,8 +316,8 @@ describe('PaneElement', function() {
     describe('when a file is dragged to the pane', () =>
       it('opens it', function() {
         const event = buildDragEvent('drop', [
-          { path: '/fake1' },
-          { path: '/fake2' }
+          fakeFile('/fake1'),
+          fakeFile('/fake2')
         ]);
         paneElement.dispatchEvent(event);
         expect(atom.applicationDelegate.open.calls.count()).toBe(1);
