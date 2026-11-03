@@ -155,12 +155,12 @@ module.exports = class WindowEventHandler {
     event.stopImmediatePropagation();
   }
 
-  handleDrop(event) {
+  handleDocumentDrop(event) {
     event.preventDefault();
     event.stopPropagation();
   }
 
-  handleDragover(event) {
+  handleDocumentDragover(event) {
     event.preventDefault();
     event.stopPropagation();
     event.dataTransfer.dropEffect = 'none';
