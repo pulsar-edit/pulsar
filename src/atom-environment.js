@@ -55,12 +55,6 @@ const stat = util.promisify(fs.stat);
 
 let nextId = 0;
 
-/**
- * @class AtomEnvironment
- * @classdesc Pulsar global for dealing with packages, themes, menus, and the window.
- *
- * An instance of this class is always available as the `atom` global.
- */
 // Error messages that should not cause the dev tools to open. These are
 // Chromium notifications that arrive through `window.onerror` despite not
 // indicating a fault; see `installUncaughtErrorHandler`.
@@ -78,6 +72,10 @@ const IGNORED_ERROR_MESSAGES = [
   /ResizeObserver loop limit exceeded/
 ];
 
+// Essential: Pulsar global for dealing with packages, themes, menus, and the
+// window.
+//
+// An instance of this class is always available as the `atom` global.
 class AtomEnvironment {
 
   constructor(params = {}) {
