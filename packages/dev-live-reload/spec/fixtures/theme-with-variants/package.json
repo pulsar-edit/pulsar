@@ -1,0 +1,15 @@
+{
+  "name": "dev-live-reload-theme-with-variants",
+  "themes": [
+    {
+      "name": "dev-live-reload-theme-variant-night-ui",
+      "theme": "ui",
+      "stylesheetsPath": "styles/night-ui"
+    },
+    {
+      "name": "dev-live-reload-theme-variant-night-syntax",
+      "theme": "syntax",
+      "stylesheetsPath": "styles/night-syntax"
+    }
+  ]
+}
