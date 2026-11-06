@@ -22,7 +22,7 @@ const {CompositeDisposable} = require('event-kit');
 const TextEditor = require('../../src/text-editor');
 const TextEditorElement = require('../../src/text-editor-element');
 const TextMateLanguageMode = require('../../src/text-mate-language-mode');
-const {clipboard} = require('electron');
+const clipboard = require('@electron/remote').clipboard;
 const {mockDebounce} = require("./mock-debounce.js");
 
 const jasmineStyle = document.createElement('style');
@@ -149,9 +149,7 @@ beforeEach(function () {
     );
   });
 
-  let clipboardContent = 'initial clipboard content';
-  spyOn(clipboard, 'writeText').andCallFake(text => clipboardContent = text);
-  spyOn(clipboard, 'readText').andCallFake(() => clipboardContent);
+  waitsForPromise(() => atom.clipboard.write('initial clipboard content'));
 
   return addCustomMatchers(this);
 });
