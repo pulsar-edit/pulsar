@@ -142,3 +142,5 @@
 
 ((element) @meta.tag.incomplete.html
   (#not-match? @meta.tag.incomplete.html ">$"))
+(start_tag) @meta.tag.start.html
+(self_closing_tag) @meta.tag.self-closing.html
