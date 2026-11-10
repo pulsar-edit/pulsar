@@ -2,6 +2,7 @@ const { conditionPromise } = require('./helpers/async-spec-helpers');
 const fs = require('fs');
 const path = require('path');
 const temp = require('temp').track();
+const { Emitter } = require('event-kit');
 const AtomEnvironment = require('../src/atom-environment');
 const { timeoutPromise: wait } = require('./helpers/async-spec-helpers');
 
@@ -149,6 +150,35 @@ describe('AtomEnvironment', () => {
         });
       });
     });
+
+    describe('when an event listener throws', () => {
+      let disposable;
+      beforeEach(() => {
+        // This handler is skipped in spec mode, so we have to call it manually
+        // for these tests.
+        disposable = atom.installEventHandlerExceptionHandler();
+      });
+      // The handler list is static on `Emitter`; leaking it would change
+      // `emit` behavior for every later spec.
+      afterEach(() => disposable.dispose());
+
+      it('still calls later listeners and reports the error', () => {
+        const emitter = new Emitter();
+        const error = new Error('Test of listener failure');
+        const didThrowSpy = jasmine.createSpy('didThrow');
+        const laterListener = jasmine.createSpy('laterListener');
+
+        atom.onDidThrowError(didThrowSpy);
+        emitter.on('foo', () => { throw error; });
+        emitter.on('foo', laterListener);
+
+        expect(() => emitter.emit('foo', 42)).not.toThrow();
+        expect(laterListener).toHaveBeenCalledWith(42);
+        expect(didThrowSpy).toHaveBeenCalled();
+        expect(didThrowSpy.calls.mostRecent().args[0].originalError).toBe(error);
+      });
+    });
+
   });
 
   describe('.assert(condition, message, callback)', () => {
