@@ -358,6 +358,13 @@ class AtomEnvironment {
     this.keymaps.subscribeToFileReadFailure();
 
     this.installUncaughtErrorHandler();
+    if (!this.inSpecMode()) {
+      // Don't add this exception handler in spec mode because it'll get in the
+      // way of specs that assert on raised exceptions. In production, those
+      // exceptions will still be reported even though a `try/catch` won't
+      // intercept them.
+      this.disposables.add(this.installEventHandlerExceptionHandler());
+    }
     this.attachSaveStateListeners();
     this.windowEventHandler.initialize(this.window, this.document);
 
@@ -1277,6 +1284,23 @@ class AtomEnvironment {
         originalError
       });
     };
+  }
+
+  installEventHandlerExceptionHandler () {
+    // `event-kit` allows us to define one global error handler for exceptions
+    // thrown inside callback functions.
+    return Emitter.onEventHandlerException((error) => {
+      // `reportError` is somewhat new and is designed exactly for this
+      // purpose: to surface errors that arise in callbacks and let them be
+      // treated identically to uncaught exceptions, but without _actually_
+      // being uncaught exceptions that interfere with other callbacks.
+      //
+      // These errors will still show up in the console (and still trigger
+      // display of the console if the user is in dev mode). It'll also trigger
+      // an error notification with a "report this issue" button. So it's
+      // exactly what we need.
+      this.window.reportError(error);
+    });
   }
 
   uninstallUncaughtErrorHandler() {
