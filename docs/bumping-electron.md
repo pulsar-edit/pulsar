@@ -4,38 +4,52 @@ We expect to be bumping Electron versions much more frequently these days… fir
 
 ## Bump in `pulsar`
 
-Choose the Electron version you want to install. We’ll call it X.Y.Z.
+Choose the Electron version you want to install. We’ll call it `X.Y.Z`. You want to pick a major version and then use the newest release on that version; you can find this on [Electron’s own releases page](https://releases.electronjs.org/). Helpfully, this page will also tell you the corresponding Node version; we’ll call it `T.U.V`. Note it as well.
 
 ```bash
-yarn install electron@X.Y.Z
+yarn add electron@X.Y.Z
+yarn build
 ```
 
 Build the app:
 
 ```bash
-yarn dist # or `yarn dist --next` if you want better isolation from main Pulsar
+yarn dist -t zip # or `yarn dist --next` if you want better isolation from main Pulsar
 ```
 
-Launch the app. Do some sanity checking. Read the Electron release notes between the current version and X.Y.Z to make sure you’re not missing any major gotchas. (If the release notes mention dropping support for any specific OS versions, note that; that applies to Pulsar as well.)
+(It’s good to add the `--next` flag if you’ve got time! It sanity-checks that the “next”-channel machinery still works, plus it allows you to run the app without having to quit any other instance that may be running.)
 
-Open the dev tools console and run `process.versions`. Inspect the result to find out the version of Node that this version of Electron is using. We’ll call it T.U.V.
+Launch the app. Do some sanity checking. Read the Electron release notes between the current version and `X.Y.Z` to make sure you’re not missing any major gotchas. (If the release notes mention dropping support for any specific OS versions, note that; that applies to Pulsar as well.)
 
-If it works fine, proceed; if not, troubleshoot.
+Open the dev tools console and run `process.versions`. Inspect the result to double-check that the `node` value matches what you thought it would be (`T.U.V` above).
+
+If it works fine, proceed; if not, troubleshoot. At this point, failures could be for any of these reasons:
+
+* If upgrading Electron involved a major-version bump of Node, some failures could be related to underlying API changes. These are typically quick fixes once you figure out the root cause.
+* Similarly, bumping Node could influence our native modules and require that they be bumped to support newer versions of `napi` or `nan`.
 
 ## Update the version references
 
-The Node version is written down in more places than you’d expect, and nothing will fail loudly if you miss one. Update all of these to T.U.V:
+The Node version is written down in more places than you’d expect, and nothing will fail loudly if you miss one. Update all of these:
 
-* the `electronVersion` field in `package.json`
-* the `engines.node` field in `package.json`
-* `.nvmrc`
-* `ppm/BUNDLED_NODE_VERSION` (see the next section)
+* the `electronVersion` field in `package.json` (to `X.Y.Z`)
+* the `engines.node` field in `package.json` (to `T.U.V`)
+* `.nvmrc` (to `T.U.V`)
+* `ppm/BUNDLED_NODE_VERSION` (to `T.U.V`) (see the next section)
 
 ## Bump Node version in `ppm`
 
 Open the `ppm` repo and read `docs/bumping-the-node-version.md` to proceed. In some places you’ll need to supply the new Node version (`T.U.V`) and in some places the new Electron version (`X.Y.Z`).
 
 ## Push to a branch and verify the builds
+
+You want to commit
+
+* all the version bumps (changes to `package.json` and `.nvmrc`);
+* whatever changes you had to make to core or builtin-package code to fix issues that arose from the bump;
+* a submodule bump to `ppm`. (You know the SHA to point to even if it’s not yet landed to `master`; just remember to bump `ppm` again if further commits are added!)
+
+Push that work to a remote branch and open a PR.
 
 The proof is in “the pudding,” which is my nickname for CI. If, after these changes, CI can produce a working binary on each platform that uses the intended Electron version, we’re in great shape. Otherwise, troubleshoot what went wrong (perhaps one of the items noted below).
 
