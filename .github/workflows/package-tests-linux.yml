@@ -233,3 +233,29 @@ jobs:
     - name: Run ${{ matrix.package }} Tests
       continue-on-error: ${{ matrix.allow-failure || false }}
       run: Xvfb :1 & cd node_modules/${{ matrix.package }} && DISPLAY=:1 pulsar --test ${{ matrix.dir || 'spec'}}
+
+    # Pulsar starts Crashpad on Linux (`src/main-process/start.js`) and writes
+    # dumps under `$ATOM_HOME/crashdumps`, which is `~/.pulsar/crashdumps` here.
+    # Check whether or not the specs failed: a crash can hide behind
+    # `allow-failure`, or happen in a process the specs don't depend on.
+    - name: Check for crash dumps
+      id: crash-dumps
+      if: ${{ !cancelled() }}
+      run: |
+        dir="${ATOM_HOME:-$HOME/.pulsar}/crashdumps"
+        dumps="$(find "$dir" -type f -name '*.dmp' 2>/dev/null || true)"
+        if [ -n "$dumps" ]; then
+          echo "::warning::Pulsar crashed while running the ${{ matrix.package }} specs."
+          echo "$dumps" | xargs ls -la
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+        fi
+
+    # Skipped entirely unless the previous step found at least one dump.
+    - name: Upload crash dumps
+      if: ${{ !cancelled() && steps.crash-dumps.outputs.found == 'true' }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: crash-dumps-${{ matrix.package }}
+        path: ${{ steps.crash-dumps.outputs.dir }}/**/*.dmp
+        retention-days: 7
