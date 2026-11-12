@@ -232,7 +232,11 @@ jobs:
 
     - name: Run ${{ matrix.package }} Tests
       continue-on-error: ${{ matrix.allow-failure || false }}
-      run: Xvfb :1 & cd node_modules/${{ matrix.package }} && DISPLAY=:1 pulsar --test ${{ matrix.dir || 'spec'}}
+      # `xvfb-run` waits for the X server to accept connections before
+      # launching Pulsar. Starting `Xvfb` in the background and launching
+      # Pulsar right away races it, and when Pulsar wins, the main process
+      # segfaults during startup ("Missing X server or $DISPLAY").
+      run: cd node_modules/${{ matrix.package }} && xvfb-run --auto-servernum pulsar --test ${{ matrix.dir || 'spec'}}
 
     # Pulsar starts Crashpad on Linux (`src/main-process/start.js`) and writes
     # dumps under `$ATOM_HOME/crashdumps`, which is `~/.pulsar/crashdumps` here.
