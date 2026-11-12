@@ -233,6 +233,14 @@ ipcMain.handle('openPath', async (_, filePath) => {
   }
 });
 
+// Since Electron 35, `shell.beep` on Linux calls into GTK
+// (`gdk_display_beep`), which is only initialized in the main process. Called
+// from a renderer, it segfaults. Renderers send this message instead. It's
+// fire-and-forget, since there's nothing to report back.
+ipcMain.on('beep', () => {
+  shell.beep();
+});
+
 ipcMain.handle('openExternal', async (_, url) => {
   try {
     let result = await withShellTimeout(
