@@ -316,9 +316,9 @@ class Directory {
         stat = fs.statSyncNoException(fullPath)
       }
 
-      const statFlat = _.pick(stat, _.keys(stat))
+      const statFlat = { ...stat }
       for (let key of ['atime', 'birthtime', 'ctime', 'mtime']) {
-        statFlat[key] = statFlat[key] && statFlat[key].getTime()
+        statFlat[key] = stats[`${key}Ms`]
       }
 
       if (typeof stat.isDirectory === 'function' && stat.isDirectory()) {
