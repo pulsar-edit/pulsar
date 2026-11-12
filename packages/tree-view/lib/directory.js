@@ -318,7 +318,7 @@ class Directory {
 
       const statFlat = { ...stat }
       for (let key of ['atime', 'birthtime', 'ctime', 'mtime']) {
-        statFlat[key] = stats[`${key}Ms`]
+        statFlat[key] = stat[`${key}Ms`]
       }
 
       if (typeof stat.isDirectory === 'function' && stat.isDirectory()) {
