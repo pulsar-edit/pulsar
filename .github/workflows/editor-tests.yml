@@ -74,6 +74,33 @@ jobs:
     - name: Run Tests with xvfb-run (Linux)
       if: runner.os == 'Linux'
       run: xvfb-run --auto-servernum yarn start --test spec
+
+    # Pulsar starts Crashpad on Linux (`src/main-process/start.js`) and writes
+    # dumps under `$ATOM_HOME/crashdumps`, which is `~/.pulsar/crashdumps` here.
+    # Check whether or not the specs failed, since a crash in a process the
+    # specs don't depend on fails nothing. Unlike the Windows steps below, this
+    # stages nothing, so the upload step is skipped unless a dump exists.
+    - name: Check for crash dumps (Linux)
+      id: crash-dumps-linux
+      if: ${{ !cancelled() && runner.os == 'Linux' }}
+      run: |
+        dir="${ATOM_HOME:-$HOME/.pulsar}/crashdumps"
+        dumps="$(find "$dir" -type f -name '*.dmp' 2>/dev/null || true)"
+        if [ -n "$dumps" ]; then
+          echo "::warning::Pulsar crashed while running the editor specs."
+          echo "$dumps" | xargs ls -la
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Upload crash dumps (Linux)
+      if: ${{ !cancelled() && runner.os == 'Linux' && steps.crash-dumps-linux.outputs.found == 'true' }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: Crash dumps (${{ matrix.os }})
+        path: ${{ steps.crash-dumps-linux.outputs.dir }}/**/*.dmp
+        retention-days: 7
+
     # The renderer can die without producing any JS-level output, so we should
     # grab a crashdump whenever that happens.
     - name: Collect crash dumps
