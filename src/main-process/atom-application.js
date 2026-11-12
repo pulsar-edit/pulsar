@@ -233,12 +233,32 @@ ipcMain.handle('openPath', async (_, filePath) => {
   }
 });
 
-// Since Electron 35, `shell.beep` on Linux calls into GTK
-// (`gdk_display_beep`), which is only initialized in the main process. Called
-// from a renderer, it segfaults. Renderers send this message instead. It's
-// fire-and-forget, since there's nothing to report back.
+// Electron 35 changed `shell.beep` on Linux to call `gdk_display_beep`
+// through a stub that is never initialized, so it segfaults in any process
+// (electron/electron#49436). It's fixed by electron/electron#49680, which
+// only reached 40.x and later. Until then, do what Electron did before 35:
+// write BEL to the system console, or failing that, to our controlling
+// terminal. Either may be missing or unwritable (no terminal, not root); a
+// beep isn't worth reporting an error over.
+//
+// TODO: Remove the Linux branch once we're on a fixed Electron, and confirm
+// that the `::beep()` specs pass on Linux.
+function beepOnLinux() {
+  fs.appendFile('/dev/console', '\x07', error => {
+    if (error) fs.appendFile('/dev/tty', '\x07', () => {});
+  });
+}
+
+// Renderers send this message instead of calling `shell.beep` themselves:
+// even on a fixed Electron, a renderer can't call `gdk_display_beep`, since
+// GTK is only initialized in the main process. It's fire-and-forget, since
+// there's nothing to report back.
 ipcMain.on('beep', () => {
-  shell.beep();
+  if (process.platform === 'linux') {
+    beepOnLinux();
+  } else {
+    shell.beep();
+  }
 });
 
 ipcMain.handle('openExternal', async (_, url) => {
