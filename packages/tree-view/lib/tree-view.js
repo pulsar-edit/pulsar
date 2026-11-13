@@ -507,9 +507,9 @@ class TreeView {
         let stats = fs.lstatSyncNoException(projectPath);
         if (!stats) continue;
 
-        stats = _.pick(stats, ..._.keys(stats));
+        let result = { ...stats };
         for (let key of ['atime', 'birthtime', 'ctime', 'mtime']) {
-          stats[key] = stats[key].getTime();
+          result[key] = stats[`${key}Ms`];
         }
 
         let directory = new Directory({
@@ -522,7 +522,7 @@ class TreeView {
             { isExpanded: true },
           ignoredNames: new IgnoredNames(),
           useSyncFS: this.useSyncFS,
-          stats
+          stats: result
         });
 
         let root = new DirectoryView(directory).element;

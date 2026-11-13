@@ -1,4 +1,4 @@
-const { ipcRenderer, shell } = require('electron');
+const { ipcRenderer } = require('electron');
 const remote = require('@electron/remote');
 const ipcHelpers = require('./ipc-helpers');
 const { Emitter, Disposable } = require('event-kit');
@@ -299,8 +299,9 @@ module.exports = class ApplicationDelegate {
   }
 
   playBeepSound() {
-    // TODO: Delegate to main.
-    return shell.beep();
+    // Calling `shell.beep` from the renderer crashes it on Linux; see the
+    // `beep` handler in `atom-application.js`.
+    return ipcRenderer.send('beep');
   }
 
   onDidOpenLocations(callback) {

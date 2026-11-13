@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const temp = require('temp').track();
 const { Emitter } = require('event-kit');
+const { ipcRenderer } = require('electron');
 const AtomEnvironment = require('../src/atom-environment');
 const { timeoutPromise: wait } = require('./helpers/async-spec-helpers');
 
@@ -1012,6 +1013,38 @@ describe('AtomEnvironment', () => {
       expect(error).toEqual(jasmine.any(Error));
       expect(error?.message).toBeTruthy();
       expect(error?.code).toBe('ENOENT');
+    });
+  });
+
+  describe('::beep()', () => {
+    // We can't hear the beep. But since Electron 35, calling `shell.beep` from
+    // a renderer process segfaults it on Linux, so we really do beep here: if
+    // beeping regresses, these specs crash the renderer rather than pass.
+
+    it('beeps when `core.audioBeep` is enabled', async () => {
+      atom.config.set('core.audioBeep', true);
+      spyOn(atom.applicationDelegate, 'playBeepSound').and.callThrough();
+      const didBeep = jasmine.createSpy('did-beep');
+      atom.onDidBeep(didBeep);
+
+      atom.beep();
+      expect(atom.applicationDelegate.playBeepSound).toHaveBeenCalled();
+      expect(didBeep).toHaveBeenCalled();
+
+      // The beep itself happens in the main process. Make a round trip there
+      // so that it has run before this spec finishes.
+      await ipcRenderer.invoke('getScrollbarStyle');
+    });
+
+    it('emits `did-beep` without making a sound when `core.audioBeep` is disabled', () => {
+      atom.config.set('core.audioBeep', false);
+      spyOn(atom.applicationDelegate, 'playBeepSound');
+      const didBeep = jasmine.createSpy('did-beep');
+      atom.onDidBeep(didBeep);
+
+      atom.beep();
+      expect(atom.applicationDelegate.playBeepSound).not.toHaveBeenCalled();
+      expect(didBeep).toHaveBeenCalled();
     });
   });
 });
