@@ -49,11 +49,6 @@
         path.join(process.env.ATOM_HOME, 'blob-store')
       );
 
-      const NativeCompileCache = require('../src/native-compile-cache');
-      NativeCompileCache.setCacheStore(blobStore);
-      NativeCompileCache.setV8Version(process.versions.v8);
-      NativeCompileCache.install();
-
       if (getWindowLoadSettings().profileStartup) {
         profileStartup(Date.now() - startTime);
       } else {
