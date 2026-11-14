@@ -43,7 +43,7 @@ class LocaleChecker {
 
   getId() {
     let localeToken = this.locale.toLowerCase().replace('_', '-');
-    return `spell-check:locale:${localeToken};`;
+    return `spell-check:locale:${localeToken}`;
   }
   getName() {
     return `Locale Dictionary (${this.locale})`;

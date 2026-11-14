@@ -5,19 +5,11 @@ class KnownWordsChecker {
   spelling = null;
   checker = null;
 
-  static initClass() {
-    this.prototype.enableAdd = false;
-    this.prototype.spelling = null;
-    this.prototype.checker = null;
-  }
-
   constructor(knownWords) {
-    // Set up the spelling manager we'll be using.
     SpellingManager ??= require('spelling-manager');
     this.spelling = new SpellingManager.TokenSpellingManager();
     this.checker = new SpellingManager.BufferSpellingChecker(this.spelling);
 
-    // Set our known words.
     this.setKnownWords(knownWords);
   }
 
