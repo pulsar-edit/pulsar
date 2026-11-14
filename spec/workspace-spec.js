@@ -761,6 +761,41 @@ describe('Workspace', () => {
         expect(
           workspace.getActiveTextEditor().getCursorBufferPosition()
         ).toEqual([2, 11])
+
+        await workspace.open('a', { initialLine: null, initialColumn: 4 });
+
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([0, 4])
+
+        await workspace.open('a', { initialLine: 2, initialColumn: null });
+
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([2, 0])
+      });
+
+      it('does not throw when opened without position options', async () => {
+        await workspace.open('a', {});
+        await workspace.open('a', { initialLine: null, initialColumn: null });
+        await workspace.open('a', {
+          initialLine: undefined,
+          initialColumn: undefined
+        });
+      });
+
+      it('does not throw when opening a file outside the project with null position options', async () => {
+        // atom-application.js parsePathToOpen() sets initialLine/initialColumn to null
+        // for files opened without a line:column suffix (e.g. via recent files or drag-and-drop)
+        const dir = temp.mkdirSync('outside-project');
+        const filePath = path.join(dir, 'outside.txt');
+        fs.writeFileSync(filePath, 'content outside project\n');
+
+        await workspace.open(filePath, { initialLine: null, initialColumn: null });
+
+        expect(
+          workspace.getActiveTextEditor().getCursorBufferPosition()
+        ).toEqual([0, 0]);
       });
 
       it('unfolds the fold containing the line', async () => {
@@ -1759,6 +1794,63 @@ describe('Workspace', () => {
       expect(workspace.getTextEditors()).toHaveLength(1);
       editor.destroy();
       expect(workspace.getTextEditors()).toHaveLength(0);
+    });
+  });
+
+  describe('when an editor becomes active', () => {
+    let filePath;
+
+    // Resolves with the next value the buffer reports for its deleted status.
+    const nextDeletedStatus = buffer =>
+      new Promise(resolve => {
+        const disposable = buffer.onDidChangeDeleted(status => {
+          disposable.dispose();
+          resolve(status);
+        });
+      });
+
+    beforeEach(() => {
+      // Outside of any project root, so that no project watcher will notice
+      // when the file is restored.
+      const dir = temp.mkdirSync('atom-spec-workspace-resurrect');
+      filePath = path.join(dir, 'restored.txt');
+      fs.writeFileSync(filePath, 'original\n');
+    });
+
+    it('resurrects its buffer if the buffer’s file was deleted and has been restored', async () => {
+      const editor = await workspace.open(filePath);
+      const buffer = editor.getBuffer();
+      await workspace.open('a');
+      expect(workspace.getActiveTextEditor()).not.toBe(editor);
+
+      let deleted = nextDeletedStatus(buffer);
+      fs.unlinkSync(filePath);
+      expect(await deleted).toBe(true);
+
+      // Nothing else should notice the file's return.
+      fs.writeFileSync(filePath, 'restored\n');
+      await timeoutPromise(500);
+      expect(atom.project.deletedBuffers.has(buffer)).toBe(true);
+
+      deleted = nextDeletedStatus(buffer);
+      workspace.getActivePane().activateItem(editor);
+      expect(await deleted).toBe(false);
+
+      await conditionPromise(
+        () => buffer.getText() === 'restored\n',
+        'buffer to reload restored file'
+      );
+      expect(buffer.isDeleted()).toBe(false);
+    });
+
+    it('does not resurrect its buffer if the buffer was never deleted', async () => {
+      const editor = await workspace.open(filePath);
+      spyOn(editor.getBuffer(), 'resurrect').and.callThrough();
+      await workspace.open('a');
+
+      workspace.getActivePane().activateItem(editor);
+      expect(workspace.getActiveTextEditor()).toBe(editor);
+      expect(editor.getBuffer().resurrect).not.toHaveBeenCalled();
     });
   });
 
@@ -2855,9 +2947,13 @@ describe('Workspace', () => {
             // * a-dir/sample1.js ("smapdi" exists in the modified buffer, but
             //   this path doesn't match our glob!)
             expect(paths.length).toBe(2, glob);
-            expect(paths.includes('b-dir/sample1.js')).toBe(true, glob);
-            expect(paths.includes('b-dir/sample2.js')).toBe(true, glob);
-            expect(paths.includes('a-dir/sample1.js')).toBe(false, glob);
+
+            // Be sure to construct these paths with `path.join` so that the
+            // separator is appropriate for the platform. Without this, specs
+            // fail on Windows.
+            expect(paths.includes(path.join('b-dir', 'sample1.js'))).toBe(true, glob);
+            expect(paths.includes(path.join('b-dir', 'sample2.js'))).toBe(true, glob);
+            expect(paths.includes(path.join('a-dir', 'sample1.js'))).toBe(false, glob);
           }
 
           for (let glob of negativeGlobs) {
@@ -2877,9 +2973,9 @@ describe('Workspace', () => {
             // * b-dir/sample2.js ("smapdi" exists on disk, but should fail our
             //   negated glob!)
             expect(paths.length).toBe(1, glob);
-            expect(paths.includes('b-dir/sample1.js')).toBe(false, glob);
-            expect(paths.includes('b-dir/sample2.js')).toBe(false, glob);
-            expect(paths.includes('a-dir/sample1.js')).toBe(true, glob);
+            expect(paths.includes(path.join('b-dir', 'sample1.js'))).toBe(false, glob);
+            expect(paths.includes(path.join('b-dir', 'sample2.js'))).toBe(false, glob);
+            expect(paths.includes(path.join('a-dir', 'sample1.js'))).toBe(true, glob);
           }
         });
 

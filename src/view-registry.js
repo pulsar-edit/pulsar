@@ -5,8 +5,8 @@ const AnyConstructor = Symbol('any-constructor');
 
 // Essential: `ViewRegistry` handles the association between model and view
 // types in Pulsar. We call this association a View Provider. As in, for a given
-// model, this class can provide a view via {::getView}, as long as the
-// model/view association was registered via {::addViewProvider}
+// model, this class can provide a view (a DOMElement) via {::getView}, as long
+// as the model/view association was registered via {::addViewProvider}
 //
 // If you're adding your own kind of pane item, a good strategy for all but the
 // simplest items is to separate the model and the view. The model handles

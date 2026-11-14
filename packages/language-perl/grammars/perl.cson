@@ -719,6 +719,15 @@
       '2':
         'name': 'entity.name.type.class.perl'
     'match': '^\\s*(package)\\s+([^\\s;]+)'
+    'name': 'meta.package.perl'
+  }
+  {
+    'captures':
+      '1':
+        'name': 'keyword.control.perl'
+      '2':
+        'name': 'entity.name.type.class.perl'
+    'match': '^\\s*(class)\\s+([^\\s;\\{\\}]+)'
     'name': 'meta.class.perl'
   }
   {
@@ -785,7 +794,7 @@
     'name': 'keyword.control.perl'
   }
   {
-    'match': '\\b(my|our|local|state)\\b'
+    'match': '\\b(my|our|local|state|has|field)\\b'
     'name': 'storage.modifier.perl'
   }
   {
@@ -2295,7 +2304,7 @@
     ]
   'sub':
     'match': '''(?x) (?<!->)
-      \\b (sub) \\b
+      \\b (sub|method) \\b
       (?:
         \\s+
         ([-\\w]+)?

@@ -1,7 +1,7 @@
 const path = require('path');
-const { shell } = require('@electron/remote');
 const _ = require('underscore-plus');
 const fs = require('fs-plus');
+const { webUtils } = require('electron');
 const { CompositeDisposable, Emitter } = require('atom');
 
 const {
@@ -507,9 +507,9 @@ class TreeView {
         let stats = fs.lstatSyncNoException(projectPath);
         if (!stats) continue;
 
-        stats = _.pick(stats, ..._.keys(stats));
+        let result = { ...stats };
         for (let key of ['atime', 'birthtime', 'ctime', 'mtime']) {
-          stats[key] = stats[key].getTime();
+          result[key] = stats[`${key}Ms`];
         }
 
         let directory = new Directory({
@@ -522,7 +522,7 @@ class TreeView {
             { isExpanded: true },
           ignoredNames: new IgnoredNames(),
           useSyncFS: this.useSyncFS,
-          stats
+          stats: result
         });
 
         let root = new DirectoryView(directory).element;
@@ -825,7 +825,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return atom.showItemInFolder(filePath);
   }
 
   showCurrentFileInFileManager() {
@@ -837,7 +837,7 @@ class TreeView {
         `Unable to show ${filePath} in ${this.getFileManagerName()}`
       );
     }
-    return shell.showItemInFolder(filePath);
+    return atom.showItemInFolder(filePath);
   }
 
   getFileManagerName() {
@@ -853,9 +853,21 @@ class TreeView {
 
   openSelectedEntryInNewWindow() {
     let pathToOpen = this.selectedEntry()?.getPath();
-    if (pathToOpen) {
-      return atom.open({ pathsToOpen: [pathToOpen], newWindow: true });
-    }
+    if (!pathToOpen) return;
+
+    // Opening a file in a new window should preserve the current project
+    // roots, just as the tab bar's “Open in New Window” does; but opening a
+    // folder means opening that folder _as_ a project, so it stands alone.
+    let pathsToOpen = fs.isDirectorySync(pathToOpen)
+      ? [pathToOpen]
+      : [...atom.project.getPaths(), pathToOpen];
+
+    return atom.open({
+      pathsToOpen,
+      newWindow: true,
+      devMode: atom.devMode,
+      safeMode: atom.safeMode
+    });
   }
 
   copySelectedEntry() {
@@ -932,7 +944,7 @@ class TreeView {
 
           this.emitter.emit('will-delete-entry', meta);
 
-          let promise = shell.trashItem(selectedPath).then(() => {
+          let promise = atom.trashItem(selectedPath).then(() => {
             this.emitter.emit('entry-deleted', meta);
           }).catch(() => {
             this.emitter.emit('delete-entry-failed', meta);
@@ -1603,9 +1615,10 @@ class TreeView {
         // Drop event from OS
         entry.classList.remove('selected');
         for (let file of event.dataTransfer.files) {
+          let filePath = webUtils.getPathForFile(file);
           if ((process.platform === 'darwin' && event.metaKey) || event.ctrlKey) {
-            this.copyEntry(file.path, newDirectoryPath);
-          } else if (!this.moveEntry(file.path, newDirectoryPath)) {
+            this.copyEntry(filePath, newDirectoryPath);
+          } else if (!this.moveEntry(filePath, newDirectoryPath)) {
             break;
           }
         }
@@ -1615,7 +1628,7 @@ class TreeView {
       // tree view. This is probably the user dragging a folder into the tree
       // view in order to add a new folder to the project.
       for (let entry of event.dataTransfer.files) {
-        atom.project.addPath(entry.path);
+        atom.project.addPath(webUtils.getPathForFile(entry));
       }
     }
   }

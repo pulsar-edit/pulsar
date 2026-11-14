@@ -2,12 +2,13 @@ const temp = require('temp');
 const fs = require('fs-plus');
 const path = require('path');
 const { promisify } = require('util');
-const { File, Directory } = require('atom');
+const { File } = require('atom');
 const { closeAllWatchers } = require('@pulsar-edit/pathwatcher');
 const { sep } = path;
 
 const { CompositeDisposable } = require('event-kit');
-const { watchPath, stopAllWatchers } = require('../src/path-watcher');
+const { watchPath } = require('../src/path-watcher');
+const { NativeWatcherRegistry } = require('../src/native-watcher-registry');
 const { conditionPromise } = require('./helpers/async-spec-helpers');
 
 function waitsForCondition(label, condition) {
@@ -15,6 +16,26 @@ function waitsForCondition(label, condition) {
 }
 
 temp.track();
+
+const rename = promisify(fs.rename);
+const unlink = promisify(fs.unlink);
+
+// The watcher classes aren't exported, so reach one through a live watcher.
+// Subclassing gives us our own task and registry, so these specs don't depend
+// on whatever `atom.project` and `atom.themes` are watching.
+async function isolatedWatcherClass() {
+  const probe = await watchPath(await tempMkdir('atom-fsmanager-probe-'), {}, () => {});
+  const Klass = probe.native.constructor;
+  probe.dispose();
+  return class extends Klass {
+    static task = null;
+    static initialized = false;
+    static started = false;
+    static pendingRespawn = false;
+    static INSTANCES = new Map();
+    static PROMISE_META = new Map();
+  };
+}
 
 function wait(ms) {
   return new Promise(r => setTimeout(r, ms));
@@ -44,7 +65,7 @@ describe('File', () => {
     file.unsubscribeFromNativeChangeEvents();
     fs.removeSync(filePath);
     closeAllWatchers();
-    await stopAllWatchers();
+    await watchPath.reset();
     await wait(100);
   });
 
@@ -324,271 +345,1215 @@ describe('watchPath', function () {
 
   afterEach(async function () {
     subs.dispose();
-    await stopAllWatchers();
+    await watchPath.reset();
   });
 
+  // Wait until a freshly created watcher is actually delivering events, by
+  // writing until one arrives, then discard what was collected.
+  //
+  // `watchPath` resolves when the backend reports its subscription as live,
+  // and with `@parcel/watcher` on Windows that isn't the same thing: a spec
+  // that writes exactly once can write into a window where the subscription
+  // exists but reports nothing, and then waits forever for an event nobody
+  // recorded. Writing repeatedly turns that one-shot race into a retry.
+  //
+  // Only the specs that watch a path and then immediately write to it need
+  // this. If you add such a spec, arm it.
+  //
+  // We chased the underlying defect a long way before settling for this. To
+  // save the next person the trip… these were ruled out by experiment rather
+  // than by argument:
+  //
+  // * the watcher-sharing scheme; bypassed entirely, the failure survived
+  // * releasing child watchers during a handover; kept alive, failure
+  //   survived
+  // * the order and timing of subscribe/unsubscribe, paced and pipelined
+  // * case sensitivity in our own path filtering
+  // * hung IPC replies and hung teardown
+  // * `@parcel/watcher` in isolation: 120 consecutive subscriptions on Windows
+  //   each delivered within 116ms, none ever dead
+  // * the same through our real worker over IPC, under both Node and Electron
+  //
+  // VS Code, which uses the same library, stopped at the same wall: their
+  // parcel watcher suite is `suite.skip`, commented "this suite has shown
+  // flaky runs in Azure pipelines where tasks would just hang and timeout
+  // after a while." Arming at least keeps ours running.
+  async function armWatcher(dir, events, label = 'the watcher to deliver events') {
+    let n = 0;
+    await conditionPromise(async () => {
+      await writeFile(path.join(dir, `arm-${n++}.txt`), '!');
+      return events.length > 0;
+    }, label);
+    events.length = 0;
+  }
+
+  // Resolve once an event has been seen for every named file.
+  //
+  // Rejects if they don't all turn up in time, naming the ones that didn't.
+  // Without a timeout, a filesystem event that never arrives leaves the spec
+  // sitting until Jasmine's global limit and then reports only that two
+  // minutes elapsed. That tells us nothing about which file went unreported,
+  // which is exactly what we need to know when a backend is at fault on one
+  // platform.
+  //
+  // A trailing number overrides the timeout for a caller that legitimately
+  // needs more time.
+  const DEFAULT_CHANGE_TIMEOUT_MS = 10000;
   function waitForChanges(watcher, ...fileNames) {
+    let timeoutMs = DEFAULT_CHANGE_TIMEOUT_MS;
+    if (typeof fileNames[fileNames.length - 1] === 'number') {
+      timeoutMs = fileNames.pop();
+    }
+
     const waiting = new Set(fileNames);
-    let fired = false;
     const relevantEvents = [];
 
-    return new Promise(resolve => {
-      const sub = watcher.onDidChange(events => {
+    const promise = new Promise((resolve, reject) => {
+      let settled = false;
+      let sub = null;
+      let timer = null;
+
+      const settle = (settleWith, value) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        sub?.dispose();
+        settleWith(value);
+      };
+
+      sub = watcher.onDidChange(events => {
         for (const event of events) {
           if (waiting.delete(event.path)) {
             relevantEvents.push(event);
           }
         }
 
-        if (!fired && waiting.size === 0) {
-          fired = true;
-          resolve(relevantEvents);
-          sub.dispose();
+        if (waiting.size === 0) settle(resolve, relevantEvents);
+      });
+
+      timer = setTimeout(() => {
+        settle(
+          reject,
+          new Error(
+            `Timed out after ${timeoutMs}ms waiting for filesystem events. ` +
+              `Never saw: ${[...waiting].join(', ')}`
+          )
+        );
+      }, timeoutMs);
+    });
+
+    // Callers typically build these _before_ the writes they cover and await
+    // them afterwards. If the timeout fires inside that gap there's no handler
+    // attached yet, and the rejection gets reported as unhandled on top of the
+    // spec failure. This no-op handler marks it as handled without affecting
+    // what the caller sees when it awaits.
+    promise.catch(() => {});
+    return promise;
+  }
+
+  const WATCHER_IMPLEMENTATIONS = ['nsfw', 'parcel'];
+
+  for (let impl of WATCHER_IMPLEMENTATIONS) {
+    describe(`watchPath() (${impl} implementation)`, function () {
+      let disposables;
+      beforeEach(async () => {
+        jasmine.useRealClock();
+        atom.config.set('core.fileSystemWatcher', impl);
+        // Changing the config setting will trigger an async transition to new
+        // file-watchers. This helper method lets us wait until that transition
+        // has finished.
+        await watchPath.waitForTransition();
+        disposables = new CompositeDisposable();
+      });
+
+      afterEach(() => {
+        disposables?.dispose();
+      });
+
+      it('resolves the returned promise when the watcher begins listening', async function () {
+        const rootDir = await tempMkdir('atom-fsmanager-test-');
+
+        const watcher = await watchPath(rootDir, {}, () => {});
+        expect(watcher.constructor.name).toBe('PathWatcher');
+      });
+
+      it('reuses an existing native watcher and resolves getStartPromise immediately if attached to a running watcher', async function () {
+        const rootDir = await tempMkdir('atom-fsmanager-test-');
+
+        const watcher0 = await watchPath(rootDir, {}, () => {});
+        const watcher1 = await watchPath(rootDir, {}, () => {});
+
+        expect(watcher0.native).toBe(watcher1.native);
+      });
+
+      // TODO: File-watchers cannot respect `core.ignoredNames` by default
+      // without breaking backward-compatibility. Keeping this around for a
+      // future where we might use this new behavior on an opt-in basis.
+      xit('respects `core.ignoredNames`', async () => {
+        jasmine.useRealClock();
+
+        let existing = atom.config.get('core.ignoredNames');
+        atom.config.set(
+          'core.ignoredNames',
+          [...existing, 'some-other-dir']
+        );
+
+        const rootDir = await tempMkdir('atom-fsmanager-test-');
+
+        // Create a directory that will be affected by our `core.ignoredNames`
+        // value.
+        let ignoredDir = path.join(rootDir, 'some-other-dir');
+        await mkdir(ignoredDir, { recursive: true });
+
+        let spy = jasmine.createSpy();
+
+        let watcher = await watchPath(rootDir, {}, spy);
+        disposables.add(watcher);
+
+        // Writing a file to a path within an ignored directory should not
+        // trigger the callback…
+        await writeFile(path.join(ignoredDir, 'foo.txt'), 'something');
+        // (file-watchers might have a debounce interval)
+        await wait(process.env.CI ? 3000 : 1000);
+        expect(spy).not.toHaveBeenCalled();
+
+        // …but writing a file to a path outside of an ignored directory should
+        // trigger the callback.
+        await writeFile(path.join(rootDir, 'foo.txt'), 'something');
+        // (file-watchers might have a debounce interval)
+        await wait(process.env.CI ? 3000 : 1000);
+        expect(spy).toHaveBeenCalled();
+      });
+
+      it('resolves the returned promise when the watcher begins listening', async function () {
+        const rootDir = await tempMkdir('atom-fsmanager-test-');
+        const watcher = await watchPath(rootDir, {}, () => {});
+        disposables.add(watcher);
+        expect(watcher.constructor.name).toBe('PathWatcher');
+      });
+
+      it('recovers from an unexpected worker crash', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+
+        let events = [];
+        const watcher = await watchPath(rootDir, {}, (batch) => events.push(...batch));
+        disposables.add(watcher);
+
+        let errors = [];
+        watcher.onDidError(err => errors.push(err));
+
+        // Prove the watcher works *before* we break it, so that a failure
+        // below can only mean the respawn didn't work.
+        //
+        // Write repeatedly rather than once: the backend can take a moment to
+        // arm after `watchPath` resolves, and a lone write that lands in that
+        // gap is gone for good, leaving us polling for an event that will never
+        // arrive. (This is the same reason the post-crash check below writes in
+        // a loop.)
+        let writes = 0;
+        await conditionPromise(
+          async () => {
+            await writeFile(path.join(rootDir, `before-${writes++}.txt`), 'before\n');
+            return events.length > 0;
+          },
+          'the pre-crash write to be observed'
+        );
+
+        const task = watcher.native.constructor.task;
+        const doomed = task.childProcess;
+        const respawned = new Promise(resolve => task.once('task:respawned', resolve));
+
+        doomed.kill('SIGKILL');
+        await respawned;
+
+        expect(task.childProcess).not.toBe(null);
+        expect(task.childProcess.pid).not.toBe(doomed.pid);
+
+        // `task:respawned` only means a replacement was forked; the watches
+        // aren't re-established until it reports ready, and the OS needs a
+        // moment beyond that. Write repeatedly until an event lands rather
+        // than guessing at a delay.
+        events.length = 0;
+        let n = 0;
+        await conditionPromise(
+          async () => {
+            await writeFile(path.join(rootDir, `after-${n++}.txt`), 'after\n');
+            return events.length > 0;
+          },
+          'the respawned worker to deliver events'
+        );
+        expect(errors.some(e => /restarted/.test(e.message))).toBe(true);
+      });
+
+      it('rejects in-flight requests when the worker dies', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+
+        const watcher = await watchPath(rootDir, {}, () => {});
+        disposables.add(watcher);
+
+        const native = watcher.native;
+        const task = native.constructor.task;
+
+        // Neither worker replies to an unrecognized event — it just hits the
+        // `default` branch and warns — so this request can only ever settle by
+        // way of the crash handling we're testing. That keeps the spec from
+        // racing the worker's reply against our kill signal.
+        const pending = native.send('watcher:nonexistent', {});
+        task.childProcess.kill('SIGKILL');
+
+        let error = null;
+        try {
+          await pending;
+        } catch (err) {
+          error = err;
         }
+
+        expect(error).not.toBe(null);
+        expect(error.message).toContain('exited unexpectedly');
+      });
+
+      // Three round trips through a real filesystem watcher don't reliably fit
+      // in the local 5s spec budget — `nsfw` alone debounces at 200ms on top of
+      // whatever latency the OS adds — so this one gets more room.
+      describe('action vocabulary', () => {
+        let originalTimeout;
+        beforeEach(() => {
+          originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+          // A floor, not an assignment. CI already grants 120s, and a plain
+          // assignment would cut that to an eighth on the very runners slow
+          // enough to need it.
+          jasmine.DEFAULT_TIMEOUT_INTERVAL = Math.max(originalTimeout, 15000);
+        });
+
+        afterEach(() => {
+          jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+        });
+
+        it('reports only contract-defined actions', async () => {
+          jasmine.useRealClock();
+          const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+          const filePath = path.join(rootDir, 'vocabulary.txt');
+
+          let events = [];
+          const watcher = await watchPath(rootDir, {}, batch => events.push(...batch));
+          disposables.add(watcher);
+
+          const eventsForFile = () => events.filter(e => e.path === filePath);
+
+          await armWatcher(rootDir, events);
+
+
+          await writeFile(filePath, 'one\n');
+          await conditionPromise(
+            () => eventsForFile().some(e => e.action === 'created'),
+            'a created event'
+          );
+
+          // Deliberately not asserting `modified` here. On macOS `nsfw`
+          // reports through `FSEvents`, whose per-path flags are cumulative: a
+          // file written moments after it was created still carries
+          // `ItemCreated`, so `nsfw` reports `created` a second time rather
+          // than `modified`.
+          //
+          // The contract guarantees the vocabulary, not that every adapter
+          // draws the create/modify line in the same place — the same way it
+          // doesn't guarantee that every adapter can detect renames.
+          const countBeforeAppend = eventsForFile().length;
+          await appendFile(filePath, 'two\n');
+          await conditionPromise(
+            () => eventsForFile().length > countBeforeAppend,
+            'an event for the append'
+          );
+
+          await unlink(filePath);
+          await conditionPromise(
+            () => eventsForFile().some(e => e.action === 'deleted'),
+            'a deleted event'
+          );
+
+          // The actual regression guard: no adapter may invent its own
+          // vocabulary. `@parcel/watcher` previously reported `updated` here.
+          const allowed = ['created', 'modified', 'deleted', 'renamed'];
+          const seen = [...new Set(events.map(e => e.action))];
+          expect(seen.every(a => allowed.includes(a))).toBe(true, `saw: ${seen}`);
+        });
+      });
+
+      it('builds a fresh task after the last watcher goes away', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+
+        // We construct our own subclass so that we can test this behavior more
+        // easily. If we test the built-in watcher, we end up treading on
+        // shared ground; there's an implicit watch over the project root that
+        // we do not control, plus `ThemeManager` declares its own watcher.
+        const probe = await watchPath(rootDir, {}, () => {});
+        disposables.add(probe);
+
+        // We test which constructor is being used, then subclass that; this
+        // means we're testing behavior that matches what would happen under
+        // this configured watcher, but with a clean slate.
+        class IsolatedWatcher extends probe.native.constructor {
+          // These must be declared, not inherited: static lookup walks the
+          // prototype chain, so without them `initialize()` would find the
+          // parent's live task and bind onto it.
+          static task = null;
+          static initialized = false;
+          static started = false;
+          static pendingRespawn = false;
+          static INSTANCES = new Map();
+          static PROMISE_META = new Map();
+        }
+
+        const native = new IsolatedWatcher(rootDir);
+        await native.start();
+
+        const firstTask = IsolatedWatcher.task;
+        expect(firstTask).toBeTruthy();
+        expect(firstTask.emitter.listenerCountForEventName('watcher:events')).toBe(1);
+
+        await native.stop();
+        expect(IsolatedWatcher.task).toBe(null);
+
+        await native.start();
+        const secondTask = IsolatedWatcher.task;
+        expect(secondTask).not.toBe(firstTask);
+
+        // The regression this guards: re-binding onto a terminated task's
+        // emitter, which silently doubled every handler per cycle.
+        expect(
+          secondTask.emitter.listenerCountForEventName('watcher:events')
+        ).toBe(1);
+
+        await native.stop();
+      });
+
+      it('reuses an existing native watcher and resolves getStartPromise immediately if attached to a running watcher', async function () {
+        const rootDir = await tempMkdir('atom-fsmanager-test-');
+
+        const watcher0 = await watchPath(rootDir, {}, () => {});
+        const watcher1 = await watchPath(rootDir, {}, () => {});
+
+        disposables.add(watcher0, watcher1);
+
+        expect(watcher0.native).toBe(watcher1.native);
+      });
+
+      it("returns paths that appear to descend from the given path, even when symlinks are involved, when `realPaths` is `false`", async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-');
+        const realRootDir = await realpath(rootDir)
+        const symlinkedPath = temp.path({ suffix: '-symlinked' })
+        await symlink(realRootDir, symlinkedPath)
+
+        let events0 = [];
+        let watcher0 = await watchPath(realRootDir, { realPaths: false }, (events) => {
+          events0.push(...events);
+        });
+        let events1 = [];
+        let watcher1 = await watchPath(symlinkedPath, { realPaths: false }, (events) => {
+          events1.push(...events);
+        });
+
+        disposables.add(watcher0, watcher1);
+
+        await writeFile(path.join(realRootDir, 'foo.txt'), '!')
+        await conditionPromise(() => {
+          return events0.length > 0 && events1.length > 0 && events0.length === events1.length;
+        });
+
+        let [first0] = events0;
+        let [first1] = events1;
+
+        // Even though these two events describe the same filesystem action,
+        // their `path` properties don't match one another; they correspond to
+        // the paths given in their respective calls to `watchPath`.
+        expect(first0.path).not.toBe(first1.path);
+        expect(first0.path.startsWith(realRootDir)).toBe(true);
+        expect(first1.path.startsWith(symlinkedPath)).toBe(true);
+      })
+
+      it("returns real paths for events when `realPaths` is `true`", async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-');
+        const realRootDir = await realpath(rootDir)
+        const symlinkedPath = temp.path({ suffix: '-symlinked' })
+        await symlink(realRootDir, symlinkedPath)
+        const realSymlinkedPath = await realpath(symlinkedPath)
+
+        let events0 = [];
+        let watcher0 = await watchPath(realRootDir, { realPaths: true }, (events) => {
+          events0.push(...events);
+        });
+        let events1 = [];
+        let watcher1 = await watchPath(symlinkedPath, { realPaths: true }, (events) => {
+          events1.push(...events);
+        });
+
+        disposables.add(watcher0, watcher1);
+
+        await writeFile(path.join(realRootDir, 'foo.txt'), '!')
+        await conditionPromise(() => {
+          return events0.length > 0 && events1.length > 0 &&
+            events0.length === events1.length;
+        });
+
+        let [first0] = events0;
+        let [first1] = events1;
+
+        // Because `realPaths` is `true`, these events will have identical `path`
+        // properties that point to the file's true path on disk.
+        expect(first0.path).toBe(first1.path);
+        expect(first0.path.startsWith(realRootDir)).toBe(true);
+        expect(first1.path.startsWith(symlinkedPath)).toBe(false);
+      })
+
+      it("normalizes a path without resolving symlinks when `realPaths` is `false`", async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-');
+        const realRootDir = await realpath(rootDir);
+        const symlinkedPath = temp.path({ suffix: '-symlinked' })
+        await symlink(realRootDir, symlinkedPath);
+
+        const relativizedPath = `${symlinkedPath}${path.sep}..${path.sep}${path.basename(symlinkedPath)}`
+
+        let events0 = [];
+        let watcher0 = await watchPath(relativizedPath, { realPaths: false }, (events) => {
+          events0.push(...events);
+        });
+        disposables.add(watcher0);
+
+        await armWatcher(realRootDir, events0);
+
+        await writeFile(path.join(realRootDir, 'foo.txt'), '!')
+        await conditionPromise(() => events0.length > 0);
+
+        let [first0] = events0;
+
+        // We want to ensure that the weird relative path the user gave to
+        // `watchPath` is resolved internally _without_ it pointing to the real
+        // path on disk.
+        expect(first0.path.startsWith(symlinkedPath)).toBe(true);
+        expect(first0.path.startsWith(relativizedPath)).toBe(false);
+      })
+
+      it('treats a sibling with a shared prefix as outside the root', async () => {
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const watcher = await watchPath(rootDir, {}, () => {});
+        disposables.add(watcher);
+
+        expect(watcher.pathStartsWith(rootDir, rootDir)).toBe(true);
+        expect(
+          watcher.pathStartsWith(path.join(rootDir, 'a.txt'), rootDir)
+        ).toBe(true);
+        // The reason this isn't a plain `startsWith`: `…-sibling` shares a
+        // prefix with the root without being inside it, and an atomic save
+        // leaves exactly that shape next to a watched file.
+        expect(watcher.pathStartsWith(`${rootDir}-sibling`, rootDir)).toBe(
+          false
+        );
+      });
+
+      it('matches paths case-insensitively on win32', function (done) {
+        jasmine.filterByPlatform({ only: ['win32'] }, done);
+
+        // Windows reports event paths in whatever spelling it likes, which need
+        // not match the spelling the watcher was rooted at. Every event from a
+        // shared native watcher is filtered through `pathStartsWith`, so a
+        // spelling we fail to recognize is an event delivered to nobody.
+        (async () => {
+          const rootDir = await tempMkdir('atom-fsmanager-test-').then(
+            realpath
+          );
+          const watcher = await watchPath(rootDir, {}, () => {});
+          disposables.add(watcher);
+
+          const shouted = path.join(rootDir.toUpperCase(), 'A.TXT');
+          expect(watcher.pathStartsWith(shouted, rootDir)).toBe(true);
+          // Case folding must not weaken the sibling check above.
+          expect(
+            watcher.pathStartsWith(`${rootDir.toUpperCase()}-SIBLING`, rootDir)
+          ).toBe(false);
+
+          done();
+        })().catch(err => done.fail(err));
+      });
+
+      it("reuses existing native watchers even while they're still starting", async function () {
+        const rootDir = await tempMkdir('atom-fsmanager-test-');
+
+        const [watcher0, watcher1] = await Promise.all([
+          watchPath(rootDir, {}, () => {}),
+          watchPath(rootDir, {}, () => {})
+        ]);
+        expect(watcher0.native).toBe(watcher1.native);
+      });
+
+      it("doesn't attach new watchers to a native watcher that's stopping", async function () {
+        const rootDir = await tempMkdir('atom-fsmanager-test-');
+
+        const watcher0 = await watchPath(rootDir, {}, () => {});
+        const native0 = watcher0.native;
+
+        watcher0.dispose();
+        const watcher1 = await watchPath(rootDir, {}, () => {});
+
+        expect(watcher1.native).not.toBe(native0);
+      });
+
+      it('reuses an existing native watcher on a parent directory and filters events', async function () {
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const rootFile = path.join(rootDir, 'rootfile.txt');
+        const subDir = path.join(rootDir, 'subdir');
+        const subFile = path.join(subDir, 'subfile.txt');
+
+        await mkdir(subDir);
+
+        // Keep the watchers alive with an undisposed subscription
+        const rootEvents = [];
+        const rootWatcher = await watchPath(rootDir, {}, events =>
+          rootEvents.push(...events)
+        );
+        const childEvents = [];
+        const childWatcher = await watchPath(subDir, {}, events =>
+          childEvents.push(...events)
+        );
+
+        expect(rootWatcher.native).toBe(childWatcher.native);
+        expect(rootWatcher.native.isRunning()).toBe(true);
+
+        // One native serves both, so arming through the subdirectory
+        // establishes delivery for each of them.
+        await armWatcher(subDir, childEvents, 'the shared watcher');
+        rootEvents.length = 0;
+
+        const firstChanges = Promise.all([
+          waitForChanges(rootWatcher, subFile),
+          waitForChanges(childWatcher, subFile)
+        ]);
+        await writeFile(subFile, 'subfile\n', { encoding: 'utf8' });
+        await firstChanges;
+
+        const nextRootEvent = waitForChanges(rootWatcher, rootFile);
+        await writeFile(rootFile, 'rootfile\n', { encoding: 'utf8' });
+        await nextRootEvent;
+      });
+
+      it('adopts existing child watchers and filters events appropriately to them', async function () {
+        const parentDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+
+        // Create the directory tree
+        const rootFile = path.join(parentDir, 'rootfile.txt');
+        const subDir0 = path.join(parentDir, 'subdir0');
+        const subFile0 = path.join(subDir0, 'subfile0.txt');
+        const subDir1 = path.join(parentDir, 'subdir1');
+        const subFile1 = path.join(subDir1, 'subfile1.txt');
+
+        await mkdir(subDir0);
+        await mkdir(subDir1);
+        await Promise.all([
+          writeFile(rootFile, 'rootfile\n', { encoding: 'utf8' }),
+          writeFile(subFile0, 'subfile 0\n', { encoding: 'utf8' }),
+          writeFile(subFile1, 'subfile 1\n', { encoding: 'utf8' })
+        ]);
+
+        // Begin the child watchers and keep them alive
+        const subEvents0 = [];
+        const subWatcher0 = await watchPath(subDir0, {}, events =>
+          subEvents0.push(...events)
+        );
+
+        const subEvents1 = [];
+        const subWatcher1 = await watchPath(subDir1, {}, events =>
+          subEvents1.push(...events)
+        );
+
+        expect(subWatcher0.native).not.toBe(subWatcher1.native);
+
+        // Create the parent watcher
+        const parentEvents = [];
+        const parentWatcher = await watchPath(parentDir, {}, events =>
+          parentEvents.push(...events)
+        );
+
+        // Arm each of the three before asking anything of them. Arming the
+        // parent last, since writes under the children reach it too.
+        await armWatcher(subDir0, subEvents0, 'the subdir0 watcher');
+        await armWatcher(subDir1, subEvents1, 'the subdir1 watcher');
+        await armWatcher(parentDir, parentEvents, 'the parent watcher');
+
+        const subWatcherChanges0 = waitForChanges(subWatcher0, subFile0);
+        const subWatcherChanges1 = waitForChanges(subWatcher1, subFile1);
+        const parentWatcherChanges = waitForChanges(
+          parentWatcher,
+          rootFile,
+          subFile0,
+          subFile1
+        );
+
+        expect(subWatcher0.native).toBe(parentWatcher.native);
+        expect(subWatcher1.native).toBe(parentWatcher.native);
+
+        // Ensure events are filtered correctly
+        await Promise.all([
+          appendFile(rootFile, 'change\n', { encoding: 'utf8' }),
+          appendFile(subFile0, 'change\n', { encoding: 'utf8' }),
+          appendFile(subFile1, 'change\n', { encoding: 'utf8' })
+        ]);
+
+        await Promise.all([
+          subWatcherChanges0,
+          subWatcherChanges1,
+          parentWatcherChanges
+        ]);
+      });
+
+      it('honors a stop that arrives while the watcher is still starting', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+
+        // Deliberately not awaited: stop lands mid-`STARTING`.
+        const starting = native.start();
+        const stopping = native.stop();
+        await Promise.all([starting, stopping]);
+
+        expect(native.isRunning()).toBe(false);
+        // The watcher used to finish starting after the stop was ignored,
+        // leaving a worker subscription that could never be disposed.
+        expect(Isolated.INSTANCES.size).toBe(0);
+        expect(Isolated.task).toBe(null);
+      });
+
+      it('reports a failed start and returns to a stopped state', async () => {
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(path.join(path.sep, 'definitely', 'not', 'here'));
+
+        const errors = [];
+        native.onDidError(err => errors.push(err));
+
+        await native.start();
+
+        expect(errors.length).toBe(1);
+        expect(native.isRunning()).toBe(false);
+        // Not wedged in STARTING: it can be started again.
+        expect(Isolated.task).toBe(null);
+      });
+
+      it('rejects a pending watchPath when the worker can never start', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+
+        // Point the worker at a script that doesn't exist. The bootstrap's
+        // `require` fails, it reports the failure and exits nonzero, so no
+        // amount of respawning will ever produce a usable worker.
+        const Isolated = await isolatedWatcherClass();
+        Isolated.taskPath = path.join(__dirname, 'fixtures', 'no-such-worker-script.js');
+
+        // Fail on the first bad spawn instead of waiting out five of them
+        // inside `RESTART_WINDOW_MS`. Five real forks is slow! Perhaps too
+        // slow for CI, even.
+        const createWatcherTask = Isolated.createWatcherTask;
+        Isolated.createWatcherTask = function () {
+          createWatcherTask.call(this);
+          this.task.MAX_RESTARTS = 0;
+        };
+
+        // The same wiring `PathWatcherManager.createWatcher` uses, but against
+        // our isolated native class. `PathWatcher` isn't exported, so reach it
+        // through a live watcher, the way `isolatedWatcherClass` does.
+        const probe = await watchPath(rootDir, {}, () => {});
+        const PathWatcherClass = probe.constructor;
+        probe.dispose();
+
+        const registry = new NativeWatcherRegistry(p => new Isolated(p));
+        const watcher = new PathWatcherClass(registry, rootDir, {});
+        watcher.onDidChange(() => {});
+
+        let error = null;
+        try {
+          await watcher.getStartPromise();
+        } catch (err) {
+          error = err;
+        }
+
+        // Before this behavior existed, the `await` above never settled and
+        // the spec died of the jasmine timeout instead.
+        expect(error).not.toBe(null);
+        expect(error.message).toContain('exited repeatedly');
+
+        // The bookkeeping that lets a later `startTask` try again.
+        expect(Isolated.started).toBe(false);
+        expect(Isolated.PROMISE_META.has('self:start')).toBe(false);
+
+        // Every watcher is dead, so the user is told (once, however many
+        // watchers were affected) and pointed at the setting.
+        const notification = atom.notifications
+          .getNotifications()
+          .find(n => n.getMessage().includes('file watcher has failed'));
+        expect(notification).toBeTruthy();
+        expect(notification.getType()).toBe('error');
+        expect(notification.getOptions().buttons.length).toBe(1);
+      });
+
+      it('warns when the worker keeps crashing but recovers each time', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        // Two crashes rather than six: the threshold is policy, and six real
+        // forks is a slow way to assert a counter. Set after `start`, since
+        // `createWatcherTask` is what resets the count.
+        Isolated.MAX_RESPAWNS_BEFORE_WARNING = 2;
+
+        for (let i = 0; i < 2; i++) {
+          const respawned = new Promise(resolve =>
+            Isolated.task.once('task:respawned', resolve)
+          );
+          Isolated.task.childProcess.kill('SIGKILL');
+          await respawned;
+        }
+
+        const notification = atom.notifications
+          .getNotifications()
+          .find(n => n.getMessage().includes('keeps crashing'));
+        expect(notification).toBeTruthy();
+        // A warning, not an error: watching still works, it just keeps dropping
+        // events on the floor while it recovers.
+        expect(notification.getType()).toBe('warning');
+        expect(notification.getOptions().buttons.length).toBe(1);
+
+        await native.stop();
+      });
+
+      it('warns about repeated crashes only once per task', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        Isolated.MAX_RESPAWNS_BEFORE_WARNING = 2;
+
+        // Four crashes: two to reach the threshold, two more to pass it again.
+        // Stays under `WatcherTask`'s rapid-restart limit, so none of these is
+        // fatal.
+        for (let i = 0; i < 4; i++) {
+          const respawned = new Promise(resolve =>
+            Isolated.task.once('task:respawned', resolve)
+          );
+          Isolated.task.childProcess.kill('SIGKILL');
+          await respawned;
+        }
+
+        const notifications = atom.notifications
+          .getNotifications()
+          .filter(n => n.getMessage().includes('keeps crashing'));
+        expect(notifications.length).toBe(1);
+
+        await native.stop();
+      });
+
+      it('stays quiet about repeated crashes once it has reported a fatal failure', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        Isolated.MAX_RESPAWNS_BEFORE_WARNING = 2;
+        // A failed task can be started again and crash afresh, so respawns can
+        // follow the fatal error. Stand in for that rather than staging it.
+        Isolated.reportedFatalFailure = true;
+
+        for (let i = 0; i < 2; i++) {
+          const respawned = new Promise(resolve =>
+            Isolated.task.once('task:respawned', resolve)
+          );
+          Isolated.task.childProcess.kill('SIGKILL');
+          await respawned;
+        }
+
+        const notification = atom.notifications
+          .getNotifications()
+          .find(n => n.getMessage().includes('keeps crashing'));
+        expect(notification).toBeFalsy();
+
+        // The suppression is one-way: having warned must not stop a later
+        // fatal failure from reporting the escalation.
+        expect(Isolated.reportedRepeatedCrashes).toBe(false);
+
+        await native.stop();
+      });
+
+      it('still reports a fatal failure after warning about repeated crashes', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        Isolated.reportedRepeatedCrashes = true;
+        Isolated.reportFatalFailure(new Error('worker gave up'));
+
+        const notification = atom.notifications
+          .getNotifications()
+          .find(n => n.getMessage().includes('file watcher has failed'));
+        expect(notification).toBeTruthy();
+
+        await native.stop();
+      });
+
+      it('forgets restarts that fall outside the warning window', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        Isolated.MAX_RESPAWNS_BEFORE_WARNING = 2;
+        // Short enough that the first crash has aged out by the time the second
+        // happens — standing in for the slow crash-every-few-hours case.
+        Isolated.RESPAWN_WINDOW_MS = 1;
+
+        for (let i = 0; i < 2; i++) {
+          const respawned = new Promise(resolve =>
+            Isolated.task.once('task:respawned', resolve)
+          );
+          Isolated.task.childProcess.kill('SIGKILL');
+          await respawned;
+          await wait(5);
+        }
+
+        const notification = atom.notifications
+          .getNotifications()
+          .find(n => n.getMessage().includes('keeps crashing'));
+        expect(notification).toBeFalsy();
+
+        await native.stop();
+      });
+
+      it('fails fast rather than waiting when there is no worker to send to', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        // An *expected* termination, so nothing respawns: from here on there is
+        // nobody to receive a message, let alone reply to one.
+        Isolated.task.terminate();
+
+        let error = null;
+        try {
+          await native.send('watcher:watch', native.buildWatchParams());
+        } catch (err) {
+          error = err;
+        }
+        expect(error).not.toBe(null);
+        expect(error.message).toContain('Cannot reach the file watcher worker');
+        // The request cleaned up after itself instead of waiting for a reply
+        // that can never arrive.
+        expect(Isolated.PROMISE_META.size).toBe(0);
+
+        // Ignored-name updates are deliberately silent — the names ride along
+        // with the next `watcher:watch` — so this must neither throw nor leave
+        // anything pending.
+        expect(() => native.setIgnoredNames(['*.log'])).not.toThrow();
+        expect(Isolated.PROMISE_META.size).toBe(0);
+
+        // A stop still unregisters. Skipping that would keep the task alive for
+        // the rest of the window, since it's the last instance leaving that
+        // destroys it.
+        await native.stop();
+        expect(Isolated.INSTANCES.size).toBe(0);
+        expect(Isolated.task).toBe(null);
+      });
+
+      it('gives up on a request the worker never answers', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        // Neither worker replies to an event it doesn't recognize — it warns and
+        // moves on — so this request can only ever settle by way of the timeout,
+        // which makes it a deterministic way to exercise it.
+        Isolated.REPLY_TIMEOUT_MS = 250;
+
+        let error = null;
+        try {
+          await native.send('watcher:unrecognized-by-design', {
+            normalizedPath: rootDir
+          });
+        } catch (err) {
+          error = err;
+        }
+
+        expect(error).not.toBe(null);
+        expect(error.message).toContain(
+          'did not reply to watcher:unrecognized-by-design'
+        );
+        // The path matters: a hung request is only useful if it says which
+        // watcher it belonged to.
+        expect(error.message).toContain(rootDir);
+        // And nothing is left waiting on a reply that will never come.
+        expect(Isolated.PROMISE_META.size).toBe(0);
+
+        Isolated.REPLY_TIMEOUT_MS = 60000;
+        await native.stop();
+      });
+
+      it('starts a fresh worker for a watch that arrives after a fatal failure', async () => {
+        jasmine.useRealClock();
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const Isolated = await isolatedWatcherClass();
+        const native = new Isolated(rootDir);
+        await native.start();
+
+        // Exhaust the budget on a worker that had already started successfully.
+        // Unlike a first-spawn failure, nothing is waiting on `self:start` here.
+        Isolated.task.MAX_RESTARTS = 0;
+        const failed = new Promise(resolve =>
+          Isolated.task.once('task:failed', resolve)
+        );
+        Isolated.task.childProcess.kill('SIGKILL');
+        await failed;
+
+        expect(Isolated.started).toBe(false);
+
+        // The point of clearing that flag: this watcher gets a new worker,
+        // instead of posting `watcher:watch` into a dead one and hanging.
+        const second = new Isolated(rootDir);
+        await second.start();
+        expect(second.isRunning()).toBe(true);
+
+        await second.stop();
+        await native.stop();
+      });
+
+      it('does not throw on a rename event with no origin path', async () => {
+        const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+        const watcher = await watchPath(rootDir, {}, () => {});
+        subs.add(watcher);
+
+        const received = [];
+        watcher.onNativeEvents(
+          [{ action: 'renamed', path: path.join(rootDir, 'orphan.txt') }],
+          batch => received.push(...batch)
+        );
+
+        expect(received.length).toBe(1);
+        expect(received[0].action).toBe('created');
+      });
+
+      describe('when watching a single file', () => {
+        let rootDir, filePath;
+
+        beforeEach(async () => {
+          jasmine.useRealClock();
+          rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+          filePath = path.join(rootDir, 'thud.js');
+          await writeFile(filePath, 'original\n');
+        });
+
+        it('reports modifications to the file', async () => {
+          let events = [];
+          const watcher = await watchPath(filePath, {}, batch => events.push(...batch));
+          disposables.add(watcher);
+
+          await appendFile(filePath, 'more\n');
+          await conditionPromise(
+            () => events.some(e => e.action === 'modified' && e.path === filePath),
+            'a modified event'
+          );
+        });
+
+        it('reports deletion of the file', async () => {
+          let events = [];
+          const watcher = await watchPath(filePath, {}, batch => events.push(...batch));
+          disposables.add(watcher);
+
+          await unlink(filePath);
+          await conditionPromise(
+            () => events.some(e => e.action === 'deleted' && e.path === filePath),
+            'a deleted event'
+          );
+        });
+
+        // The regression test for the stale-inode bug: a watch on the file
+        // itself would follow the old inode and go silent after this.
+        it('survives an atomic replacement and reports it as a modification', async () => {
+          let events = [];
+          const watcher = await watchPath(filePath, {}, batch => events.push(...batch));
+          disposables.add(watcher);
+
+          const tmpPath = path.join(rootDir, 'thud.js.tmp');
+          await writeFile(tmpPath, 'replaced\n');
+          await rename(tmpPath, filePath);
+
+          await conditionPromise(
+            () => events.some(e => e.action === 'modified' && e.path === filePath),
+            'a modified event for the replacement'
+          );
+          expect(events.some(e => e.action === 'created')).toBe(false);
+
+          // And it's still live afterwards — the point of watching the parent.
+          events.length = 0;
+          await appendFile(filePath, 'again\n');
+          await conditionPromise(
+            () => events.some(e => e.path === filePath),
+            'events to continue after the replacement'
+          );
+        });
+
+        it('coalesces a burst of writes into few batches', async () => {
+          const callback = jasmine.createSpy('onDidChange');
+          const watcher = await watchPath(filePath, {}, callback);
+          disposables.add(watcher);
+
+          for (let i = 0; i < 10; i++) {
+            await appendFile(filePath, `line ${i}\n`);
+          }
+          await conditionPromise(() => callback.calls.count() > 0, 'any batch');
+          await wait(process.env.CI ? 1000 : 400);
+
+          // Ten writes, nowhere near ten batches.
+          expect(callback.calls.count()).toBeLessThan(4);
+        });
       });
     });
   }
 
-  describe('watchPath()', function () {
-    it('resolves the returned promise when the watcher begins listening', async function () {
-      const rootDir = await tempMkdir('atom-fsmanager-test-');
-
-      const watcher = await watchPath(rootDir, {}, () => {});
-      expect(watcher.constructor.name).toBe('PathWatcher');
-    });
-
-    it('reuses an existing native watcher and resolves getStartPromise immediately if attached to a running watcher', async function () {
-      const rootDir = await tempMkdir('atom-fsmanager-test-');
-
-      const watcher0 = await watchPath(rootDir, {}, () => {});
-      const watcher1 = await watchPath(rootDir, {}, () => {});
-
-      expect(watcher0.native).toBe(watcher1.native);
-    });
-
-    let disposables;
-    beforeEach(() => {
-      disposables = new CompositeDisposable();
-    })
-
-    afterEach(() => {
-      disposables?.dispose();
-    })
-
-    it('resolves the returned promise when the watcher begins listening', async function () {
-      const rootDir = await tempMkdir('atom-fsmanager-test-');
-      const watcher = await watchPath(rootDir, {}, () => {});
-      disposables.add(watcher);
-      expect(watcher.constructor.name).toBe('PathWatcher');
-    });
-
-    it('reuses an existing native watcher and resolves getStartPromise immediately if attached to a running watcher', async function () {
-      const rootDir = await tempMkdir('atom-fsmanager-test-');
-
-      const watcher0 = await watchPath(rootDir, {}, () => {});
-      const watcher1 = await watchPath(rootDir, {}, () => {});
-
-      disposables.add(watcher0, watcher1);
-
-      expect(watcher0.native).toBe(watcher1.native);
-    });
-
-    it("returns paths that appear to descend from the given path, even when symlinks are involved, when `realPaths` is `false`", async () => {
+  describe('when the fileSystemWatcher setting changes', () => {
+    it('keeps existing watchers alive across the transition', async () => {
       jasmine.useRealClock();
-      const rootDir = await tempMkdir('atom-fsmanager-test-');
-      const realRootDir = await realpath(rootDir)
-      const symlinkedPath = temp.path({ suffix: '-symlinked' })
-      await symlink(realRootDir, symlinkedPath)
+      atom.config.set('core.fileSystemWatcher', 'nsfw');
+      await watchPath.waitForTransition();
 
-      let events0 = [];
-      let watcher0 = await watchPath(realRootDir, { realPaths: false }, (events) => {
-        events0.push(...events);
-      });
-      let events1 = [];
-      let watcher1 = await watchPath(symlinkedPath, { realPaths: false }, (events) => {
-        events1.push(...events);
-      });
-
-      disposables.add(watcher0, watcher1);
-
-      await writeFile(path.join(realRootDir, 'foo.txt'), '!')
-      await conditionPromise(() => {
-        return events0.length > 0 && events1.length > 0 && events0.length === events1.length;
-      });
-
-      let [first0] = events0;
-      let [first1] = events1;
-
-      // Even though these two events describe the same filesystem action,
-      // their `path` properties don't match one another; they correspond to
-      // the paths given in their respective calls to `watchPath`.
-      expect(first0.path).not.toBe(first1.path);
-      expect(first0.path.startsWith(realRootDir)).toBe(true);
-      expect(first1.path.startsWith(symlinkedPath)).toBe(true);
-    })
-
-    it("returns real paths for events when `realPaths` is `true`", async () => {
-      jasmine.useRealClock();
-      const rootDir = await tempMkdir('atom-fsmanager-test-');
-      const realRootDir = await realpath(rootDir)
-      const symlinkedPath = temp.path({ suffix: '-symlinked' })
-      await symlink(realRootDir, symlinkedPath)
-      const realSymlinkedPath = await realpath(symlinkedPath)
-
-      let events0 = [];
-      let watcher0 = await watchPath(realRootDir, { realPaths: true }, (events) => {
-        events0.push(...events);
-      });
-      let events1 = [];
-      let watcher1 = await watchPath(symlinkedPath, { realPaths: true }, (events) => {
-        events1.push(...events);
-      });
-
-      disposables.add(watcher0, watcher1);
-
-      await writeFile(path.join(realRootDir, 'foo.txt'), '!')
-      await conditionPromise(() => {
-        return events0.length > 0 && events1.length > 0 &&
-          events0.length === events1.length;
-      });
-
-      let [first0] = events0;
-      let [first1] = events1;
-
-      // Because `realPaths` is `true`, these events will have identical `path`
-      // properties that point to the file's true path on disk.
-      expect(first0.path).toBe(first1.path);
-      expect(first0.path.startsWith(realRootDir)).toBe(true);
-      expect(first1.path.startsWith(symlinkedPath)).toBe(false);
-    })
-
-    it("normalizes a path without resolving symlinks when `realPaths` is `false`", async () => {
-      jasmine.useRealClock();
-      const rootDir = await tempMkdir('atom-fsmanager-test-');
-      const realRootDir = await realpath(rootDir);
-      const symlinkedPath = temp.path({ suffix: '-symlinked' })
-      await symlink(realRootDir, symlinkedPath);
-
-      const relativizedPath = `${symlinkedPath}${path.sep}..${path.sep}${path.basename(symlinkedPath)}`
-
-      let events0 = [];
-      let watcher0 = await watchPath(relativizedPath, { realPaths: false }, (events) => {
-        events0.push(...events);
-      });
-      disposables.add(watcher0);
-
-      await writeFile(path.join(realRootDir, 'foo.txt'), '!')
-      await conditionPromise(() => events0.length > 0);
-
-      let [first0] = events0;
-
-      // We want to ensure that the weird relative path the user gave to
-      // `watchPath` is resolved internally _without_ it pointing to the real
-      // path on disk.
-      expect(first0.path.startsWith(symlinkedPath)).toBe(true);
-      expect(first0.path.startsWith(relativizedPath)).toBe(false);
-    })
-
-    it("reuses existing native watchers even while they're still starting", async function () {
-      const rootDir = await tempMkdir('atom-fsmanager-test-');
-
-      const [watcher0, watcher1] = await Promise.all([
-        watchPath(rootDir, {}, () => {}),
-        watchPath(rootDir, {}, () => {})
-      ]);
-      expect(watcher0.native).toBe(watcher1.native);
-    });
-
-    it("doesn't attach new watchers to a native watcher that's stopping", async function () {
-      const rootDir = await tempMkdir('atom-fsmanager-test-');
-
-      const watcher0 = await watchPath(rootDir, {}, () => {});
-      const native0 = watcher0.native;
-
-      watcher0.dispose();
-      const watcher1 = await watchPath(rootDir, {}, () => {});
-
-      expect(watcher1.native).not.toBe(native0);
-    });
-
-    it('reuses an existing native watcher on a parent directory and filters events', async function () {
       const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
-      const rootFile = path.join(rootDir, 'rootfile.txt');
-      const subDir = path.join(rootDir, 'subdir');
-      const subFile = path.join(subDir, 'subfile.txt');
+      let events = [];
+      const watcher = await watchPath(rootDir, {}, batch => events.push(...batch));
+      subs.add(watcher);
 
-      await mkdir(subDir);
+      // Write repeatedly rather than once: the backend can take a moment to arm
+      // after `watchPath` resolves, and a lone write that lands in that gap is
+      // gone for good, leaving us polling for an event that will never arrive.
+      // (Same reason the post-switch check below writes in a loop.)
+      let writes = 0;
+      await conditionPromise(async () => {
+        await writeFile(path.join(rootDir, `before-${writes++}.txt`), 'before\n');
+        return events.length > 0;
+      }, 'events before the switch');
 
-      // Keep the watchers alive with an undisposed subscription
-      const rootWatcher = await watchPath(rootDir, {}, () => {});
-      const childWatcher = await watchPath(subDir, {}, () => {});
+      const before = watcher.native.constructor.name;
 
-      expect(rootWatcher.native).toBe(childWatcher.native);
-      expect(rootWatcher.native.isRunning()).toBe(true);
+      atom.config.set('core.fileSystemWatcher', 'parcel');
+      await watchPath.waitForTransition();
 
-      const firstChanges = Promise.all([
-        waitForChanges(rootWatcher, subFile),
-        waitForChanges(childWatcher, subFile)
-      ]);
-      await writeFile(subFile, 'subfile\n', { encoding: 'utf8' });
-      await firstChanges;
+      expect(watcher.native.constructor.name).not.toBe(before);
 
-      const nextRootEvent = waitForChanges(rootWatcher, rootFile);
-      await writeFile(rootFile, 'rootfile\n', { encoding: 'utf8' });
-      await nextRootEvent;
-    });
-
-    it('adopts existing child watchers and filters events appropriately to them', async function () {
-      const parentDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
-
-      // Create the directory tree
-      const rootFile = path.join(parentDir, 'rootfile.txt');
-      const subDir0 = path.join(parentDir, 'subdir0');
-      const subFile0 = path.join(subDir0, 'subfile0.txt');
-      const subDir1 = path.join(parentDir, 'subdir1');
-      const subFile1 = path.join(subDir1, 'subfile1.txt');
-
-      await mkdir(subDir0);
-      await mkdir(subDir1);
-      await Promise.all([
-        writeFile(rootFile, 'rootfile\n', { encoding: 'utf8' }),
-        writeFile(subFile0, 'subfile 0\n', { encoding: 'utf8' }),
-        writeFile(subFile1, 'subfile 1\n', { encoding: 'utf8' })
-      ]);
-
-      // Begin the child watchers and keep them alive
-      const subWatcher0 = await watchPath(subDir0, {}, () => {});
-      const subWatcherChanges0 = waitForChanges(subWatcher0, subFile0);
-
-      const subWatcher1 = await watchPath(subDir1, {}, () => {});
-      const subWatcherChanges1 = waitForChanges(subWatcher1, subFile1);
-
-      expect(subWatcher0.native).not.toBe(subWatcher1.native);
-
-      // Create the parent watcher
-      const parentWatcher = await watchPath(parentDir, {}, () => {});
-      const parentWatcherChanges = waitForChanges(
-        parentWatcher,
-        rootFile,
-        subFile0,
-        subFile1
-      );
-
-      expect(subWatcher0.native).toBe(parentWatcher.native);
-      expect(subWatcher1.native).toBe(parentWatcher.native);
-
-      // Ensure events are filtered correctly
-      await Promise.all([
-        appendFile(rootFile, 'change\n', { encoding: 'utf8' }),
-        appendFile(subFile0, 'change\n', { encoding: 'utf8' }),
-        appendFile(subFile1, 'change\n', { encoding: 'utf8' })
-      ]);
-
-      await Promise.all([
-        subWatcherChanges0,
-        subWatcherChanges1,
-        parentWatcherChanges
-      ]);
+      events.length = 0;
+      let n = 0;
+      await conditionPromise(async () => {
+        await writeFile(path.join(rootDir, `after-${n++}.txt`), 'after\n');
+        return events.length > 0;
+      }, 'events after the switch');
     });
   });
+
+  describe('when the fileSystemWatcherLogging setting changes', () => {
+    // The worker warns about events it doesn't recognize, and it does so
+    // through the very `console` shim this setting controls. That makes it a
+    // deterministic way to ask "is this worker logging?" without any
+    // filesystem events or debouncing.
+    function provokeLog(native) {
+      // Nothing replies to an unrecognized event, so this request never
+      // settles. We only care about the log it produces on the way past.
+      native.send('watcher:unrecognized-by-design', {}).catch(() => {});
+    }
+
+    beforeEach(async () => {
+      jasmine.useRealClock();
+      atom.config.set('core.fileSystemWatcher', 'nsfw');
+      await watchPath.waitForTransition();
+    });
+
+    afterEach(() => {
+      atom.config.set('core.fileSystemWatcherLogging', false);
+    });
+
+    it('starts a worker with logging off, then turns it on without respawning it', async () => {
+      const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+      const Isolated = await isolatedWatcherClass();
+      const native = new Isolated(rootDir);
+      await native.start();
+
+      const logs = [];
+      Isolated.task.on('task:warn', (args) => logs.push(args));
+      const worker = Isolated.task.childProcess;
+
+      provokeLog(native);
+      await wait(500);
+      expect(logs.length).toBe(0);
+
+      atom.config.set('core.fileSystemWatcherLogging', true);
+      await Isolated.updateLogging();
+
+      provokeLog(native);
+      // Arriving here is also what proves the check above wasn't just
+      // impatience: the same provocation is silent before and audible after.
+      await waitsForCondition('a log message from the worker', () => logs.length > 0);
+      expect(logs[0][0]).toBe('nsfw-worker');
+
+      // The point of notifying rather than restarting: same worker throughout,
+      // so no watches were re-established and no events were missed.
+      expect(Isolated.task.childProcess).toBe(worker);
+
+      await native.stop();
+    });
+
+    it('passes the setting to a worker that spawns while logging is enabled', async () => {
+      atom.config.set('core.fileSystemWatcherLogging', true);
+
+      const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+      const Isolated = await isolatedWatcherClass();
+      const native = new Isolated(rootDir);
+      await native.start();
+
+      const logs = [];
+      Isolated.task.on('task:warn', (args) => logs.push(args));
+
+      provokeLog(native);
+      await waitsForCondition('a log message from the worker', () => logs.length > 0);
+
+      await native.stop();
+    });
+
+    it('carries a change through to the worker of a live watcher', async () => {
+      const rootDir = await tempMkdir('atom-fsmanager-test-').then(realpath);
+      const watcher = await watchPath(rootDir, {}, () => {});
+      subs.add(watcher);
+
+      const logs = [];
+      watcher.native.constructor.task.on('task:warn', (args) => logs.push(args));
+
+      atom.config.set('core.fileSystemWatcherLogging', true);
+
+      // Nothing here calls `updateLogging`. The config subscription is what has
+      // to carry this to the worker. Provoke on each poll, since the message
+      // reaches the worker asynchronously.
+      await waitsForCondition('the worker to start logging', async () => {
+        provokeLog(watcher.native);
+        return logs.length > 0;
+      });
+    });
+  });
+
 });

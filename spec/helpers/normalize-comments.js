@@ -32,7 +32,7 @@ function normalizeTreeSitterTextData(editor, commentRegex, trailingCommentRegex)
   })
   return allMatches.map(({text, row, col, testRow}) => {
     const exactPos = text.match(/\^\s+(.*)/)
-    if(exactPos) {
+    if (exactPos) {
       const expected = exactPos[1]
       return {
         expected,
@@ -41,7 +41,7 @@ function normalizeTreeSitterTextData(editor, commentRegex, trailingCommentRegex)
       }
     } else {
       const pos = text.match(/<-\s+(.*)/)
-      if(!pos) throw new Error(`Can't match ${text}`)
+      if (!pos) throw new Error(`Can't match ${text}`)
       return {
         expected: pos[1],
         editorPosition: {row, column: col},
@@ -94,25 +94,25 @@ async function runFoldsTests(fullPath, commentRegex) {
   let grouped = {}
   const normalized = normalizeTreeSitterTextData(editor, commentRegex).forEach(test => {
     const [kind, id] = test.expected.split('.')
-    if(!kind || !id) {
+    if (!kind || !id) {
       throw new Error(`Folds must be in the format fold_end.some-id\n` +
         `      at ${test.testPosition.row+1}:${test.testPosition.column+1}`)
     }
     grouped[id] ||= {}
     grouped[id][kind] = test
   })
-  for(const k in grouped) {
+  for (const k in grouped) {
     const v = grouped[k]
     const keys = Object.keys(v)
-    if(keys.indexOf('fold_begin') === -1)
+    if (keys.indexOf('fold_begin') === -1)
       throw new Error(`Fold ${k} must contain fold_begin`)
-    if(keys.indexOf('fold_end') === -1)
+    if (keys.indexOf('fold_end') === -1)
       throw new Error(`Fold ${k} must contain fold_end`)
-    if(keys.indexOf('fold_new_position') === -1)
+    if (keys.indexOf('fold_new_position') === -1)
       throw new Error(`Fold ${k} must contain fold_new_position`)
   }
 
-  for(const k in grouped) {
+  for (const k in grouped) {
     const fold = grouped[k]
     const begin = fold['fold_begin']
     const end = fold['fold_end']

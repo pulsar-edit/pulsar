@@ -23,6 +23,32 @@ XPStyle on
   WriteRegStr SHELL_CONTEXT "${UNINSTALL_REGISTRY_KEY}" "InstallLocation" "$INSTDIR"
 !macroend
 
+; Removes a shell integration key that Pulsar registered (see
+; `src/main-process/win-shell.js`), but only if it launches this
+; installation's executable, or launches nothing at all. Pulsar makes the
+; first check before deregistering an entry itself. The second covers entries
+; written by Pulsar 1.131.0 through 1.132.1: their version of `winreg` failed
+; to write any value containing a space, so it left each command empty. Such
+; an entry is broken no matter which installation created it.
+;
+; * ROOT_KEY: the key to delete, under HKCU.
+; * COMMAND_SUBKEY: the subkey (relative to ROOT_KEY) whose default value is
+;   the command.
+; * ARG: the placeholder that the command passes (`%1` or `%V`).
+!macro RemovePulsarShellEntry ROOT_KEY COMMAND_SUBKEY ARG
+  ClearErrors
+  ; This reads as "" if the command is empty or missing, or if the key
+  ; doesn't exist; deleting a key that doesn't exist does nothing.
+  ReadRegStr $0 HKCU "${ROOT_KEY}\${COMMAND_SUBKEY}" ""
+  ; This must match the command value that `win-shell.js` writes. (`==` is
+  ; case-insensitive, as are Windows paths.)
+  ${if} $0 == ""
+  ${orIf} $0 == '"$INSTDIR\${APP_EXECUTABLE_FILENAME}" "${ARG}"'
+    DeleteRegKey HKCU "${ROOT_KEY}"
+  ${endIf}
+  ClearErrors
+!macroend
+
 !macro customUnInstall ; Macro called by electron-builder
   ; Since adding the PATH occurs during installation, we want to ensure to remove it.
   ; Luckily 'EnvVarUpdate' handles the case of it not being present
@@ -32,6 +58,13 @@ XPStyle on
     ; install steps, ultimately removing Pulsar from the PATH
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources"
     ${un.EnvVarUpdate} $0 "PATH" "R" "HKCU" "$INSTDIR\resources\app\ppm\bin"
+
+    ; Remove shell integration entries (context menus and file handler), if
+    ; this installation registered them.
+    !insertmacro RemovePulsarShellEntry "Software\Classes\*\shell\${PRODUCT_NAME}" "command" "%1"
+    !insertmacro RemovePulsarShellEntry "Software\Classes\Directory\shell\${PRODUCT_NAME}" "command" "%1"
+    !insertmacro RemovePulsarShellEntry "Software\Classes\Directory\background\shell\${PRODUCT_NAME}" "command" "%V"
+    !insertmacro RemovePulsarShellEntry "Software\Classes\Applications\${APP_EXECUTABLE_FILENAME}" "shell\open\command" "%1"
   ${endIf}
 !macroend
 

@@ -1,9 +1,9 @@
 const SpecChecker = require('./spec-checker');
 
 class EndOfTestSpecChecker extends SpecChecker {
-    constructor() {
-        super('eot', true, ['eot']);
-    }
+  constructor() {
+    super('eot', true, ['eot']);
+  }
 }
 
 const checker = new EndOfTestSpecChecker();

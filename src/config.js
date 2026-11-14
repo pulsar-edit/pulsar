@@ -487,7 +487,7 @@ class Config {
   //   * `scope` (optional) {ScopeDescriptor} describing a path from
   //     the root of the syntax tree to a token. Get one by calling
   //     {editor.getLastCursor().getScopeDescriptor()}. See {::get} for examples.
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://docs.pulsar-edit.dev/infrastructure/scoped-settings/)
   //     for more information.
   // * `callback` {Function} to call when the value of the key changes.
   //   * `value` the new value of the key
@@ -506,7 +506,7 @@ class Config {
       scopeDescriptor = options.scope;
     } else {
       console.error(
-        'An unsupported form of Config::observe is being used. See https://atom.io/docs/api/latest/Config for details'
+        'An unsupported form of Config::observe is being used. See https://docs.pulsar-edit.dev/api/pulsar/latest/Config/ for details'
       );
       return;
     }
@@ -531,7 +531,7 @@ class Config {
   //   * `scope` (optional) {ScopeDescriptor} describing a path from
   //     the root of the syntax tree to a token. Get one by calling
   //     {editor.getLastCursor().getScopeDescriptor()}. See {::get} for examples.
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://docs.pulsar-edit.dev/infrastructure/scoped-settings/)
   //     for more information.
   // * `callback` {Function} to call when the value of the key changes.
   //   * `event` {Object}
@@ -613,7 +613,7 @@ class Config {
   //   * `scope` (optional) {ScopeDescriptor} describing a path from
   //     the root of the syntax tree to a token. Get one by calling
   //     {editor.getLastCursor().getScopeDescriptor()}
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://docs.pulsar-edit.dev/infrastructure/scoped-settings/)
   //     for more information.
   //
   // Returns the value from Pulsar's default settings, the user's configuration
@@ -720,7 +720,7 @@ class Config {
   //   setting to the default value.
   // * `options` (optional) {Object}
   //   * `scopeSelector` (optional) {String}. eg. '.source.ruby'
-  //     See [the scopes docs](https://pulsar-edit.dev/docs/launch-manual/sections/behind-pulsar#scoped-settings-scopes-and-scope-descriptors)
+  //     See [the scopes docs](https://docs.pulsar-edit.dev/infrastructure/scoped-settings/)
   //     for more information.
   //   * `source` (optional) {String} The name of a file with which the setting
   //     is associated. Defaults to the user's config file.

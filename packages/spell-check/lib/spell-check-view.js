@@ -66,7 +66,7 @@ class SpellCheckView {
 
       // When these settings are changed, it could affect each buffer's
       // results, so we need to reset state.
-      atom.config.onDidChange('spell-check.grammars', () => subscribe),
+      atom.config.onDidChange('spell-check.grammars', subscribe),
       atom.config.observe('spell-check.excludedScopes', (excludedScopes) => {
         this.excludedScopes = excludedScopes;
         subscribe();

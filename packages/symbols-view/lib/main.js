@@ -1,8 +1,7 @@
-const { Disposable, TextEditor } = require('atom');
+const { Disposable } = require('atom');
 const Config = require('./config');
 const ProviderBroker = require('./provider-broker');
 const Path = require('path');
-const { shell } = require('electron');
 const { migrateOldConfigIfNeeded } = require('./util');
 
 const NO_PROVIDERS_MESSAGE = `You don’t have any symbol providers installed.`;
@@ -18,7 +17,7 @@ const NO_PROVIDERS_BUTTONS = [
   {
     text: 'Find providers',
     onDidClick: () => {
-      shell.openExternal(`https://web.pulsar-edit.dev/packages?service=symbol.provider&serviceType=provided`);
+      atom.openExternal(`https://web.pulsar-edit.dev/packages?service=symbol.provider&serviceType=provided`);
     }
   }
 ];

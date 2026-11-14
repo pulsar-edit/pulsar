@@ -25,9 +25,9 @@
     max-width: @tab-max-width;
     height: @tab-height;
     line-height: @tab-height;
+    color: @text-color;
     padding: 0;
     margin: 0 20px 0 5px;
-    color: @text-color;
 
     transition: color .1s ease-in;
     border: none;
@@ -91,6 +91,14 @@
       padding-top: @tab-top-padding;
       padding-right: 10px;
     }
+
+    &.deleted {
+      &, & .title {
+        color: @text-color-error;
+        text-decoration: line-through;
+        text-decoration-color: @text-color-error;
+      }
+    }
   }
 
   .tab.active {
@@ -132,9 +140,11 @@
   .placeholder {
     height: (@tab-height + @tab-top-padding + @tab-bottom-border-height);
     pointer-events: none;
+
     &:before {
       margin-left: -9px; // center between tabs
     }
+
     &:after {
       top: (@tab-height + @tab-top-padding + @tab-bottom-border-height - 2px);
       margin-left: -10px; // center between tabs

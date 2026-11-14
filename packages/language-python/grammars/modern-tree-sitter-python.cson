@@ -27,7 +27,7 @@ fileTypes: [
 ]
 
 treeSitter:
-  parserSource: 'github:tree-sitter/tree-sitter-python#4bfdd9033a2225cc95032ce77066b7aeca9e2efc'
+  parserSource: 'github:tree-sitter/tree-sitter-python#26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64'
   grammar: 'ts/tree-sitter-python.wasm'
   highlightsQuery: 'ts/highlights.scm'
   tagsQuery: 'ts/tags.scm'

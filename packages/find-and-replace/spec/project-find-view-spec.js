@@ -450,23 +450,24 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
         projectFindView.findEditor.setText('items');
 
         atom.commands.dispatch(projectFindView.element, 'core:confirm');
-        await waitForCondition( () =>
-          atom.workspace.getCenter().getActivePane().getItems()[0]?.refs?.resultsView
-        );
+        // Let the search finish before duplicating its results.
+        await waitForSearchResults();
 
         const resultsPaneView1 = atom.views.getView(getExistingResultsPane());
         const pane1 = atom.workspace.getCenter().getActivePane();
-        const resultsView1 = pane1.getItems()[0].refs.resultsView
         pane1.splitRight({copyActiveItem: true});
 
         const pane2 = atom.workspace.getCenter().getActivePane();
-        const resultsView2 = pane2.getItems()[0].refs.resultsView
         const resultsPaneView2 = atom.views.getView(pane2.itemForURI(ResultsPaneView.URI));
         expect(pane1).not.toBe(pane2);
         expect(resultsPaneView1).not.toBe(resultsPaneView2);
-        simulateResizeEvent(resultsView2.element);
 
-        await waitForCondition(() => resultsView1.refs.listView.element.querySelector(".match-row"));
+        // The copy renders its rows once its `ResizeObserver` reports a
+        // height; wait until it shows as many rows as the original.
+        await waitForCondition(() => {
+          const count = resultsPaneView1.querySelectorAll('.match-row').length;
+          return count > 0 && resultsPaneView2.querySelectorAll('.match-row').length === count;
+        });
         const resultCount = resultsPaneView1.querySelectorAll('.match-row').length;
         expect(resultCount).toBeGreaterThan(0);
         expect(resultsPaneView2.querySelectorAll('.match-row')).toHaveLength(resultCount);
@@ -1277,7 +1278,7 @@ describe(`ProjectFindView (ripgrep=${ripgrep})`, () => {
       it("is disabled when a search returns no results", async () => {
         projectFindView.findEditor.setText('items');
         atom.commands.dispatch(projectFindView.element, 'project-find:confirm');
-        await wait(500);
+        await waitForSearchResults();
 
         expect(projectFindView.refs.replaceAllButton).not.toHaveClass('disabled');
 

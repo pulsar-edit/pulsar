@@ -74,6 +74,14 @@ echo "Extracting ${PULSAR_APPIMAGE} to Pulsar.AppDir…"
 # Will extract to `squashfs-root`. Let's rename it just for sanity.
 mv "squashfs-root" "Pulsar.AppDir"
 
+# Some directories (notably everything under `resources/app/ppm`) come out of
+# the build with mode 0700. `appimagetool` refuses to package anything that
+# isn't readable by all users (see AppImage/appimagetool#135), so make every
+# directory readable and searchable and every file readable. (`X` only grants
+# execute permission to directories and to files that are already executable.)
+echo "Normalizing permissions in Pulsar.AppDir…"
+chmod -R a+rX "Pulsar.AppDir"
+
 # Move the `AppImage` to a new filename because we'll be replacing it soon.
 mv "${PULSAR_APPIMAGE}" "${PULSAR_APPIMAGE%.AppImage}.old.AppImage"
 

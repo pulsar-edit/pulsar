@@ -1,3 +1,24 @@
+const { webUtils } = require('electron');
+
+// Electron 32 removed `File::path`; the only way to get a dropped file's path
+// is `webUtils.getPathForFile`. Fake files deliberately lack a `path` property
+// so that a regression to `file.path` fails the specs that use them.
+const fakePaths = new WeakMap();
+
+function fakeFile(filePath) {
+  const file = {};
+  fakePaths.set(file, filePath);
+  return file;
+}
+
+// Must be called from within a spec (or a `beforeEach`), since Jasmine removes
+// spies when each spec finishes.
+function stubGetPathForFile() {
+  if (webUtils.getPathForFile.isSpy) return;
+  spyOn(webUtils, 'getPathForFile').andCallFake(
+    file => fakePaths.get(file) ?? ''
+  );
+}
 
 module.exports.buildInternalDragEvents = function(dragged, enterTarget, dropTarget, treeView, copy) {
   if (copy == null) { copy = false; }
@@ -90,8 +111,9 @@ module.exports.buildExternalDropEvent = function(filePaths, dropTarget, copy) {
     Object.defineProperty(dropEvent, key, {value: true});
   }
 
+  stubGetPathForFile();
   for (let filePath of Array.from(filePaths)) {
-    dropEvent.dataTransfer.files.push({path: filePath});
+    dropEvent.dataTransfer.files.push(fakeFile(filePath));
     dropEvent.dataTransfer.setData(filePath, 'bla');
   } // Not technically correct, but gets the job done
 

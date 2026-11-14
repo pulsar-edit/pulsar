@@ -3,7 +3,6 @@
 
 import {CompositeDisposable, Disposable} from 'atom'
 import etch from 'etch'
-import {shell} from 'electron'
 
 export default class BadgeView {
   constructor(badge) {
@@ -18,7 +17,7 @@ export default class BadgeView {
       if (!anchor) return
       event.stopPropagation()
       event.preventDefault()
-      shell.openExternal(anchor.href)
+      atom.openExternal(anchor.href)
     }
 
     if (this.hasLink()) {

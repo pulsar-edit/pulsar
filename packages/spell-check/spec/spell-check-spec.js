@@ -51,8 +51,6 @@ describe('Spell check', function () {
   });
 
   it('decorates all misspelled words', async function () {
-    // jasmine.useRealClock();
-    console.log('use locales!');
     atom.config.set('spell-check.useLocales', true);
     editor.insertText(
       'This middle of thiss\nsentencts\n\nhas issues and the "edn" \'dsoe\' too'

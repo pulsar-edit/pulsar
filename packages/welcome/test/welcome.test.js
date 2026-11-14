@@ -62,6 +62,23 @@ describe('Welcome', () => {
       });
     });
 
+    describe('the "Install Shell Commands" section', () => {
+      it('is shown only on macOS', () => {
+        const panes = atom.workspace.getCenter().getPanes();
+        const guideView = panes[1].getItems()[0];
+        const section = guideView.element.querySelector(
+          'details[data-section="shellCommands"]'
+        );
+
+        assert(section);
+        if (process.platform === 'darwin') {
+          assert(!section.hidden);
+        } else {
+          assert(section.hidden);
+        }
+      });
+    });
+
     describe('deserializing the pane items', () => {
       describe('when GuideView is deserialized', () => {
         it('remembers open sections', () => {

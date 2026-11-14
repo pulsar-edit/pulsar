@@ -7,16 +7,20 @@ const { expect } = require('@playwright/test')
 async function openAtom(profilePath, videoName) {
   const env = process.env
   env.ATOM_HOME = path.join("tmp", profilePath)
+  // `ATOM_HOME` doesn't cover Electron's `userData` directory, which holds
+  // IndexedDB, among other things. Without this, every instance shares the
+  // default one, and when two run at once, the second can't open IndexedDB.
+  const userDataArg = `--user-data-dir=${path.resolve("tmp", profilePath, "user-data")}`
 
   const config = {
-    args: ["--no-sandbox", "."],
+    args: ["--no-sandbox", userDataArg, "."],
     cwd: ".",
     env: env,
     timeout: 50000
   }
   if(env.BINARY_NAME) {
     config.executablePath = env.BINARY_NAME
-    config.args = ["--no-sandbox"]
+    config.args = ["--no-sandbox", userDataArg]
   }
 
   if(process.env.CI) {

@@ -1,6 +1,7 @@
 module.exports = {
   env: { jasmine: true },
   globals: {
+    runGrammarTests: true,
     waitsForPromise: true
   },
   rules: {

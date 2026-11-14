@@ -60,6 +60,12 @@
       "default": false,
       "description": "Color file names in tabs based on VCS status, similar to how file names are colored in the tree view."
     },
+    "enableItemStatusColoring": {
+      "type": "boolean",
+      "title": "Enable Item Status Coloring",
+      "default": true,
+      "description": "Color tab names based on internal item status. “Deleted” status means the item once had a file on disk but it was deleted. “Conflicted” status means the file on disk changed while the item had unsaved changes. (Not all themes add styles for these states.)"
+    },
     "addNewTabsAtEnd": {
       "type": "boolean",
       "default": false,

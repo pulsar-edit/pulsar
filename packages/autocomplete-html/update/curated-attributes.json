@@ -1116,34 +1116,47 @@
       "alternate",
       "author",
       "bookmark",
+      "external",
       "help",
       "license",
+      "me",
       "next",
       "nofollow",
+      "noopener",
       "noreferrer",
-      "prefetch",
+      "opener",
       "prev",
+      "privacy-policy",
       "search",
-      "sidebar",
       "tag",
-      "external"
+      "terms-of-service"
     ]
   },
   "link/rel": {
     "attribOption": [
       "alternate",
       "author",
+      "canonical",
+      "compression-dictionary",
+      "dns-prefetch",
+      "expect",
       "help",
       "icon",
       "license",
+      "manifest",
+      "me",
+      "modulepreload",
       "next",
       "pingback",
+      "preconnect",
       "prefetch",
+      "preload",
+      "prerender",
       "prev",
+      "privacy-policy",
       "search",
-      "sidebar",
       "stylesheet",
-      "tag"
+      "terms-of-service"
     ]
   },
   "readonly": {

@@ -29,10 +29,6 @@ const PARSERS_IN_USE = new Set();
 
 const FUNCTION_TRUE = () => true;
 
-function isParseTimeout(err) {
-  return err.message.includes('Parsing failed');
-}
-
 function last(array) {
   return array[array.length - 1];
 }
@@ -180,6 +176,15 @@ function isBetweenPoints(point, a, b) {
     comparePoints(point, greater) <= 0;
 }
 
+// Make a function suitable for passing to `Parser::parse` as a progress callback.
+function makeProgressCallback(syncTimeoutMicros = PARSE_JOB_LIMIT_MICROS) {
+  let start = performance.now() * 1000;
+  return () => {
+    let now = performance.now() * 1000;
+    return (now - start) >= syncTimeoutMicros;
+  };
+}
+
 // eslint-disable-next-line no-unused-vars
 let totalBufferChanges = 0;
 let nextTransactionId = 1;
@@ -194,6 +199,7 @@ class WASMTreeSitterLanguageMode {
     this.grammar = grammar;
     this.config = config ?? atom.config;
     this.grammarRegistry = grammars;
+    this.destroyed = false;
 
     this.syncTimeoutMicros = syncTimeoutMicros ?? PARSE_JOB_LIMIT_MICROS;
     this.useAsyncParsing = FEATURE_ASYNC_PARSE;
@@ -223,6 +229,11 @@ class WASMTreeSitterLanguageMode {
 
     this.grammarForLanguageString = this.grammarForLanguageString.bind(this);
 
+    // Keep track of parsers by language. This is a `Map` whose keys are
+    // `Language` instances and whose values are arrays of `Parser` instances.
+    // When we need to parse in a certain language, we take the first instance
+    // for that language that is not currently in use by another parsing job,
+    // or create a new `Parser` if there isn't one available.
     this.parsersByLanguage = new Index();
     this.tokenIterator = new TokenIterator(this);
 
@@ -248,7 +259,9 @@ class WASMTreeSitterLanguageMode {
     // considers only a single `LanguageLayer` at a time. For instance, a given
     // indentation task might consult one layer's indentation query to know
     // whether to indent a line, but another layer's indentation query to know
-    // whether to dedent the line. There are no simplicity gains to be made.
+    // whether to dedent the line. There are no simplicity gains to be made
+    // from having each `LanguageLayer` declare its own instance of
+    // `IndentResolver`.
     //
     // `IndentResolver` _could_ therefore fold its methods into
     // `WASMTreeSitterLanguageMode`, but is separate from it for reasons of
@@ -257,22 +270,38 @@ class WASMTreeSitterLanguageMode {
 
     this.ready = this.grammar.getLanguage()
       .then(language => {
+        // This language mode may have been destroyed while the language was
+        // loading. If so, we shouldn't create anything that would need to be
+        // cleaned up.
+        if (this.destroyed) { return; }
         this.rootLanguage = language;
         this.rootLanguageLayer = new LanguageLayer(null, this, grammar, 0);
         return this.getOrCreateParserForLanguage(language);
       })
-      .then(() => this.rootLanguageLayer.update(null, { id: 0 }))
+      .then(() => this.rootLanguageLayer?.update(null, { id: 0 }))
       .then(() => this.emitter.emit('did-tokenize'));
   }
 
   destroy() {
+    this.destroyed = true;
+    // Clear the memory we used to hold the buffer text, but keep this a string
+    // in case something tries to call string methods on it.
+    this.cachedCurrentBufferText = '';
+    this.isFoldableCache = [];
     let layers = this.getAllLanguageLayers();
     for (let layer of layers) {
-      layer?.destroy();
+      let description = '';
+      try {
+        description = layer?.inspect();
+        layer?.destroy();
+      } catch (err) {
+        console.error('Error destroying layer:', description, err);
+      }
     }
     this.injectionsMarkerLayer?.destroy();
     this.rootLanguageLayer = null;
     this.subscriptions?.dispose();
+    this.emitter.dispose();
 
     // Clean up all `Parser` instances created during the lifetime of this
     // buffer.
@@ -308,6 +337,9 @@ class WASMTreeSitterLanguageMode {
       parser = pool.find(p => !PARSERS_IN_USE.has(p));
     }
 
+    // We try to find the first `Parser` instance of the given language that is
+    // not currently being used. If we fail, we'll create a new parser and add
+    // it to the pool for future use.
     if (!parser) {
       parser = new Parser();
       parser.setLanguage(language);
@@ -759,11 +791,27 @@ class WASMTreeSitterLanguageMode {
     return point;
   }
 
-  parseAsync(language, oldTree, includedRanges, { tag = null } = {}) {
+  // Private: Parse the buffer with the given language.
+  //
+  // Will try to parse synchronously, but will go async if the time budget for
+  // parsing is exceeded.
+  //
+  // * `language`: A Tree-sitter {Language} instance.
+  // * `oldTree`: Optional; the last {Tree} that was produced from parsing.
+  //   Helps reduce parsing time if given because Tree-sitter can re-use the
+  //   tree and make incremental changes as needed.
+  // * `includedRanges`: Optional; an {Array} of objects that contain
+  //   `startIndex`, `endIndex`, `startPosition`, and `endPosition` keys. Tells
+  //   Tree-sitter to consider only those ranges of the document and ignore
+  //   everything else. Used when parsing injections.
+  //
+  // Returns either a {Tree} (if parsing was able to be achieved synchronously)
+  // or a {Promise} that eventually resolves with a {Tree}.
+  //
+  parseAsync(language, oldTree, includedRanges, { tag = null, isCancelled = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     parser.reset();
-    parser.setTimeoutMicros(this.syncTimeoutMicros);
     PARSERS_IN_USE.add(parser);
 
     // When you edit a tree, the positions of nodes in the tree are adjusted
@@ -798,6 +846,7 @@ class WASMTreeSitterLanguageMode {
       let currentText = parseDone ? this.cachedCurrentBufferText : text;
       return currentText.slice(index, endIndex);
     };
+    let progressCallback = makeProgressCallback(this.syncTimeoutMicros);
 
     let tree;
     // eslint-disable-next-line no-unused-vars
@@ -805,33 +854,70 @@ class WASMTreeSitterLanguageMode {
 
     const cleanup = () => {
       parseDone = true;
+      text = null; // (or else this closure retains a full text copy)
       if (devMode && tag) {
         console.timeEnd(tag);
         if (batchCount > 0) {
           console.log(`(async: ${batchCount} batches)`);
         }
       }
-      parser.setTimeoutMicros(null);
       PARSERS_IN_USE.delete(parser);
     };
 
     if (devMode && tag) { console.time(tag); }
 
-    try {
-      // Attempt a synchronous parse.
-      tree = parser.parse(callback, oldTree, { includedRanges });
-    } catch (err) {
-      if (!isParseTimeout(err)) { throw err; }
+    // Attempt a synchronous parse.
+    tree = parser.parse(callback, oldTree, { includedRanges, progressCallback });
 
-      // The parse couldn't be completed in the allotted time, so we'll go
-      // async and return a promise.
+    // The tree can be `null` if we never set a language on the `Parser`
+    // instance — but we definitely did that. So if it's `null` after calling
+    // `parse`, it can only be for the other reason: parsing could not finish
+    // in the allotted time. If that happens, we'll go async and return a
+    // promise.
+    if (tree === null) {
       return new Promise((resolve, reject) => {
+        // Perform however many jobs (each of no more than `syncTimeoutMicros`
+        // duration) are needed to finish parsing this document. We yield after
+        // each job so that we don't lock up the UI.
+        //
+        // NOTE: If X equals the job time limit and Y equals how long we yield
+        // in between jobs, it's possible that there are "sweet-spot" values of
+        // X and Y that strike the right balance between performance and prompt
+        // parsing.
+        //
+        // By default, the job time limit is 3000 microseconds, or 3ms. Using
+        // `setImmediate` to reschedule results in a very low value for Y. On
+        // large files, this winds up prioritizing parsing work quite a bit
+        // while still guaranteeing that the UI won't completely lock up.
+        //
+        // But we could try an approach like this instead:
+        //
+        // An animation frame is about 16ms long (usually; depends on the
+        // display). So, for example, we could switch from `setImmediate` to
+        // `requestAnimationFrame` — in which case we'd be saying that we want
+        // to spend no more than 3/16ths of the animation frame (18.75%) on
+        // parsing the buffer. That would represent an increase in Y from what
+        // we're doing now, so it might also be worth it to increase X.
+        //
         const parseJob = () => {
+          // This language mode, or the language layer associated with this
+          // parse, may have been deleted in between batches. If so, the parser
+          // and/or `oldTree` may already be deleted, so stop before touching
+          // either.
+          if (this.destroyed || isCancelled?.()) {
+            cleanup();
+            resolve(null);
+            return;
+          }
           try {
             batchCount++;
-            tree = parser.parse(callback, oldTree, { includedRanges });
+            tree = parser.parse(callback, oldTree, { includedRanges, progressCallback });
           } catch (err) {
-            if (!isParseTimeout(err)) { return reject(err); }
+            return reject(err);
+          }
+
+          if (tree === null) {
+            // Still not done!
             setImmediate(parseJob);
             return;
           }
@@ -848,11 +934,17 @@ class WASMTreeSitterLanguageMode {
     return tree;
   }
 
+  // Private: Parse the buffer with the given language.
+  //
+  // Always synchronous, unlike {::parseAsync}. This will be used if the
+  // `useAsyncParsing` property on {WasmTreeSitterLanguageMode} is `false`; but
+  // that's meant to be changed _only_ when running certain specs.
+  //
+  // Do not use this method in non-spec scenarios; prefer {::parseAsync}.
   parse(language, oldTree, includedRanges, { tag = null } = {}) {
     let devMode = atom.inDevMode();
     let parser = this.getOrCreateParserForLanguage(language);
     parser.reset();
-    parser.setTimeoutMicros(null);
 
     let text = this.buffer.getText();
     this.cachedCurrentBufferText = text;
@@ -2029,6 +2121,11 @@ class NullLanguageModeHighlightIterator {
 }
 
 class NullLayerHighlightIterator {
+  constructor(languageLayer) {
+    this.languageLayer = languageLayer;
+    this.depth = languageLayer.depth;
+    this.coverShallowerScopes = false;
+  }
   seek() {
     return [false, new OpenScopeMap];
   }
@@ -2179,7 +2276,7 @@ class HighlightIterator {
         // cover shallower scopes, so we need to re-assess our list of already
         // open scopes to see if any of them _would've_ been covered at the
         // point when they were opened.
-        let ranges = iterator.languageLayer.getCurrentRanges();
+        let ranges = iterator.languageLayer.getCurrentRanges() ?? [];
         for (let [earlierIterator, earlierOpenScopes] of openScopesByLayer) {
           // It's possible, though uncommon, for injections to overlap, because
           // there's no mechanism that prevents it. Since we sorted the layers
@@ -2804,6 +2901,8 @@ class LanguageLayer {
   destroy() {
     if (this.destroyed) { return; }
     this.destroyed = true;
+    this.nodesToInvalidateOnChange.clear();
+    this.foldNodesToInvalidateOnChange.clear();
 
     // Clean up all Tree-sitter trees.
     let temporaryTrees = this.temporaryTrees ?? [];
@@ -3134,7 +3233,7 @@ class LanguageLayer {
     if (this.tree) {
       return new LayerHighlightIterator(this, this.tree);
     } else {
-      return new NullLayerHighlightIterator();
+      return new NullLayerHighlightIterator(this);
     }
   }
 
@@ -3466,7 +3565,10 @@ class LanguageLayer {
         language,
         this.tree,
         includedRanges,
-        // { tag: `Parsing ${this.inspect()} (async) ${params.id}` }
+        {
+          // tag: `Parsing ${this.inspect()} (async) ${params.id}`,
+          isCancelled: () => this.destroyed
+        }
       );
       if (tree.then) {
         params.async = true;
@@ -3479,6 +3581,11 @@ class LanguageLayer {
         includedRanges,
         // { tag: `Parsing ${this.inspect()} (sync) ${params.id}` }
       );
+    }
+    if (this.destroyed || !tree) {
+      this.patchSinceCurrentParseStarted = null;
+      tree?.delete();
+      return;
     }
 
     let changes = this.patchSinceCurrentParseStarted.getChanges();

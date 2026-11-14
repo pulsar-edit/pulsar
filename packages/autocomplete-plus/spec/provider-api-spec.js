@@ -5,6 +5,7 @@ import {
   waitForAutocomplete,
   triggerAutocompletion,
   conditionPromise,
+  timeoutPromise,
   waitForAutocompleteToDisappear
 } from './spec-helper'
 import path from 'path'
@@ -608,6 +609,139 @@ describe('Provider API', () => {
       await confirmChoice(0)
 
       expect(editor.getText()).toEqual("\nips$0um\nkbye\n, world\name$0t\n")
+    })
+  })
+
+  describe('when a lone suggestion is confirmed automatically', () => {
+    function activate () {
+      atom.commands.dispatch(atom.views.getView(editor), 'autocomplete-plus:activate')
+    }
+
+    beforeEach(async () => {
+      // Auto-confirmation of a single suggestion only happens when the user
+      // asks for suggestions explicitly.
+      atom.config.set('autocomplete-plus.enableAutoActivation', false)
+      atom.config.set('autocomplete-plus.enableAutoConfirmSingleSuggestion', true)
+      await atom.packages.activatePackage('snippets')
+      editor.setText('lorem\nhello, world\n')
+      editor.setCursorBufferPosition([1, 5])
+      // Moving the cursor queues a request to hide the suggestion list; let it
+      // resolve before the specs start, lest it hide a list we mean to show.
+      await timeoutPromise(0)
+    })
+
+    it('resolves the suggestion before inserting it', async () => {
+      let insertedSuggestion = null
+      testProvider = {
+        scopeSelector: '.source.js',
+        inclusionPriority: 2,
+        excludeLowerPriority: true,
+        getSuggestions () {
+          return [{ text: 'ohai', replacementPrefix: 'hello' }]
+        },
+        getSuggestionDetailsOnSelect (suggestion) {
+          return {
+            ...suggestion,
+            additionalTextEdits: [
+              { range: [[0, 0], [0, 5]], newText: 'ipsum' }
+            ]
+          }
+        },
+        onDidInsertSuggestion ({ suggestion }) {
+          insertedSuggestion = suggestion
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
+
+      activate()
+      await conditionPromise(() => insertedSuggestion != null)
+
+      expect(insertedSuggestion.additionalTextEdits).toBeDefined()
+      expect(editor.getText()).toEqual('ipsum\nohai, world\n')
+    })
+
+    it('waits for asynchronous resolution before inserting the suggestion', async () => {
+      let insertedSuggestion = null
+      testProvider = {
+        scopeSelector: '.source.js',
+        inclusionPriority: 2,
+        excludeLowerPriority: true,
+        getSuggestions () {
+          return [{ text: 'ohai', replacementPrefix: 'hello' }]
+        },
+        async getSuggestionDetailsOnSelect (suggestion) {
+          await timeoutPromise(50)
+          return {
+            ...suggestion,
+            additionalTextEdits: [
+              { range: [[0, 0], [0, 5]], newText: 'ipsum' }
+            ]
+          }
+        },
+        onDidInsertSuggestion ({ suggestion }) {
+          insertedSuggestion = suggestion
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
+
+      activate()
+
+      // Nothing should have been inserted while the provider was still
+      // resolving the suggestion.
+      await timeoutPromise(25)
+      expect(insertedSuggestion).toBe(null)
+      expect(editor.getText()).toEqual('lorem\nhello, world\n')
+
+      await conditionPromise(() => insertedSuggestion != null)
+
+      expect(insertedSuggestion.additionalTextEdits).toBeDefined()
+      expect(editor.getText()).toEqual('ipsum\nohai, world\n')
+    })
+
+    it('inserts the suggestion when the provider cannot resolve suggestions', async () => {
+      let insertedSuggestion = null
+      testProvider = {
+        scopeSelector: '.source.js',
+        inclusionPriority: 2,
+        excludeLowerPriority: true,
+        getSuggestions () {
+          return [{ text: 'ohai', replacementPrefix: 'hello' }]
+        },
+        onDidInsertSuggestion ({ suggestion }) {
+          insertedSuggestion = suggestion
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
+
+      activate()
+      await conditionPromise(() => insertedSuggestion != null)
+
+      expect(editor.getText()).toEqual('lorem\nohai, world\n')
+    })
+
+    it('does not confirm anything when more than one suggestion is present', async () => {
+      testProvider = {
+        scopeSelector: '.source.js',
+        inclusionPriority: 2,
+        excludeLowerPriority: true,
+        getSuggestions () {
+          return [
+            { text: 'ohai', replacementPrefix: 'hello' },
+            { text: 'ohno', replacementPrefix: 'hello' }
+          ]
+        },
+        getSuggestionDetailsOnSelect (suggestion) {
+          return suggestion
+        }
+      }
+      registration = atom.packages.serviceHub.provide('autocomplete.provider', '5.1.0', testProvider)
+
+      activate()
+      await waitForAutocomplete(editor)
+
+      // The list is shown instead of anything being auto-confirmed.
+      expect(autocompleteManager.suggestionList.items.length).toBe(2)
+      expect(editor.getText()).toEqual('lorem\nhello, world\n')
     })
   })
 })

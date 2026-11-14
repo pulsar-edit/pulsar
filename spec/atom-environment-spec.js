@@ -2,6 +2,8 @@ const { conditionPromise } = require('./helpers/async-spec-helpers');
 const fs = require('fs');
 const path = require('path');
 const temp = require('temp').track();
+const { Emitter } = require('event-kit');
+const { ipcRenderer } = require('electron');
 const AtomEnvironment = require('../src/atom-environment');
 const { timeoutPromise: wait } = require('./helpers/async-spec-helpers');
 
@@ -149,6 +151,35 @@ describe('AtomEnvironment', () => {
         });
       });
     });
+
+    describe('when an event listener throws', () => {
+      let disposable;
+      beforeEach(() => {
+        // This handler is skipped in spec mode, so we have to call it manually
+        // for these tests.
+        disposable = atom.installEventHandlerExceptionHandler();
+      });
+      // The handler list is static on `Emitter`; leaking it would change
+      // `emit` behavior for every later spec.
+      afterEach(() => disposable.dispose());
+
+      it('still calls later listeners and reports the error', () => {
+        const emitter = new Emitter();
+        const error = new Error('Test of listener failure');
+        const didThrowSpy = jasmine.createSpy('didThrow');
+        const laterListener = jasmine.createSpy('laterListener');
+
+        atom.onDidThrowError(didThrowSpy);
+        emitter.on('foo', () => { throw error; });
+        emitter.on('foo', laterListener);
+
+        expect(() => emitter.emit('foo', 42)).not.toThrow();
+        expect(laterListener).toHaveBeenCalledWith(42);
+        expect(didThrowSpy).toHaveBeenCalled();
+        expect(didThrowSpy.calls.mostRecent().args[0].originalError).toBe(error);
+      });
+    });
+
   });
 
   describe('.assert(condition, message, callback)', () => {
@@ -213,29 +244,18 @@ describe('AtomEnvironment', () => {
       atom.enablePersistence = false;
     });
 
-    it('selects the state based on the current project paths', async () => {
+    it('computes the state key based on the current project paths', async () => {
       jasmine.useRealClock();
 
       const [dir1, dir2] = [temp.mkdirSync('dir1-'), temp.mkdirSync('dir2-')];
 
-      const loadSettings = Object.assign(atom.getLoadSettings(), {
-        initialProjectRoots: [dir1],
-        windowState: null
-      });
-
-      spyOn(atom, 'getLoadSettings').and.callFake(() => loadSettings);
-      spyOn(atom, 'serialize').and.returnValue({ stuff: 'cool' });
-
-      atom.project.setPaths([dir1, dir2]);
-
-      // State persistence will fail if other Atom instances are running
-      expect(await atom.stateStore.connect()).toBe(true);
-
-      await atom.saveState();
-      expect(await atom.loadState()).toBeFalsy();
-
-      loadSettings.initialProjectRoots = [dir2, dir1];
-      expect(await atom.loadState()).toEqual({ stuff: 'cool' });
+      let stateKey = await atom.getStateKey([dir1, dir2]);
+      expect(stateKey).toEqual(
+        await atom.getStateKey([dir1, dir2], { pathsOnly: true })
+      );
+      expect(stateKey).toEqual(
+        await atom.getStateKey([dir2, dir1], { pathsOnly: true })
+      );
     });
 
     it('saves state when the CPU is idle after a keydown or mousedown event', async () => {
@@ -938,6 +958,93 @@ describe('AtomEnvironment', () => {
 
       version = '1.7.0-dev-5340c91';
       expect(atom.getReleaseChannel()).toBe('dev');
+    });
+  });
+
+  describe('::trashItem()', () => {
+    let fileToBeTrashed, tempDir;
+    beforeEach(() => {
+      tempDir = temp.mkdirSync('trash-item-');
+      fileToBeTrashed = path.join(tempDir, 'file-1.txt');
+      fs.writeFileSync(fileToBeTrashed, 'test file');
+    });
+
+    it('trashes the file', async () => {
+      expect(fs.existsSync(fileToBeTrashed)).toBe(true);
+      await atom.trashItem(fileToBeTrashed);
+      expect(fs.existsSync(fileToBeTrashed)).toBe(false);
+    });
+
+    it('rejects when asked to trash a nonexistent file', async () => {
+      let nonexistentFile = path.join(tempDir, 'zzyzx.txt');
+      expect(fs.existsSync(nonexistentFile)).toBe(false);
+      let outcome = undefined;
+      // Assert that the `catch` clause was hit. (`expect().toThrow()` does not
+      // work with async functions.)
+      try {
+        await atom.trashItem(nonexistentFile);
+        outcome = 'success';
+      } catch (error) {
+        outcome = 'failure';
+      } finally {
+        expect(outcome).toBe('failure');
+      }
+    });
+  });
+
+  describe('::openPath()', () => {
+    // We can't test the success case without launching an external
+    // application.
+    it('rejects when asked to open a nonexistent path', async () => {
+      const tempDir = temp.mkdirSync('open-path-');
+      const nonexistentPath = path.join(tempDir, 'zzyzx.txt');
+      expect(fs.existsSync(nonexistentPath)).toBe(false);
+
+      // `atom.openPath` checks for the path's existence before asking the
+      // system to open it — otherwise, on Windows, the system would show an
+      // error dialog and wait for the user to dismiss it. The resulting
+      // error's `code` must also survive the trip from the main process.
+      let error;
+      try {
+        await atom.openPath(nonexistentPath);
+      } catch (e) {
+        error = e;
+      }
+      expect(error).toEqual(jasmine.any(Error));
+      expect(error?.message).toBeTruthy();
+      expect(error?.code).toBe('ENOENT');
+    });
+  });
+
+  describe('::beep()', () => {
+    // We can't hear the beep. But since Electron 35, calling `shell.beep` from
+    // a renderer process segfaults it on Linux, so we really do beep here: if
+    // beeping regresses, these specs crash the renderer rather than pass.
+
+    it('beeps when `core.audioBeep` is enabled', async () => {
+      atom.config.set('core.audioBeep', true);
+      spyOn(atom.applicationDelegate, 'playBeepSound').and.callThrough();
+      const didBeep = jasmine.createSpy('did-beep');
+      atom.onDidBeep(didBeep);
+
+      atom.beep();
+      expect(atom.applicationDelegate.playBeepSound).toHaveBeenCalled();
+      expect(didBeep).toHaveBeenCalled();
+
+      // The beep itself happens in the main process. Make a round trip there
+      // so that it has run before this spec finishes.
+      await ipcRenderer.invoke('getScrollbarStyle');
+    });
+
+    it('emits `did-beep` without making a sound when `core.audioBeep` is disabled', () => {
+      atom.config.set('core.audioBeep', false);
+      spyOn(atom.applicationDelegate, 'playBeepSound');
+      const didBeep = jasmine.createSpy('did-beep');
+      atom.onDidBeep(didBeep);
+
+      atom.beep();
+      expect(atom.applicationDelegate.playBeepSound).not.toHaveBeenCalled();
+      expect(didBeep).toHaveBeenCalled();
     });
   });
 });

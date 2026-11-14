@@ -2,6 +2,7 @@ const AtomWindow = require('./atom-window');
 const ApplicationMenu = require('./application-menu');
 const AtomProtocolHandler = require('./atom-protocol-handler');
 const { onDidChangeScrollbarStyle, getScrollbarStyle } = require('./scrollbar-style');
+const { getStateKey, releaseStateKey, reserveStateKey } = require('./state-keys');
 const StorageFolder = require('../storage-folder');
 const Config = require('../config');
 const ConfigFile = require('../config-file');
@@ -134,6 +135,143 @@ ipcMain.handle('isDefaultProtocolClient', (_, { protocol, path, args }) => {
 
 ipcMain.handle('setAsDefaultProtocolClient', (_, { protocol, path, args }) => {
   return app.setAsDefaultProtocolClient(protocol, path, args);
+});
+
+// Describes a failed shell operation for the renderer. An `Error` sent over
+// IPC keeps its `message` but loses custom properties like `code`, so we send
+// `code` alongside it; `ApplicationDelegate` puts it back.
+function shellFailure(error) {
+  return { outcome: 'failure', error, code: error?.code };
+}
+
+// Handle file deletion requests.
+//
+// Works around https://github.com/electron/electron/issues/29598, which seems
+// to be the cause of failed deletion attempts on Windows.
+ipcMain.handle('trashItem', async (_, filePath) => {
+  // We can't toss a promise over the wall, so we'll `await` it on our side and
+  // report the progress back to the renderer.
+  //
+  // If we return an `Error` object from this handler in the case of error,
+  // `ipcRenderer.invoke` will detect it and wrap it with its own explanation.
+  // We want to preserve the original error and hide the implementation
+  // details, so we instead return an object with an explicit `outcome`
+  // property to avoid this behavior.
+  try {
+    // `shell.trashItem` resolves with an empty value on success…
+    let result = await shell.trashItem(filePath);
+    return { outcome: 'success', result };
+  } catch (error) {
+    // …and rejects on failure.
+    return shellFailure(error);
+  }
+});
+
+ipcMain.handle('showItemInFolder', async (_, filePath) => {
+  try {
+    // Result will be `undefined`, but might as well return it in case of a
+    // future Electron API change.
+    //
+    // Unlike the others, this method does not return a promise; but we must go
+    // async anyway.
+    let result = shell.showItemInFolder(filePath);
+    return { outcome: 'success', result };
+  } catch (error) {
+    // Not sure whether this can even fail, but might as well handle it.
+    return shellFailure(error);
+  }
+});
+
+// How long to wait for `shell.openPath` or `shell.openExternal` before giving
+// up. On Windows, these can block for as long as the system shows UI for the
+// request (e.g., a "How do you want to open this file?" picker), which is
+// indefinitely if the user leaves it open.
+const SHELL_OPERATION_TIMEOUT_MS = 60000;
+
+// Settles like `promise`, or rejects with an `ETIMEDOUT` error after `ms`
+// milliseconds, whichever comes first. The underlying operation is not
+// cancelled — it may still be waiting on a system dialog, and can still
+// complete after we've given up on it.
+function withShellTimeout(promise, ms, description) {
+  let timer;
+  let timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      let error = new Error(
+        `Timed out waiting for the system to ${description}; the operation may still complete.`
+      );
+      error.code = 'ETIMEDOUT';
+      reject(error);
+    }, ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+ipcMain.handle('openPath', async (_, filePath) => {
+  try {
+    // On Windows, asking the system to open a nonexistent path shows an error
+    // dialog and blocks until it's dismissed; fail fast instead.
+    if (!fs.existsSync(filePath)) {
+      let error = new Error(`Path does not exist: ${filePath}`);
+      error.code = 'ENOENT';
+      return shellFailure(error);
+    }
+    // Unlike the other `shell` methods here, `shell.openPath` doesn't reject
+    // on failure; it resolves with an error message (or an empty string on
+    // success). Normalize that so that `atom.openPath` rejects on failure,
+    // like its siblings.
+    let errorMessage = await withShellTimeout(
+      shell.openPath(filePath),
+      SHELL_OPERATION_TIMEOUT_MS,
+      'open the path'
+    );
+    if (errorMessage) {
+      return shellFailure(new Error(errorMessage));
+    }
+    return { outcome: 'success' };
+  } catch (error) {
+    return shellFailure(error);
+  }
+});
+
+// Electron 35 changed `shell.beep` on Linux to call `gdk_display_beep`
+// through a stub that is never initialized, so it segfaults in any process
+// (electron/electron#49436). It's fixed by electron/electron#49680, which
+// only reached 40.x and later. Until then, do what Electron did before 35:
+// write BEL to the system console, or failing that, to our controlling
+// terminal. Either may be missing or unwritable (no terminal, not root); a
+// beep isn't worth reporting an error over.
+//
+// TODO: Remove the Linux branch once we're on a fixed Electron, and confirm
+// that the `::beep()` specs pass on Linux.
+function beepOnLinux() {
+  fs.appendFile('/dev/console', '\x07', error => {
+    if (error) fs.appendFile('/dev/tty', '\x07', () => {});
+  });
+}
+
+// Renderers send this message instead of calling `shell.beep` themselves:
+// even on a fixed Electron, a renderer can't call `gdk_display_beep`, since
+// GTK is only initialized in the main process. It's fire-and-forget, since
+// there's nothing to report back.
+ipcMain.on('beep', () => {
+  if (process.platform === 'linux') {
+    beepOnLinux();
+  } else {
+    shell.beep();
+  }
+});
+
+ipcMain.handle('openExternal', async (_, url) => {
+  try {
+    let result = await withShellTimeout(
+      shell.openExternal(url),
+      SHELL_OPERATION_TIMEOUT_MS,
+      'open the URL'
+    );
+    return { outcome: 'success', result };
+  } catch (error) {
+    return shellFailure(error);
+  }
 });
 
 // The application's singleton class.
@@ -340,6 +478,7 @@ module.exports = class AtomApplication extends EventEmitter {
   openWithOptions(options) {
     const {
       pathsToOpen,
+      stateKey,
       executedFrom,
       foldersToOpen,
       urlsToOpen,
@@ -363,6 +502,7 @@ module.exports = class AtomApplication extends EventEmitter {
       return this.runTests({
         headless: true,
         devMode,
+        stateKey,
         resourcePath: this.resourcePath,
         executedFrom,
         pathsToOpen,
@@ -395,6 +535,7 @@ module.exports = class AtomApplication extends EventEmitter {
         clearWindowState,
         addToLastWindow,
         preserveFocus,
+        stateKey,
         env
       });
     } else if (urlsToOpen && urlsToOpen.length > 0) {
@@ -427,6 +568,7 @@ module.exports = class AtomApplication extends EventEmitter {
 
   // Public: Removes the {AtomWindow} from the global window list.
   removeWindow(window) {
+    releaseStateKey(window);
     this.windowStack.removeWindow(window);
     if (this.getAllWindows().length === 0 && process.platform !== 'darwin') {
       app.quit();
@@ -1006,6 +1148,15 @@ module.exports = class AtomApplication extends EventEmitter {
         window => window.temporaryState
       )
     );
+    this.disposable.add(
+      ipcHelpers.respondTo(
+        'get-state-key',
+        (browserWindow, projectPaths, options) => {
+          const win = this.atomWindowForBrowserWindow(browserWindow);
+          return getStateKey(win, projectPaths, options);
+        }
+      )
+    );
 
     this.disposable.add(
       ipcHelpers.respondTo('set-temporary-window-state', (win, state) => {
@@ -1268,6 +1419,7 @@ module.exports = class AtomApplication extends EventEmitter {
   async openPaths({
     pathsToOpen,
     foldersToOpen,
+    stateKey,
     executedFrom,
     pidToKillWhenClosed,
     newWindow,
@@ -1427,6 +1579,9 @@ module.exports = class AtomApplication extends EventEmitter {
       });
       openedWindow.preserveFocus = preserveFocus;
       this.addWindow(openedWindow);
+      if (stateKey) {
+        reserveStateKey(openedWindow, stateKey);
+      }
       openedWindow.focus();
     }
 
@@ -1505,7 +1660,10 @@ module.exports = class AtomApplication extends EventEmitter {
       version: APPLICATION_STATE_VERSION,
       windows: windows
         .filter(window => !window.isSpec)
-        .map(window => ({ projectRoots: window.projectRoots }))
+        .map(window => ({
+          projectRoots: window.projectRoots,
+          stateKey: getStateKey(window, window.projectRoots)
+        }))
     };
     state.windows.reverse();
 
@@ -1526,6 +1684,7 @@ module.exports = class AtomApplication extends EventEmitter {
       // Schema: {version: '1', windows: [{projectRoots: ['<root-dir>', ...]}, ...]}
       return state.windows.map(each => ({
         foldersToOpen: each.projectRoots,
+        stateKey: each.stateKey,
         devMode: this.devMode,
         safeMode: this.safeMode,
         newWindow: true

@@ -37,8 +37,11 @@ exports.activate = function() {
   atom.grammars.addInjectionPoint('source.clojure', {
     type: 'list_lit',
     language(node) {
-      if(node.children[1].text === 'js*') {
+      const childText = node.children[1].text;
+      if(childText === 'js*') {
         return 'javascript'
+      } else if(childText === 'cpp/raw') {
+        return 'cpp'
       }
     },
     content(node) {

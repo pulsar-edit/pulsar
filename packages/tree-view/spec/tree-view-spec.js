@@ -1,3 +1,4 @@
+const path = require('path')
 const TreeView = require('../lib/tree-view')
 
 describe('TreeView', () => {
@@ -101,6 +102,84 @@ describe('TreeView', () => {
         treeView.roots[0].entries.firstChild.entries.firstChild,
         treeView.roots[0].entries.lastChild
       ])
+    })
+  })
+
+  describe('opening an entry in a new window', () => {
+    let treeView
+
+    // Finds a direct child of `view` (a root or an expanded directory) by its
+    // file name, asserting that it exists so that a fixture change fails here
+    // rather than somewhere more confusing.
+    function entryNamed (view, name) {
+      const entry = Array.from(view.entries.children).find(
+        child => path.basename(child.getPath()) === name
+      )
+      expect(entry).not.toBeUndefined()
+      return entry
+    }
+
+    function optionsPassedToOpen () {
+      expect(atom.open).toHaveBeenCalled()
+      return atom.open.mostRecentCall.args[0]
+    }
+
+    beforeEach(() => {
+      treeView = new TreeView({})
+      treeView.roots[0].expand()
+      spyOn(atom, 'open')
+    })
+
+    it('preserves the existing project roots when opening a file', () => {
+      const directory = entryNamed(treeView.roots[0], 'root-dir1')
+      directory.expand()
+      const file = entryNamed(directory, 'tree-view.txt')
+
+      treeView.selectEntry(file)
+      treeView.openSelectedEntryInNewWindow()
+
+      // The tab bar's “Open in New Window” behaves this way too; the two
+      // should not disagree.
+      expect(optionsPassedToOpen().pathsToOpen).toEqual(
+        [...atom.project.getPaths(), file.getPath()]
+      )
+      expect(optionsPassedToOpen().newWindow).toBe(true)
+    })
+
+    it('opens a folder as a project of its own', () => {
+      const directory = entryNamed(treeView.roots[0], 'root-dir1')
+
+      treeView.selectEntry(directory)
+      treeView.openSelectedEntryInNewWindow()
+
+      expect(optionsPassedToOpen().pathsToOpen).toEqual([directory.getPath()])
+    })
+
+    it('opens a project root as a project of its own', () => {
+      const root = treeView.roots[0]
+
+      treeView.selectEntry(root)
+      treeView.openSelectedEntryInNewWindow()
+
+      expect(optionsPassedToOpen().pathsToOpen).toEqual([root.getPath()])
+    })
+
+    it('passes along dev mode and safe mode', () => {
+      const directory = entryNamed(treeView.roots[0], 'root-dir1')
+      directory.expand()
+
+      treeView.selectEntry(entryNamed(directory, 'tree-view.txt'))
+      treeView.openSelectedEntryInNewWindow()
+
+      expect(optionsPassedToOpen().devMode).toBe(atom.devMode)
+      expect(optionsPassedToOpen().safeMode).toBe(atom.safeMode)
+    })
+
+    it('does nothing when no entry is selected', () => {
+      treeView.deselect()
+      treeView.openSelectedEntryInNewWindow()
+
+      expect(atom.open).not.toHaveBeenCalled()
     })
   })
 })
