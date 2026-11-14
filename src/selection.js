@@ -877,10 +877,10 @@ module.exports = class Selection {
   // * `maintainClipboard` {Boolean}
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
-  cutToEndOfLine(maintainClipboard, options = {}) {
+  async cutToEndOfLine(maintainClipboard, options = {}) {
     if (!this.ensureWritable('cutToEndOfLine', options)) return;
     if (this.isEmpty()) this.selectToEndOfLine();
-    return this.cut(maintainClipboard, false, options.bypassReadOnly);
+    return await this.cut(maintainClipboard, false, options.bypassReadOnly);
   }
 
   // Public: Cuts the selection until the end of the buffer line.
@@ -888,10 +888,10 @@ module.exports = class Selection {
   // * `maintainClipboard` {Boolean}
   // * `options` (optional) {Object}
   //   * `bypassReadOnly` (optional) {Boolean} Must be `true` to modify text within a read-only editor. (default: false)
-  cutToEndOfBufferLine(maintainClipboard, options = {}) {
+  async cutToEndOfBufferLine(maintainClipboard, options = {}) {
     if (!this.ensureWritable('cutToEndOfBufferLine', options)) return;
     if (this.isEmpty()) this.selectToEndOfBufferLine();
-    this.cut(maintainClipboard, false, options.bypassReadOnly);
+    await this.cut(maintainClipboard, false, options.bypassReadOnly);
   }
 
   // Public: Copies the selection to the clipboard and then deletes it.
@@ -899,9 +899,9 @@ module.exports = class Selection {
   // * `maintainClipboard` {Boolean} (default: false) See {::copy}
   // * `fullLine` {Boolean} (default: false) See {::copy}
   // * `bypassReadOnly` {Boolean} (default: false) Must be `true` to modify text within a read-only editor.
-  cut(maintainClipboard = false, fullLine = false, bypassReadOnly = false) {
+  async cut(maintainClipboard = false, fullLine = false, bypassReadOnly = false) {
     if (!this.ensureWritable('cut', { bypassReadOnly })) return;
-    this.copy(maintainClipboard, fullLine);
+    await this.copy(maintainClipboard, fullLine);
     this.delete({ bypassReadOnly });
   }
 
@@ -914,7 +914,7 @@ module.exports = class Selection {
   // * `fullLine` {Boolean} if `true`, the copied text will always be pasted
   //   at the beginning of the line containing the cursor, regardless of the
   //   cursor's horizontal position. (default: false)
-  copy(maintainClipboard = false, fullLine = false) {
+  async copy(maintainClipboard = false, fullLine = false) {
     if (this.isEmpty()) return;
     const { start, end } = this.getBufferRange();
     const selectionText = this.editor.getTextInRange([start, end]);
@@ -925,7 +925,7 @@ module.exports = class Selection {
       let {
         text: clipboardText,
         metadata
-      } = this.editor.constructor.clipboard.readWithMetadata();
+      } = await this.editor.constructor.clipboard.readWithMetadata();
       if (!metadata) metadata = {};
       if (!metadata.selections) {
         metadata.selections = [
@@ -941,12 +941,12 @@ module.exports = class Selection {
         indentBasis: startLevel,
         fullLine
       });
-      this.editor.constructor.clipboard.write(
+      await this.editor.constructor.clipboard.write(
         [clipboardText, selectionText].join('\n'),
         metadata
       );
     } else {
-      this.editor.constructor.clipboard.write(selectionText, {
+      await this.editor.constructor.clipboard.write(selectionText, {
         indentBasis: startLevel,
         fullLine
       });
