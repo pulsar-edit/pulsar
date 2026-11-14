@@ -1,3 +1,4 @@
+const path = require('path');
 const spellchecker = require('@pulsar-edit/spellchecker');
 const pathspec = require('./pathspec');
 const env = require('./checker-env');
@@ -99,12 +100,50 @@ class LocaleChecker {
 
     // Build up a list of paths we are checking so we can report them fully
     // to the user if we fail.
+    //
+    // An entry from `spell-check.localePaths` that doesn't resolve to an
+    // absolute path (e.g., a typo, or a `project:` path, which `getPath`
+    // rejects) is skipped, as if it weren't there. We list such entries
+    // separately when we report a failure.
     const searchPaths = [];
-    for (let searchPath of this.paths) {
-      searchPaths.push(pathspec.getPath(searchPath));
+    const ignoredPaths = [];
+    for (let spec of this.paths) {
+      let resolved = null;
+      try {
+        resolved = pathspec.getPath(spec);
+      } catch (err) {
+        this.log('could not resolve locale path', spec, err.message);
+      }
+      if (resolved && path.isAbsolute(resolved)) {
+        searchPaths.push(resolved);
+      } else {
+        ignoredPaths.push(spec);
+      }
+    }
+    if (ignoredPaths.length > 0) {
+      this.log('ignoring locale paths', ignoredPaths);
     }
 
     // Add operating system specific paths to the search list.
+    //
+    // On macOS and Windows we used to add the drive/filesystem root to the
+    // list. This was not very costly because it's not a recursive search; we
+    // check for dictionary files that live at the root.
+    //
+    // But it was still superfluous; it was a leftover from an approach where a
+    // call to `setDictionary` was needed because it produced a side effect,
+    // but the second argument to `setDictionary` was ignored. That's not true
+    // for a Hunspell checker, but it can be true for a checker backed by a
+    // system API.
+    //
+    // But that means that those lines became unnecessary as soon as we
+    // switched to a Hunspell-first approach for this checker. This is the only
+    // checker that uses `searchPaths`, so a dummy path serves no purpose in
+    // the list.
+    //
+    // If, somehow, this is wrong, a user can work around it by adding either
+    // `/` or `C:\` to the list at `spell-check.localePaths` in their
+    // `config.cson`.
     if (this.checkDefaultPaths) {
       if (env.isLinux()) {
         searchPaths.push('/usr/share/hunspell');
@@ -113,12 +152,7 @@ class LocaleChecker {
       }
 
       if (env.isDarwin()) {
-        searchPaths.push('/'); // …?
         searchPaths.push('/System/Library/Spelling');
-      }
-
-      if (env.isWindows()) {
-        searchPaths.push('C:\\');
       }
     }
 
@@ -183,6 +217,12 @@ class LocaleChecker {
     if (!env.useLocales()) {
       searches =
         '\n\nThe plugin tried to use the system dictionaries to find the locale.';
+    }
+
+    if (ignoredPaths.length > 0) {
+      searches += `\n\nThe following entries in "Locale paths" were ignored because they could not be resolved to absolute paths:\n* ${ignoredPaths
+        .map((spec) => JSON.stringify(spec))
+        .join('\n* ')}`;
     }
 
     const noticesMode = atom.config.get('spell-check.noticesMode');

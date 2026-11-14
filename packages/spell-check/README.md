@@ -114,9 +114,7 @@ In addition to what is provided, the following paths are checked:
 - `/usr/share/hunspell` (Linux only)
 - `/usr/share/myspell` (Linux only)
 - `/usr/share/myspell/dicts` (Linux only)
-- `/` (Mac only)
 - `/System/Library/Spelling` (Mac only)
-- `C:\` (Windows only)
 
 Dictionaries can be downloaded from various sites (such as [wooorm's repository](https://github.com/wooorm/dictionaries) or [LibreOffice's](https://github.com/LibreOffice/dictionaries)), but the file has to be renamed `locale.dic` and `locale.aff`.
 

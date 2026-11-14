@@ -4,11 +4,16 @@ const { app } = require('@electron/remote');
 // Adapted from the `atom-pathspec` NPM package.
 
 /**
- * Returns an absolute path from the given spec.
+ * Resolves a path spec that may start with a pseudo-drive (e.g., `~/dicts` or
+ * `config:dicts`).
  *
- * @param {string} spec A path specifier which may be an absolute,
- *    pseudo-drive, or relative path.
- * @returns {string} An absolute path of the given spec.
+ * @param {string} spec A path specifier: an absolute path, or a path starting
+ *    with a pseudo-drive.
+ * @returns {string} The resolved path if the spec starts with a known
+ *    pseudo-drive; otherwise the spec, unchanged. The result isn't
+ *    necessarily absolute, so callers that need an absolute path should
+ *    check.
+ * @throws If the spec uses `project:`, which needs a project context.
  */
 exports.getPath = function (spec) {
   // If the spec is blank, then just return it. If it starts with an absolute
@@ -17,14 +22,11 @@ exports.getPath = function (spec) {
     return spec;
   }
 
-  // Check to see if we have a pseudo-directory first.
-  var match = spec.match(/^(~|[\w-]+:)?\/*(.*)$/);
-
-  if (!match) {
-    // No match, so just make this directory relative to the current
-    // working directory.
-    return path.join(process.cwd(), spec);
-  }
+  // Check to see if we have a pseudo-drive. (Every part of this pattern is
+  // optional, so it matches any string; what matters is whether it captured
+  // a pseudo-drive.)
+  const match = spec.match(/^(~|[\w-]+:)?\/*(.*)$/);
+  if (!match[1]) return spec;
 
   // We have an apparent pseudo-drive, so normalize it and attempt to match
   // it against our known values.
