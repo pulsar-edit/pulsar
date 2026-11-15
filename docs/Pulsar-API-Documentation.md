@@ -213,7 +213,8 @@ style: Exclusively used for the <code>style</code> attribute</p>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
 <dt><a href="#getPath">getPath(spec)</a> ⇒ <code>string</code></dt>
-<dd><p>Returns an absolute path from the given spec.</p>
+<dd><p>Resolves a path spec that may start with a pseudo-drive (e.g., <code>~/dicts</code> or
+<code>config:dicts</code>).</p>
 </dd>
 <dt><a href="#beforeEach">beforeEach()</a></dt>
 <dd></dd>
@@ -563,14 +564,22 @@ This file aims to run some short simple tests against `update.js`. Focusing
 <a name="getPath"></a>
 
 ## getPath(spec) ⇒ <code>string</code>
-Returns an absolute path from the given spec.
+Resolves a path spec that may start with a pseudo-drive (e.g., `~/dicts` or
+`config:dicts`).
 
 **Kind**: global function  
-**Returns**: <code>string</code> - An absolute path of the given spec.  
+**Returns**: <code>string</code> - The resolved path if the spec starts with a known
+   pseudo-drive; otherwise the spec, unchanged. The result isn't
+   necessarily absolute, so callers that need an absolute path should
+   check.  
+**Throws**:
+
+- If the spec uses `project:`, which needs a project context.
+
 
 | Param | Type | Description |
 | --- | --- | --- |
-| spec | <code>string</code> | A path specifier which may be an absolute,    pseudo-drive, or relative path. |
+| spec | <code>string</code> | A path specifier: an absolute path, or a path starting    with a pseudo-drive. |
 
 <a name="beforeEach"></a>
 
