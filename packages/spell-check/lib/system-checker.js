@@ -8,14 +8,14 @@ let debug;
 // Initialize the global spell checker which can take some time. We also force
 // the use of the system or operating system library instead of Hunspell.
 if (env.isSystemSupported()) {
-    instance = new spellchecker.Spellchecker();
-    instance.setSpellcheckerType(spellchecker.ALWAYS_USE_SYSTEM);
+  instance = new spellchecker.Spellchecker();
+  instance.setSpellcheckerType(spellchecker.ALWAYS_USE_SYSTEM);
 
-    if (!instance.setDictionary('', '')) {
-        instance = undefined;
-    }
-} else {
+  if (!instance.setDictionary('', '')) {
     instance = undefined;
+  }
+} else {
+  instance = undefined;
 }
 
 // The `SystemChecker` is a special case to use the built-in system spell-checking
@@ -24,68 +24,75 @@ if (env.isSystemSupported()) {
 // starts to throw an occasional error if you use multiple locales at the same time
 // due to some memory bug.
 class SystemChecker {
-    constructor() {
-        if (atom.config.get('spell-check.enableDebug')) {
-            debug = require('debug');
-            this.log = debug('spell-check:system-checker');
-        } else {
-            this.log = (_) => {};
-        }
-        this.log('enabled', this.isEnabled(), this.getStatus());
+  constructor() {
+    if (atom.config.get('spell-check.enableDebug')) {
+      debug = require('debug');
+      this.log = debug('spell-check:system-checker');
+    } else {
+      this.log = (_str) => {};
     }
+    this.log('enabled', this.isEnabled(), this.getStatus());
+  }
 
-    deactivate() {}
+  deactivate() {
+    // no-op
+  }
 
-    getId() {
-        return 'spell-check:system';
-    }
-    getName() {
-        return 'System Checker';
-    }
-    getPriority() {
-        return 110;
-    }
-    isEnabled() {
-        return instance;
-    }
-    getStatus() {
-        if (instance) {
-            return 'working correctly';
-        } else {
-            return 'not supported on platform';
-        }
-    }
+  getId() {
+    return 'spell-check:system';
+  }
 
-    providesSpelling(args) {
-        return this.isEnabled();
-    }
-    providesSuggestions(args) {
-        return this.isEnabled();
-    }
-    providesAdding(args) {
-        return false;
-    } // Users can't add yet.
+  getName() {
+    return 'System Checker';
+  }
 
-    check(args, text) {
-        const id = this.getId();
+  getPriority() {
+    return 110;
+  }
 
-        if (this.isEnabled()) {
-            // We use the default checker here and not the locale-specific one so it
-            // will check all languages at the same time.
-            return instance.checkSpellingAsync(text).then((incorrect) => {
-                if (this.log.enabled) {
-                    this.log('check', incorrect);
-                }
-                return { id, invertIncorrectAsCorrect: true, incorrect };
-            });
-        } else {
-            return { id, status: this.getStatus() };
-        }
-    }
+  isEnabled() {
+    return instance;
+  }
 
-    suggest(args, word) {
-        return instance.getCorrectionsForMisspelling(word);
+  getStatus() {
+    if (instance) {
+      return 'working correctly';
+    } else {
+      return 'not supported on platform';
     }
+  }
+
+  providesSpelling(_) {
+    return this.isEnabled();
+  }
+
+  providesSuggestions(_) {
+    return this.isEnabled();
+  }
+
+  providesAdding(_) {
+    return false;
+  } // Users can't add yet.
+
+  async check(_, text) {
+    const id = this.getId();
+
+    if (this.isEnabled()) {
+      // We use the default checker here and not the locale-specific one so it
+      // will check all languages at the same time.
+      let incorrect = await instance.checkSpellingAsync(text);
+      if (this.log.enabled) {
+        this.log('check', incorrect);
+      }
+      return { id, invertIncorrectAsCorrect: true, incorrect };
+    } else {
+      return { id, status: this.getStatus() };
+    }
+  }
+
+  suggest(_, word) {
+    return instance.getCorrectionsForMisspelling(word);
+  }
 }
 
 module.exports = SystemChecker;

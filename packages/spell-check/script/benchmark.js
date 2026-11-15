@@ -13,7 +13,7 @@ const result = handler({ id: 1, text });
 const t1 = Date.now();
 
 console.log(
-    'Found %d misspellings in %d milliseconds',
-    result.misspellings.length,
-    t1 - t0
+  'Found %d misspellings in %d milliseconds',
+  result.misspellings.length,
+  t1 - t0
 );
