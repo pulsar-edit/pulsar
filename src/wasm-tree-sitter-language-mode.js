@@ -17,8 +17,6 @@ const ONE_CHAR_FORWARD_TRAVERSAL = Object.freeze(Point(0, 1));
 const FEATURE_ASYNC_INDENT = true;
 const FEATURE_ASYNC_PARSE = true;
 
-const LINE_LENGTH_LIMIT_FOR_HIGHLIGHTING = 10000;
-
 // How many milliseconds we can spend on synchronous re-parses (for indentation
 // purposes) in a given transaction before we fall back to asynchronous
 // indentation instead. Only comes into play when async indentation is enabled.
@@ -2164,47 +2162,51 @@ class HighlightIterator {
     return `[HighlightIterator id=${this.id} iterators=${this.iterators?.length ?? 0}]`;
   }
 
-  seek(start, endRow) {
+  // Seek to `start` and prepare to report boundaries up to `endRowOrPosition`.
+  //
+  // The second argument can be either:
+  //
+  // * a {Point} (or point-like object) describing the exact buffer position at
+  //   which highlighting can stop; or
+  // * (legacy) a {Number} describing a buffer row — in which case we highlight
+  //   through the end of that row, however long it is.
+  seek(start, endRowOrPosition) {
     if (!(start instanceof Point)) {
       start = Point.fromObject(start, true);
     }
     let { buffer, rootLanguageLayer } = this.languageMode;
     if (!rootLanguageLayer) { return []; }
 
-    if (!endRow) {
+    let end;
+    if (endRowOrPosition == null) {
       // Creative consumers of `HighlightIterator` exist in the wild; some of
       // them expect the `TextMateHighlightIterator::seek` signature that needs
       // only a starting position.
       //
-      // So if `endRow` isn’t specified, we should assume it wants to go to the
-      // end of the buffer. This is why `endRow` defaults to `Infinity`. It
-      // will get clipped to the end of the buffer or the end of the language
-      // layer as appropriate.
+      // So if no end is specified, we should assume it wants to go to the end
+      // of the buffer. It will get clipped to the end of the language layer
+      // as appropriate.
       //
       // This can theoretically get very costly — but it'd be the consumer's
       // fault for using a private API and not doing its own chunking.
-      endRow = buffer.getEndPosition().row
+      end = buffer.getEndPosition();
+    } else if (typeof endRowOrPosition === 'number') {
+      // Interpret a bare reference to a row N to mean "the end of buffer row
+      // N." `TextBuffer` knows not to do this anymore (because nothing limits
+      // the length of a buffer row) but the caveat above about creative API
+      // consumers applies just as much here.
+      end = buffer.clipPosition(new Point(endRowOrPosition, Infinity));
+    } else {
+      // Assume we've been given a `Point`. We won't be asked to provide
+      // highlighting information beyond this point.
+      end = buffer.clipPosition(Point.fromObject(endRowOrPosition, true));
     }
-
-    let end = {
-      row: endRow,
-      column: buffer.lineLengthForRow(endRow)
-    };
 
     this.end = end;
     this.iterators = [];
 
-    if (Math.max(start.column, end.column) > LINE_LENGTH_LIMIT_FOR_HIGHLIGHTING) {
-      return [];
-    }
-
     let injectionMarkers = this.languageMode.injectionsMarkerLayer.findMarkers(
-      {
-        intersectsRange: new Range(
-          start,
-          new Point(endRow + 1, 0)
-        )
-      }
+      { intersectsRange: new Range(start, end) }
     );
 
     injectionMarkers.sort((a, b) => {
@@ -2235,14 +2237,14 @@ class HighlightIterator {
     // already open scopes) that retains information about where each open
     // scope was opened, because we'll need that information in a moment.
     //
-    let [result, openScopes] = iterator.seek(start, endRow);
+    let [result, openScopes] = iterator.seek(start, end);
 
     if (rootLanguageLayer?.tree?.rootNode.hasChanges) {
       // The tree is dirty. We should keep going — if we stop now, then the
       // user will see a flash of unhighlighted text over this whole range. But
       // we should also schedule a re-highlight at the end of the transaction,
       // once the tree will be clean again.
-      let range = new Range(start, iterator._getEndPosition(endRow));
+      let range = new Range(start, iterator._getEndPosition(end));
       this.languageMode.atTransactionEnd().then(() => {
         this.languageMode.emitRangeUpdate(range);
       });
@@ -2262,7 +2264,7 @@ class HighlightIterator {
     // open scopes, removing any that aren't their layer's base language scope.
     for (const marker of injectionMarkers) {
       const iterator = marker.languageLayer.buildHighlightIterator();
-      let [result, openScopes] = iterator.seek(start, endRow);
+      let [result, openScopes] = iterator.seek(start, end);
 
       // Just as with the root layer, any injection layer may need to add to
       // the list of open scopes whether or not they need to mark anything
@@ -2504,19 +2506,12 @@ class LayerHighlightIterator {
 
   // If this isn't the root language layer, we need to make sure this iterator
   // doesn't try to go past its marker boundary.
-  _getEndPosition(endRow) {
+  //
+  // `end` is a {Point} that `HighlightIterator#seek` has already clipped to
+  // the buffer.
+  _getEndPosition(end) {
     let { marker } = this.languageLayer;
-    let { buffer } = this.languageLayer.languageMode;
-    let naiveEndPoint = new Point(
-      endRow,
-      buffer.lineLengthForRow(endRow)
-    );
-
-    if (marker) {
-      return Point.min(marker.getRange().end, naiveEndPoint)
-    } else {
-      return buffer.clipPosition(naiveEndPoint);
-    }
+    return marker ? Point.min(marker.getRange().end, end) : end;
   }
 
   // TODO: This still doesn't make much sense, so I suppose it's good that
@@ -2582,8 +2577,8 @@ class LayerHighlightIterator {
     }
   }
 
-  seek(start, endRow) {
-    let end = this._getEndPosition(endRow);
+  seek(start, end) {
+    end = this._getEndPosition(end);
     // let isDevMode = atom.inDevMode();
 
     // let timeKey;
