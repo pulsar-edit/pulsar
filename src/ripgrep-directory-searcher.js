@@ -219,12 +219,14 @@ module.exports = class RipgrepDirectorySearcher {
   }
 
   searchInDirectory(directory, regexp, options, numPathsFound) {
-    // Delay the require of vscode-ripgrep to not mess with the snapshot creation.
+    // `@vscode/ripgrep` itself is ESM-only and can't be `require`d here, so we
+    // resolve its platform-specific binary package directly; this mirrors what
+    // that package's `index.js` does.
     if (!this.rgPath) {
-      this.rgPath = require('vscode-ripgrep').rgPath.replace(
-        /\bapp\.asar\b/,
-        'app.asar.unpacked'
-      );
+      const binaryName = process.platform === 'win32' ? 'rg.exe' : 'rg';
+      this.rgPath = require.resolve(
+        `@vscode/ripgrep-${process.platform}-${process.arch}/bin/${binaryName}`
+      ).replace(/\bapp\.asar\b/, 'app.asar.unpacked');
     }
 
     const directoryPath = directory.getPath();
