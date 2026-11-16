@@ -526,6 +526,50 @@ jobs:
         mkdir -p ./tests/videos
         Xvfb -screen 0 1024x768x24+32 :99 & nohup ffmpeg -video_size 1024x768 -f x11grab -i :99.0 ./tests/videos/out.mpg & DISPLAY=:99 PLAYWRIGHT_JUNIT_OUTPUT_NAME=report.xml npx playwright test --reporter=junit,list
 
+    # Some bundled packages shell out to native executables (`ctags` for
+    # `symbol-provider-ctags`, `rg` for `fuzzy-finder` and project search).
+    # Package specs otherwise run only on x64 (`package-tests-linux.yml`), which
+    # is how Linux ARM64 shipped an x64 `ctags` that never ran at all. So, on
+    # each architecture, check that the packaged app contains executables for
+    # that architecture, and run the specs of the packages that use them.
+    - name: Test bundled executables - Linux
+      if: ${{ !cancelled() && runner.os == 'Linux' }}
+      run: |
+        [ -d squashfs-root ] || ./binaries/*AppImage --appimage-extract > /dev/null
+        # The dependency cache may have missed (see above).
+        [ -x node_modules/symbol-provider-ctags/build/Release/ctags ] || yarn install --check-files
+
+        UNPACKED=squashfs-root/resources/app.asar.unpacked/node_modules
+        case "${{ runner.arch }}" in
+          ARM64) ARCH=arm64; FILE_ARCH=aarch64 ;;
+          *)     ARCH=x64;   FILE_ARCH=x86-64 ;;
+        esac
+
+        CTAGS="$UNPACKED/symbol-provider-ctags/build/Release/ctags"
+        RG="$UNPACKED/@vscode/ripgrep-linux-$ARCH/bin/rg"
+        for bin in "$CTAGS" "$RG"; do
+          if ! file "$bin" | grep -q "$FILE_ARCH"; then
+            echo "::error::$bin is missing or not built for $FILE_ARCH"
+            file "$bin" || true
+            exit 1
+          fi
+        done
+        "$RG" --version | head -1
+        "$CTAGS" --version | head -1
+
+        # A ctags built without regex support still runs, but silently ignores
+        # every `--langdef`/`--regex-*` in `ctags-config`.
+        if "$CTAGS" --options="$UNPACKED/symbol-provider-ctags/lib/ctags-config" --version 2>&1 | grep -q 'regex support not available'; then
+          echo "::error::ctags was built without regex support"
+          exit 1
+        fi
+
+        for pkg in symbol-provider-ctags fuzzy-finder; do
+          echo "::group::$pkg specs"
+          (cd "node_modules/$pkg" && xvfb-run --auto-servernum "$GITHUB_WORKSPACE/squashfs-root/pulsar" --test spec)
+          echo "::endgroup::"
+        done
+
     - name: Check Pulsar Version
       if: ${{ runner.os != 'Windows' }}
       run: sed -i -e "s/[0-9]*-dev/${TIMESTAMP}/g" package.json
