@@ -72,6 +72,12 @@ class CtagsProvider {
     }
   }
 
+  getCtagsPath() {
+    // Built from vendor/ctags by binding.gyp on install.
+    let binary = process.platform === 'win32' ? 'ctags.exe' : 'ctags';
+    return path.join(this.getPackageRoot(), 'build', 'Release', binary);
+  }
+
   parseTagLine(line) {
     let sections = line.split('\t');
     if (sections.length > 3) {
@@ -227,7 +233,7 @@ class CtagsProvider {
     let tags = {};
     let packageRoot = this.getPackageRoot();
 
-    let command = path.join(packageRoot, 'vendor', `ctags-${process.platform}`);
+    let command = this.getCtagsPath();
     let defaultCtagsFile = path.join(packageRoot, 'lib', 'ctags-config');
 
     const args = [

@@ -55,9 +55,7 @@ describe('CTagsProvider', () => {
   it('identifies its project root correctly', () => {
     let root = provider.getPackageRoot();
     expect(root).toContain("symbol-provider-ctags");
-    expect(
-      fs.existsSync(path.join(root, "vendor", "ctags-darwin"))
-    ).toBe(true);
+    expect(fs.existsSync(provider.getCtagsPath())).toBe(true);
   });
 
   describe('when tags can be generated for a file', () => {
@@ -77,6 +75,23 @@ describe('CTagsProvider', () => {
 
       expect(symbols[1].name).toBe('quicksort.sort');
       expect(symbols[1].position.row).toEqual(1);
+    });
+  });
+
+  describe('when the language is only defined in ctags-config', () => {
+    // ctags 5.8 has no built-in Go parser; Go exists only via `--langdef` and
+    // `--regex-Go` in lib/ctags-config. If ctags was built without regex
+    // support, this produces no symbols at all.
+    beforeEach(async () => {
+      fs.copySync(path.join(__dirname, 'fixtures', 'go'), directory.getPath());
+      await atom.packages.activatePackage('language-go');
+      await atom.workspace.open(directory.resolve('sample.go'));
+      editor = getEditor();
+    });
+
+    it('provides symbols', async () => {
+      let symbols = await provider.getSymbols({ type: 'file', editor });
+      expect(symbols.map(s => s.name)).toEqual(['Server', 'Start', 'main']);
     });
   });
 
