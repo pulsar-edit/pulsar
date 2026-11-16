@@ -20,7 +20,11 @@ class Dialog {
     this.element.appendChild(this.promptText);
 
     this.miniEditor = new TextEditor({mini: true});
+    this.busy = false;
     const blurHandler = () => {
+      // Closing mid-operation would dispose the emitter that reports the
+      // result.
+      if (this.busy) return;
       if (document.hasFocus()) { return this.close(); }
     };
     this.miniEditor.element.addEventListener('blur', blurHandler);
@@ -35,8 +39,7 @@ class Dialog {
     atom.commands.add(this.element, {
       'core:confirm': () => this.onConfirm(this.miniEditor.getText()),
       'core:cancel': () => this.cancel()
-    }
-    );
+    });
 
     this.miniEditor.setText(initialPath);
 
@@ -74,8 +77,15 @@ class Dialog {
   }
 
   cancel() {
+    if (this.busy) return;
     this.close();
     document.querySelector('.tree-view')?.focus();
+  }
+
+  setBusy (busy) {
+    this.busy = busy;
+    this.miniEditor.setReadOnly(busy);
+    this.element.classList.toggle('busy', busy);
   }
 
   showError(message) {

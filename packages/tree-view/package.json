@@ -39,7 +39,8 @@
     "tree-view": {
       "description": "A tree-like view of directories and files",
       "versions": {
-        "1.0.0": "provideTreeView"
+        "1.0.0": "provideTreeView",
+        "1.1.0": "provideTreeView"
       }
     }
   },
@@ -85,6 +86,13 @@
       "type": "boolean",
       "default": false,
       "description": "When Pulsar is opened, the view is hidden."
+    },
+    "fileOperationTimeout": {
+      "type": "integer",
+      "default": 2000,
+      "minimum": 0,
+      "maximum": 10000,
+      "description": "How long (in milliseconds) to wait for other packages to react before creating, moving, or deleting a file. Language servers may use this to (for example) update imports when a file moves."
     }
   }
 }
