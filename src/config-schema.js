@@ -326,12 +326,6 @@ const configSchema = {
         type: 'integer',
         default: 15
       },
-      automaticallyUpdate: {
-        description:
-          'Automatically update Pulsar when a new release is available. **Note**: Currently not functional, please download new releases from [pulsar-edit.dev](https://pulsar-edit.dev/download.html)',
-        type: 'boolean',
-        default: false
-      },
       useProxySettingsWhenCallingApm: {
         title: 'Use Proxy Settings When Calling PPM',
         description:
