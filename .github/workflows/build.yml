@@ -564,9 +564,11 @@ jobs:
           exit 1
         fi
 
+        # `--no-sandbox` because extracting the AppImage loses the setuid bit on
+        # `chrome-sandbox`, and Electron refuses to start without it.
         for pkg in symbol-provider-ctags fuzzy-finder; do
           echo "::group::$pkg specs"
-          (cd "node_modules/$pkg" && xvfb-run --auto-servernum "$GITHUB_WORKSPACE/squashfs-root/pulsar" --test spec)
+          (cd "node_modules/$pkg" && xvfb-run --auto-servernum "$GITHUB_WORKSPACE/squashfs-root/pulsar" --no-sandbox --test spec)
           echo "::endgroup::"
         done
 
