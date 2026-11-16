@@ -1429,14 +1429,16 @@ class TreeView {
       return true;
     }
 
-    return this.planConflictingMove(initialPath, newPath, kind, plan);
+    return this.planConflictingMove(initialPath, newPath, newDirectoryPath, kind, plan);
   }
 
-  // Returns `false` if the user cancelled.
-  planConflictingMove (initialPath, newPath, kind, plan) {
+  // Returns `false` if the user cancelled. `newDirectoryPath` is where the
+  // user dropped the batch; conflicts are named relative to it so that the
+  // user can tell which file is meant in a nested merge.
+  planConflictingMove (initialPath, newPath, newDirectoryPath, kind, plan) {
     if (kind === 'file') {
       let chosen = atom.confirm({
-        message: `'${path.basename(newPath)}' already exists`,
+        message: `'${path.relative(newDirectoryPath, newPath)}' already exists`,
         detailedMessage: 'Do you want to replace it?',
         buttons: ['Replace file', 'Skip', 'Cancel']
       });
@@ -1459,7 +1461,7 @@ class TreeView {
       let childNewPath = path.join(newPath, entry);
       let childKind = fs.lstatSync(childInitialPath).isDirectory() ? 'folder' : 'file';
       if (fs.existsSync(childNewPath)) {
-        if (!this.planConflictingMove(childInitialPath, childNewPath, childKind, plan)) {
+        if (!this.planConflictingMove(childInitialPath, childNewPath, newDirectoryPath, childKind, plan)) {
           return false;
         }
       } else {
