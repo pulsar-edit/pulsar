@@ -4367,24 +4367,22 @@ describe("TreeView", function () {
       });
 
       describe("when multiple files and folders are deleted", function () {
-        it("does not error when the selected entries form a parent/child relationship", function () {
-          // If dir1 and dir1/file1 are both selected for deletion,
-          // and dir1 is deleted first, do not error when attempting to delete dir1/file1
+        it("does not error when the selected entries form a parent/child relationship", async () => {
+          // If dir1 and dir1/file1 are both selected for deletion, deleting
+          // dir1 covers dir1/file1; nothing should complain about the child.
           atom.notifications.clear();
 
-          spyOn(fs, 'existsSync').andCallThrough();
-
           fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-          dirView.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, metaKey: true}));
+          dirView.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, metaKey: true }));
           treeView.focus();
 
           spyOn(atom, 'confirm').andCallFake((_, callback) => callback(0));
 
           atom.commands.dispatch(treeView.element, 'tree-view:remove');
+          await fileOperationsSettled(treeView);
 
-          waitsFor('dir1/file1 to attempt to be deleted', () => fs.existsSync.mostRecentCall.args[0] === filePath);
-
-          return runs(() => expect(atom.notifications.getNotifications().length).toBe(0));
+          expect(fs.existsSync(dirPath)).toBe(false);
+          expect(atom.notifications.getNotifications().length).toBe(0);
         });
 
         it("focuses the first selected entry's parent folder", async function () {
