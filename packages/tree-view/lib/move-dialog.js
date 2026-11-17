@@ -5,7 +5,7 @@ const { repoForPath } = require("./helpers");
 
 module.exports =
 class MoveDialog extends Dialog {
-  constructor(initialPath, {willMove, onMove, onMoveFailed}) {
+  constructor(initialPath, {fileOperations, willMove, onMove, onMoveFailed}) {
     let prompt;
     if (fs.isDirectorySync(initialPath)) {
       prompt = 'Enter the new path for the directory.';
@@ -24,9 +24,11 @@ class MoveDialog extends Dialog {
     this.willMove = willMove;
     this.onMove = onMove;
     this.onMoveFailed = onMoveFailed;
+    this.fileOperations = fileOperations;
   }
 
-  onConfirm(newPath) {
+  async onConfirm(newPath) {
+    if (this.busy) return;
     newPath = newPath.replace(/\s+$/, ''); // Remove trailing whitespace
     if (!path.isAbsolute(newPath)) {
       let [rootPath] = Array.from(atom.project.relativizePath(this.initialPath));
@@ -60,23 +62,54 @@ class MoveDialog extends Dialog {
       return;
     }
 
-    const directoryPath = path.dirname(newPath);
+    let stats;
     try {
-      let repo;
-      this.willMove?.({initialPath: this.initialPath, newPath});
-      if (!fs.existsSync(directoryPath)) { fs.makeTreeSync(directoryPath); }
-      fs.moveSync(this.initialPath, newPath);
-      this.onMove?.({initialPath: this.initialPath, newPath});
-      // eslint-disable-next-line no-cond-assign
-      if (repo = repoForPath(newPath)) {
-        repo.getPathStatus(this.initialPath);
-        repo.getPathStatus(newPath);
-      }
-      return this.close();
+      stats = fs.lstatSync(this.initialPath);
     } catch (error) {
-      this.showError(`${error.message}.`);
-      return this.onMoveFailed?.({initialPath: this.initialPath, newPath});
+      // The source vanished after the dialog opened.
+      return this.showError(`${error.message}.`);
     }
+
+    let action = {
+      kind: stats.isDirectory() ? 'folder' : 'file',
+      oldPath: this.initialPath,
+      newPath
+    };
+    let error;
+    let moved;
+
+    this.setBusy(true);
+    try {
+      [moved] = await this.fileOperations.run('move', [action], async ([action]) => {
+        let { oldPath: initialPath, newPath } = action;
+        try {
+          // Check again: something may have appeared here during the wait.
+          if (!this.isNewPathValid(newPath)) {
+            throw new Error(`'${newPath}' already exists`);
+          }
+          this.willMove?.({ initialPath, newPath });
+          let directoryPath = path.dirname(newPath);
+          if (!fs.existsSync(directoryPath)) fs.makeTreeSync(directoryPath);
+          fs.moveSync(initialPath, newPath);
+          this.onMove?.({ initialPath, newPath });
+          let repo = repoForPath(newPath);
+          repo?.getPathStatus(initialPath);
+          repo?.getPathStatus(newPath);
+          return [action];
+        } catch (e) {
+          error = e;
+          this.onMoveFailed?.({ initialPath, newPath });
+          return [];
+        }
+      });
+    } finally {
+      this.setBusy(false);
+    }
+
+    if (!moved) {
+      return this.showError(`${error.message}.`);
+    }
+    return this.close();
   }
 
   isNewPathValid(newPath) {

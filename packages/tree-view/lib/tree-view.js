@@ -7,9 +7,11 @@ const { CompositeDisposable, Emitter } = require('atom');
 const {
   repoForPath,
   getStyleObject,
-  getFullExtension
+  getFullExtension,
+  withoutDescendants
 } = require('./helpers');
 
+const FileOperations = require('./file-operations');
 const AddDialog = require('./add-dialog');
 const MoveDialog = require('./move-dialog');
 const CopyDialog = require('./copy-dialog');
@@ -30,12 +32,12 @@ function toggleConfig(keyPath) {
 let nextId = 1;
 
 class TreeView {
-  constructor(state) {
+  constructor(state, fileOperations) {
+    this.fileOperations = fileOperations;
     this.onDragLeave = this.onDragLeave.bind(this);
     this.onDragEnter = this.onDragEnter.bind(this);
 
     this.onStylesheetsChanged = this.onStylesheetsChanged.bind(this);
-    this.moveConflictingEntry = this.moveConflictingEntry.bind(this);
 
     this.id = nextId++;
 
@@ -560,41 +562,83 @@ class TreeView {
     }
   }
 
-  revealActiveFile(options = {}) {
-    if (!atom.project.getPaths().length) {
-      return Promise.resolve();
-    }
-    let { show, focus } = options;
+  // Public: select the entry for `targetPath`, expanding its ancestors and
+  // scrolling it into view.
+  //
+  // * `targetPath` An absolute path to a file or folder.
+  // * `options` (optional) {Object}
+  //   * `show` Whether to reveal the tree view's dock if it's hidden. Defaults
+  //     to `true`.
+  //   * `focus` Whether to focus the tree view. Defaults to the
+  //     `tree-view.focusOnReveal` setting.
+  //
+  // Returns a {Promise} indicating whether the entry was found. Paths outside
+  // the project resolve to `false` without showing anything. Paths inside the
+  // project that have no entry (nonexistent or hidden by ignore settings) also
+  // resolve to `false`, though their ancestors will have been expanded.
+  async revealPath (targetPath, { show = true, focus } = {}) {
+    targetPath = path.resolve(targetPath);
+    let [rootPath, relativePath] = atom.project.relativizePath(targetPath);
+    if (rootPath === null) return false;
+
     focus ??= atom.config.get('tree-view.focusOnReveal');
-    let promise = (show || focus) ? this.show(focus) : Promise.resolve();
+    if (show || focus) await this.show(focus);
 
-    return promise.then(() => {
-      let activeFilePath = this.getActivePath();
-      if (!activeFilePath) return;
-      let [rootPath, relativePath] = atom.project.relativizePath(activeFilePath);
-      if (rootPath == null) return;
+    // Expand the root and every folder between it and the target. `expand`
+    // renders children synchronously before it goes async, so each child will
+    // exist by the time we look for it.
+    let components = relativePath ? relativePath.split(path.sep) : [];
+    let currentPath = rootPath;
+    let expansions = [];
+    for (let component of components) {
+      let ancestor = this.entryForPath(currentPath);
+      if (!ancestor) return false;
+      // Under `squashDirectoryNames`, an intermediate folder may have no entry
+      // of its own; the nearest one will have been expanded already.
+      if (ancestor.isPathEqual(currentPath)) expansions.push(ancestor.expand());
+      currentPath = path.join(currentPath, component);
+    }
 
-      let activePathComponents = relativePath.split(path.sep);
+    // `entryForPath` falls back to the nearest ancestor, so insist on an exact
+    // match…
+    let entry = this.entryForPath(targetPath);
+    if (!entry?.isPathEqual(targetPath)) {
+      // …unless the target is a folder squashed into a deeper one, as `a` is
+      // in `a/b`. Then the nearest entry has a child whose chain passes
+      // through the target, and that child stands for it.
+      entry = this.squashedEntryContaining(entry, targetPath);
+      if (!entry) return false;
+    }
 
-      // Add the root folder to the path components…
-      activePathComponents.unshift(
-        rootPath.substring(rootPath.lastIndexOf(path.sep) + 1)
-      );
-      // …and remove it from the current path.
-      let currentPath = rootPath.substring(0, rootPath.lastIndexOf(path.sep));
-      let results = [];
-      for (let pathComponent of activePathComponents) {
-        currentPath += path.sep + pathComponent;
-        let entry = this.entryForPath(currentPath);
-        if (entry.classList.contains('directory')) {
-          results.push(entry.expand());
-        } else {
-          this.selectEntry(entry);
-          results.push(this.scrollToEntry(entry));
-        }
+    this.selectEntry(entry);
+    this.scrollToEntry(entry);
+    await Promise.all(expansions);
+    return true;
+  }
+
+  // Returns the child of `parentEntry` whose squashed chain of folders passes
+  // through `folderPath`, or `null`.
+  squashedEntryContaining (parentEntry, folderPath) {
+    if (!parentEntry?.entries) return null;
+    let prefix = folderPath + path.sep;
+    for (let child of parentEntry.entries.children) {
+      if (child.classList.contains('directory') && child.getPath().startsWith(prefix)) {
+        return child;
       }
-      return results;
-    })
+    }
+    return null;
+  }
+
+  async revealActiveFile({ show, focus } = {}) {
+    // Unlike `revealPath`, this shows the tree view even when there's nothing
+    // to reveal. This is an important behavior to preserve because this method
+    // doubles as "Show Tree View".
+    if (!atom.project.getPaths().length) return false;
+    focus ??= atom.config.get('tree-view.focusOnReveal');
+    if (show || focus) await this.show(focus);
+    let activeFilePath = this.getActivePath();
+    if (!activeFilePath) return false;
+    return this.revealPath(activeFilePath, { show: false, focus: false });
   }
 
   copySelectedEntryPath(relativePath = false) {
@@ -800,6 +844,7 @@ class TreeView {
     }
     if (!oldPath) return;
     let dialog = new MoveDialog(oldPath, {
+      fileOperations: this.fileOperations,
       willMove: ({ initialPath, newPath }) => {
         return this.emitter.emit('will-move-entry', { initialPath, newPath });
       },
@@ -882,7 +927,8 @@ class TreeView {
     if (!oldPath) return;
 
     let dialog = new CopyDialog(oldPath, {
-      onCopy({ initialPath, newPath }) {
+      fileOperations: this.fileOperations,
+      onCopy: ({ initialPath, newPath }) => {
         return this.emitter.emit('entry-copied', { initialPath, newPath });
       }
     });
@@ -916,66 +962,68 @@ class TreeView {
       detailedMessage: `You are deleting:\n${selectedPaths.join('\n')}`,
       buttons: ['Move to Trash', 'Cancel']
     }, async (response) => {
-      if (response === 0) { // Move to Trash
-        let failedDeletions = [];
-        let deletionPromises = [];
+      if (response !== 0) return;
 
-        // Since this goes async, all entries that correspond to paths we're
-        // about to delete will soon detach frmo the tree. So we should figure
-        // out ahead of time which element we're going to select when we're
-        // done.
-        let newSelectedEntry;
-        let firstSelectedEntry = selectedEntries[0];
-        if (firstSelectedEntry) {
-          newSelectedEntry = firstSelectedEntry.closest('.directory:not(.selected)');
-        }
+      // Since this goes async, all entries that correspond to paths we're
+      // about to delete will soon detach from the tree. So we should figure
+      // out ahead of time which element we're going to select when we're done.
+      let newSelectedEntry = selectedEntries[0]?.closest('.directory:not(.selected)');
 
-        for (let selectedPath of selectedPaths) {
-          // Don't delete entries which no longer exist. This can happen, for
-          // example, when
-          //
-          // * the entry is deleted outside of Atom before "Move to Trash" is
-          //   selected;
-          // * a folder and one of its children are both selected for deletion,
-          //   but the parent folder is deleted first.
-          if (!fs.existsSync(selectedPath)) continue;
+      let actions = withoutDescendants(selectedPaths)
+        // Skip paths that don't exist (e.g., deleted outside of Pulsar after
+        // the dialog opened.)
+        .filter((p) => fs.existsSync(p))
+        .map((p) => ({
+          kind: fs.lstatSync(p).isDirectory() ? 'folder' : 'file',
+          oldPath: p
+        }));
 
-          let meta = { pathToDelete: selectedPath };
+      let failedDeletions = [];
 
+      await this.fileOperations.run('delete', actions, async (actions) => {
+        let deleted = new Set();
+        await Promise.allSettled(actions.map(async (action) => {
+          let { oldPath } = action;
+
+          // Check again; the path may have vanished while consumers were
+          // reacting.
+          if (!fs.existsSync(oldPath)) return;
+
+          let meta = { pathToDelete: oldPath };
           this.emitter.emit('will-delete-entry', meta);
-
-          let promise = atom.trashItem(selectedPath).then(() => {
+          try {
+            await atom.trashItem(oldPath);
             this.emitter.emit('entry-deleted', meta);
-          }).catch(() => {
+            deleted.add(action);
+          } catch {
             this.emitter.emit('delete-entry-failed', meta);
-            failedDeletions.push(selectedPath);
-          }).finally(() => {
-            repoForPath(selectedPath)?.getPathStatus(selectedPath);
-          });
+            failedDeletions.push(oldPath);
+          } finally {
+            repoForPath(oldPath)?.getPathStatus(oldPath);
+          }
+        }));
+        // Filtering the original array keeps the batch's order, which the
+        // concurrent trash calls would scramble.
+        return actions.filter((action) => deleted.has(action));
+      });
 
-          deletionPromises.push(promise);
-        }
+      if (failedDeletions.length > 0) {
+        atom.notifications.addError(
+          this.formatTrashFailureMessage(failedDeletions),
+          {
+            description: this.formatTrashEnabledMessage(),
+            detail: `${failedDeletions.join('\n')}`,
+            dismissable: true
+          }
+        );
+      }
 
-        await Promise.allSettled(deletionPromises);
+      if (newSelectedEntry) {
+        this.selectEntry(newSelectedEntry);
+      }
 
-        if (failedDeletions.length > 0) {
-          atom.notifications.addError(
-            this.formatTrashFailureMessage(failedDeletions),
-            {
-              description: this.formatTrashEnabledMessage(),
-              detail: `${failedDeletions.join('\n')}`,
-              dismissable: true
-            }
-          );
-        }
-
-        if (newSelectedEntry) {
-          this.selectEntry(newSelectedEntry);
-        }
-
-        if (atom.config.get('tree-view.squashDirectoryNames')) {
-          return this.updateRoots();
-        }
+      if (atom.config.get('tree-view.squashDirectoryNames')) {
+        return this.updateRoots();
       }
     });
   }
@@ -1047,25 +1095,19 @@ class TreeView {
     if (selectedEntry.classList.contains('file')) {
       newDirectoryPath = path.dirname(newDirectoryPath);
     }
-    let results = [];
-    for (let initialPath of initialPaths) {
-      if (fs.existsSync(initialPath)) {
-        if (copiedPaths) {
-          results.push(this.copyEntry(initialPath, newDirectoryPath));
-        } else if (cutPaths) {
-          if (!this.moveEntry(initialPath, newDirectoryPath)) {
-            break;
-          }
-        }
-      }
+
+    if (copiedPaths) {
+      return this.copyEntries(copiedPaths.filter((p) => fs.existsSync(p)), newDirectoryPath);
     }
+
+    return this.moveEntries(cutPaths.filter((p) => fs.existsSync(p)), newDirectoryPath);
   }
 
   add(isCreatingFile) {
     let selectedEntry = this.selectedEntry() ?? this.roots[0];
     let selectedPath = selectedEntry?.getPath() ?? '';
 
-    let dialog = new AddDialog(selectedPath, isCreatingFile);
+    let dialog = new AddDialog(selectedPath, isCreatingFile, this.fileOperations);
 
     dialog.onDidCreateDirectory((createdPath) => {
       this.entryForPath(createdPath)?.reload();
@@ -1180,28 +1222,93 @@ class TreeView {
     this.element.scrollTop += this.element.offsetHeight;
   }
 
-  // Copies an entry from `initialPath` to `newDirectoryPath`.
+  copyEntry (initialPath, newDirectoryPath) {
+    return this.copyEntries([initialPath], newDirectoryPath);
+  }
+
+  // Copies entries from `initialPaths` to `newDirectoryPath`.
   //
   // If the entry already exists in `newDirectoryPath`, a number is appended to
   // the basename.
-  copyEntry(initialPath, newDirectoryPath) {
+  copyEntries(initialPaths, newDirectoryPath) {
+    let sources = new Map();
+
+    // Plan every copy before telling everyone, so that consumers hear about
+    // the whole batch at once. Names chosen earlier in the batch count as
+    // taken. Planning waits its turn in the queue, so it also sees copies
+    // made by earlier operations.
+    let plan = () => {
+      let reserved = new Set();
+      let actions = [];
+      for (let initialPath of withoutDescendants(initialPaths)) {
+        let newPath = this.planCopy(initialPath, newDirectoryPath, reserved);
+        if (!newPath) continue;
+        reserved.add(newPath);
+        let action = {
+          kind: fs.isDirectorySync(initialPath) ? 'folder' : 'file',
+          newPath
+        };
+        sources.set(action, initialPath);
+        actions.push(action);
+      }
+      return actions;
+    };
+
+    return this.fileOperations.run('create', plan, async (actions) => {
+      let copied = [];
+      for (let action of actions) {
+        let { newPath } = action;
+        let initialPath = sources.get(action);
+        try {
+          // Check again; something may have appeared here during the wait.
+          if (fs.existsSync(newPath)) {
+            throw new Error(`'${newPath}' already exists`);
+          }
+          this.emitter.emit('will-copy-entry', { initialPath, newPath });
+          if (action.kind === 'folder') {
+            fs.copySync(initialPath, newPath);
+          } else {
+            fs.copyFileSync(initialPath, newPath);
+          }
+          this.emitter.emit('entry-copied', { initialPath, newPath });
+          let repo = repoForPath(newPath);
+          repo?.getPathStatus(initialPath);
+          repo?.getPathStatus(newPath);
+          copied.push(action);
+        } catch (error) {
+          this.emitter.emit('copy-entry-failed', { initialPath, newPath });
+          atom.notifications.addWarning(
+            `Failed to copy entry ${initialPath} to ${newDirectoryPath}`,
+            { detail: error.message }
+          );
+        }
+      }
+      return copied;
+    });
+  }
+
+  // Returns the destination path for copying `initialPath` into
+  // `newDirectoryPath`, or `null` if the copy shouldn't happen.
+  planCopy (initialPath, newDirectoryPath, reserved) {
     let initialPathIsDirectory = fs.isDirectorySync(initialPath);
-    // Do not allow copying test/a/ into test/a/b/
-    // Note: A trailing path.sep is added to prevent false positives, such as test/a -> test/ab
+    // Do not allow copying `test/a/` into `test/a/b/`.
+    // Note: A trailing path.sep is added to prevent false positives, such as
+    // `test/a` -> `test/ab`.
     let realNewDirectoryPath = fs.realpathSync(newDirectoryPath) + path.sep;
     let realInitialPath = fs.realpathSync(initialPath) + path.sep;
 
     if (initialPathIsDirectory && realNewDirectoryPath.startsWith(realInitialPath)) {
       if (!fs.isSymbolicLinkSync(initialPath)) {
         atom.notifications.addWarning('Cannot copy a folder into itself');
-        return;
+        return null;
       }
     }
+
     let newPath = path.join(newDirectoryPath, path.basename(initialPath));
-    // Append a number to the file if an item with the same name exists
+    // Append a number to the file if an item with the same name exists.
     let fileCounter = 0;
     let originalNewPath = newPath;
-    while (fs.existsSync(newPath)) {
+    while (fs.existsSync(newPath) || reserved.has(newPath)) {
       if (initialPathIsDirectory) {
         newPath = `${originalNewPath}${fileCounter}`;
       } else {
@@ -1215,41 +1322,93 @@ class TreeView {
       fileCounter++;
     }
 
-    try {
-      this.emitter.emit('will-copy-entry', { initialPath, newPath });
-      if (initialPathIsDirectory) {
-        // use fs.copy to copy directories since read/write will fail for
-        // directories
-        fs.copySync(initialPath, newPath);
-      } else {
-        fs.copyFileSync(initialPath, newPath);
-      }
-      this.emitter.emit('entry-copied', { initialPath, newPath });
-      let repo = repoForPath(newPath);
-      if (repo) {
-        repo.getPathStatus(initialPath);
-        repo.getPathStatus(newPath);
-      }
-    } catch (error) {
-      this.emitter.emit('copy-entry-failed', { initialPath, newPath });
-      atom.notifications.addWarning(
-        `Failed to copy entry ${initialPath} to ${newDirectoryPath}`,
-        { detail: error.message }
-      );
-    }
+    return newPath;
   }
 
-  // Moves an entry from `initialPath` to `newDirectoryPath`.
+  // Kept for existing callers.
   moveEntry(initialPath, newDirectoryPath) {
-    // Do not allow moving test/a/ into test/a/b/
-    // Note: A trailing path.sep is added to prevent false positives, such as test/a -> test/ab
+    return this.moveEntries([initialPath], newDirectoryPath);
+  }
+
+  // Moves entries from `initialPaths` to `newDirectoryPath`.
+  //
+  // Conflicts are resolved with the user before anyone is told about the batch
+  // so that consumers only hear about moves that will be attempted.
+  moveEntries(initialPaths, newDirectoryPath) {
+    let plan = { actions: [], replacing: new Set(), emptied: [] };
+
+    // Planning waits its turn in the queue, so that existence checks and
+    // conflict prompts reflect what earlier operations did.
+    let planAll = () => {
+      for (let initialPath of withoutDescendants(initialPaths)) {
+        if (!fs.existsSync(initialPath)) continue;
+        if (!this.planMove(initialPath, newDirectoryPath, plan)) {
+          // The user cancelled; nothing has happened yet.
+          return [];
+        }
+      }
+      return plan.actions;
+    };
+
+    return this.fileOperations.run('move', planAll, async (actions) => {
+      let moved = [];
+      for (let action of actions) {
+        let { oldPath: initialPath, newPath } = action;
+        let replacing = plan.replacing.has(action);
+        try {
+          // Check again: things may have changed during the wait.
+          if (!fs.existsSync(initialPath)) {
+            throw new Error(`'${initialPath}' no longer exists`);
+          }
+          if (!replacing && fs.existsSync(newPath)) {
+            throw new Error(`'${newPath}' already exists`);
+          }
+          this.emitter.emit('will-move-entry', { initialPath, newPath });
+          if (replacing) {
+            fs.renameSync(initialPath, newPath);
+          } else {
+            fs.moveSync(initialPath, newPath);
+          }
+          this.emitter.emit('entry-moved', { initialPath, newPath });
+          let repo = repoForPath(newPath);
+          repo?.getPathStatus(initialPath);
+          repo?.getPathStatus(newPath);
+          moved.push(action);
+        } catch (error) {
+          this.emitter.emit('move-entry-failed', { initialPath, newPath });
+          atom.notifications.addWarning(
+            `Failed to move entry ${initialPath} to ${newPath}`,
+            { detail: error.message }
+          );
+        }
+      }
+
+      // Remove folders that a merge emptied. `planConflictingMove` records
+      // children before their parents, so this order removes the deepest
+      // first. A folder the user skipped only in part won't be empty, so it
+      // stays.
+      for (let dir of plan.emptied) {
+        try {
+          if (fs.readdirSync(dir).length === 0) fs.rmdirSync(dir);
+        } catch {
+          // Already gone, or not ours to remove.
+        }
+      }
+      return moved;
+    });
+  }
+
+  planMove (initialPath, newDirectoryPath, plan) {
     try {
+      // Do not allow moving `test/a/` into `test/a/b/`. Note: A trailing
+      // `path.sep` is added to prevent false positives, such as `test/a` ->
+      // `test/ab`.
       let realNewDirectoryPath = fs.realpathSync(newDirectoryPath) + path.sep;
       let realInitialPath = fs.realpathSync(initialPath) + path.sep;
       if (fs.isDirectorySync(initialPath) && realNewDirectoryPath.startsWith(realInitialPath)) {
         if (!fs.isSymbolicLinkSync(initialPath)) {
           atom.notifications.addWarning('Cannot move a folder into itself');
-          return;
+          return true;
         }
       }
     } catch (error) {
@@ -1257,81 +1416,63 @@ class TreeView {
         `Failed to move entry ${initialPath} to ${newDirectoryPath}`,
         { detail: error.message }
       );
+      return true;
     }
+
     let newPath = path.join(newDirectoryPath, path.basename(initialPath));
-    try {
-      this.emitter.emit('will-move-entry', { initialPath, newPath });
-      fs.moveSync(initialPath, newPath);
-      this.emitter.emit('entry-moved', { initialPath, newPath });
-      let repo = repoForPath(newPath);
-      if (repo) {
-        repo.getPathStatus(initialPath);
-        repo.getPathStatus(newPath);
-      }
-    } catch (error) {
-      if (error.code === 'EEXIST') {
-        return this.moveConflictingEntry(initialPath, newPath, newDirectoryPath);
-      } else {
-        this.emitter.emit('move-entry-failed', { initialPath, newPath });
-        atom.notifications.addWarning(
-          `Failed to move entry ${initialPath} to ${newDirectoryPath}`,
-          { detail: error.message }
-        );
-      }
+    // Dropped onto its own parent folder.
+    if (newPath === initialPath) return true;
+
+    let kind = fs.lstatSync(initialPath).isDirectory() ? 'folder' : 'file';
+    if (!fs.existsSync(newPath)) {
+      plan.actions.push({ kind, oldPath: initialPath, newPath });
+      return true;
     }
-    return true;
+
+    return this.planConflictingMove(initialPath, newPath, newDirectoryPath, kind, plan);
   }
 
-  moveConflictingEntry(initialPath, newPath, newDirectoryPath) {
-    try {
-      if (!fs.isDirectorySync(initialPath)) {
-        // Files, symlinks, anything but a directory
-        let chosen = atom.confirm({
-          message: `'${path.relative(newDirectoryPath, newPath)}' already exists`,
-          detailedMessage: 'Do you want to replace it?',
-          buttons: ['Replace file', 'Skip', 'Cancel']
-        });
-        switch (chosen) {
-          case 0: {// Replace
-            fs.renameSync(initialPath, newPath);
-            this.emitter.emit('entry-moved', { initialPath, newPath });
-            let repo = repoForPath(newPath);
-            if (repo) {
-              repo.getPathStatus(initialPath);
-              repo.getPathStatus(newPath);
-            }
-            break;
-          }
-          case 2: // Cancel
-            return false;
+  // Returns `false` if the user cancelled. `newDirectoryPath` is where the
+  // user dropped the batch; conflicts are named relative to it so that the
+  // user can tell which file is meant in a nested merge.
+  planConflictingMove (initialPath, newPath, newDirectoryPath, kind, plan) {
+    if (kind === 'file') {
+      let chosen = atom.confirm({
+        message: `'${path.relative(newDirectoryPath, newPath)}' already exists`,
+        detailedMessage: 'Do you want to replace it?',
+        buttons: ['Replace file', 'Skip', 'Cancel']
+      });
+      switch (chosen) {
+        case 0: { // Replace
+          let action = { kind, oldPath: initialPath, newPath };
+          plan.actions.push(action);
+          plan.replacing.add(action);
+        }
+        case 1: // Skip (Replace also falls through)
+          return true;
+        default: // Cancel (or any other return values)
+          return false;
+      }
+    }
+
+    // A folder. Merge its contents into the existing one.
+    for (let entry of fs.readdirSync(initialPath)) {
+      let childInitialPath = path.join(initialPath, entry);
+      let childNewPath = path.join(newPath, entry);
+      let childKind = fs.lstatSync(childInitialPath).isDirectory() ? 'folder' : 'file';
+      if (fs.existsSync(childNewPath)) {
+        if (!this.planConflictingMove(childInitialPath, childNewPath, newDirectoryPath, childKind, plan)) {
+          return false;
         }
       } else {
-        let entries = fs.readdirSync(initialPath);
-        for (let entry of entries) {
-          if (fs.existsSync(path.join(newPath, entry))) {
-            let result = this.moveConflictingEntry(
-              path.join(initialPath, entry),
-              path.join(newPath, entry),
-              newDirectoryPath
-            );
-            if (!result) return false;
-          } else {
-            this.moveEntry(path.join(initialPath, entry), newPath);
-          }
-        }
-        if (!fs.readdirSync(initialPath).length) {
-          // "Move" the containing folder by deleting it, since we've already
-          // moved everything in it
-          fs.rmdirSync(initialPath);
-        }
+        plan.actions.push({ kind: childKind, oldPath: childInitialPath, newPath: childNewPath });
       }
-    } catch (error) {
-      this.emitter.emit('move-entry-failed', { initialPath, newPath });
-      atom.notifications.addWarning(
-        `Failed to move entry ${initialPath} to ${newPath}`,
-        { detail: error.message }
-      );
     }
+    // If we get this far, the user didn't abort the move in the middle of
+    // child planning... which hints that the move will empty the directory
+    // altogether. So we mark the source folder for tentative removal. Later,
+    // if the merge actually did empty the folder, we'll remove it.
+    plan.emptied.push(initialPath);
     return true;
   }
 
@@ -1585,42 +1726,37 @@ class TreeView {
       let newDirectoryPath = entry.querySelector('.name')?.dataset.path;
       if (!newDirectoryPath) return false;
 
+      let copying = (process.platform === 'darwin' && event.metaKey) || event.ctrlKey;
       let initialPaths = event.dataTransfer.getData('initialPaths');
+
       if (initialPaths) {
-        // Drop event from Atom
+        // Drop event from Pulsar.
         initialPaths = JSON.parse(initialPaths);
         if (initialPaths.includes(newDirectoryPath)) return;
-
         entry.classList.remove('drag-over', 'selected');
-        // Iterate backwards so that files in a dir are moved before the dir
-        // itself.
-        for (let j = initialPaths.length - 1; j >= 0; j -= 1) {
+
+        for (let initialPath of initialPaths) {
           // Note: This is necessary on Windows to circumvent node-pathwatcher
           // holding a lock on expanded folders and preventing them from being
           // moved or deleted.
-          //
-          // TODO: Investigate whether this is still needed now that we're on
-          // the `watchPath` API.
-          let initialPath = initialPaths[j];
           this.entryForPath(initialPath)?.collapse?.();
-          if ((process.platform === 'darwin' && event.metaKey) || event.ctrlKey) {
-            // Mimic OS-specific conventions in which holding down a modifier
-            // key means that an entry is copied rather than moved.
-            this.copyEntry(initialPath, newDirectoryPath);
-          } else if (!this.moveEntry(initialPath, newDirectoryPath)) {
-            break;
-          }
+        }
+
+        if (copying) {
+          // Mimic OS-specific conventions in which holding down a modifier
+          // key means that an entry is copied rather than moved.
+          this.copyEntries(initialPaths, newDirectoryPath);
+        } else {
+          this.moveEntries(initialPaths, newDirectoryPath);
         }
       } else {
         // Drop event from OS
         entry.classList.remove('selected');
-        for (let file of event.dataTransfer.files) {
-          let filePath = webUtils.getPathForFile(file);
-          if ((process.platform === 'darwin' && event.metaKey) || event.ctrlKey) {
-            this.copyEntry(filePath, newDirectoryPath);
-          } else if (!this.moveEntry(filePath, newDirectoryPath)) {
-            break;
-          }
+        let filePaths = Array.from(event.dataTransfer.files, (file) => webUtils.getPathForFile(file));
+        if (copying) {
+          this.copyEntries(filePaths, newDirectoryPath);
+        } else {
+          this.moveEntries(filePaths, newDirectoryPath);
         }
       }
     } else if (event.dataTransfer.files.length) {

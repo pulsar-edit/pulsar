@@ -5,7 +5,7 @@ const { repoForPath } = require('./helpers');
 
 module.exports =
 class AddDialog extends Dialog {
-  constructor(initialPath, isCreatingFile) {
+  constructor(initialPath, isCreatingFile, fileOperations) {
     let directoryPath;
 
     if (fs.isFileSync(initialPath)) {
@@ -28,6 +28,7 @@ class AddDialog extends Dialog {
 
     this.isCreatingFile = isCreatingFile;
     this.rootProjectPath = rootProjectPath;
+    this.fileOperations = fileOperations;
   }
 
   onDidCreateFile(callback) {
@@ -38,7 +39,9 @@ class AddDialog extends Dialog {
     return this.emitter.on('did-create-directory', callback);
   }
 
-  onConfirm(newPath) {
+  async onConfirm(newPath) {
+    if (this.busy) return;
+
     newPath = newPath.replace(/\s+$/, ''); // Remove trailing whitespace
     const endsWithDirectorySeparator = newPath[newPath.length - 1] === path.sep;
     if (!path.isAbsolute(newPath)) {
@@ -52,25 +55,53 @@ class AddDialog extends Dialog {
 
     if (!newPath) { return; }
 
+    if (fs.existsSync(newPath)) {
+      return this.showError(`'${newPath}' already exists.`);
+    }
+
+    if (this.isCreatingFile && endsWithDirectorySeparator) {
+      return this.showError(`File names must not end with a '${path.sep}' character.`);
+    }
+
+    let action = { kind: this.isCreatingFile ? 'file' : 'folder', newPath };
+    let error;
+    let created;
+
+    this.setBusy(true);
     try {
-      if (fs.existsSync(newPath)) {
-        return this.showError(`'${newPath}' already exists.`);
-      } else if (this.isCreatingFile) {
-        if (endsWithDirectorySeparator) {
-          return this.showError(`File names must not end with a '${path.sep}' character.`);
-        } else {
-          fs.writeFileSync(newPath, '');
-          repoForPath(newPath)?.getPathStatus(newPath);
-          this.emitter.emit('did-create-file', newPath);
-          return this.close();
+      [created] = await this.fileOperations.run('create', [action], async ([action]) => {
+        try {
+          // Check again; something may have appeared here while consumers were
+          // reacting.
+          if (fs.existsSync(newPath)) {
+            throw new Error(`'${newPath}' already exists`);
+          }
+          if (action.kind === 'file') {
+            fs.writeFileSync(newPath, '');
+            repoForPath(newPath)?.getPathStatus(newPath);
+          } else {
+            fs.makeTreeSync(newPath);
+          }
+          return [action];
+        } catch (e) {
+          error = e;
+          return [];
         }
-      } else {
-        fs.makeTreeSync(newPath);
-        this.emitter.emit('did-create-directory', newPath);
-        return this.cancel();
-      }
-    } catch (error) {
+      });
+    } finally {
+      this.setBusy(false);
+    }
+
+    if (!created) {
       return this.showError(`${error.message}.`);
+    }
+
+    if (this.isCreatingFile) {
+      this.emitter.emit('did-create-file', newPath);
+      return this.close();
+    } else {
+      this.emitter.emit('did-create-directory', newPath);
+      return this.cancel();
     }
   }
 }

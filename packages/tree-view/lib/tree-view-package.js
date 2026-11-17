@@ -2,10 +2,12 @@ const {Disposable, CompositeDisposable} = require('atom')
 
 const getIconServices = require('./get-icon-services')
 const TreeView = require('./tree-view')
+const FileOperations = require('./file-operations')
 
 module.exports =
 class TreeViewPackage {
   activate () {
+    this.fileOperations ??= new FileOperations()
     this.disposables = new CompositeDisposable()
     this.disposables.add(atom.commands.add('atom-workspace', {
       'tree-view:show': () => this.getTreeViewInstance().show(),
@@ -30,9 +32,9 @@ class TreeViewPackage {
 
     this.treeViewOpenPromise.then(() => {
       if (atom.config.get("tree-view.hiddenOnStartup")) {
-        this.treeView.hide();
+        this.treeView.hide()
       } else {
-        this.treeView.show();
+        this.treeView.show()
       }
     })
   }
@@ -42,6 +44,8 @@ class TreeViewPackage {
     await this.treeViewOpenPromise // Wait for Tree View to finish opening before destroying it
     if (this.treeView) this.treeView.destroy()
     this.treeView = null
+    this.fileOperations.dispose()
+    this.fileOperations = null
   }
 
   consumeElementIcons (service) {
@@ -61,15 +65,28 @@ class TreeViewPackage {
   provideTreeView () {
     return {
       selectedPaths: () => this.getTreeViewInstance().selectedPaths(),
-      entryForPath: (entryPath) => this.getTreeViewInstance().entryForPath(entryPath)
+      entryForPath: (entryPath) => this.getTreeViewInstance().entryForPath(entryPath),
+
+      onWillCreate: (cb) => this.fileOperations.onWill('create', cb),
+      onWillMove:   (cb) => this.fileOperations.onWill('move', cb),
+      onWillDelete: (cb) => this.fileOperations.onWill('delete', cb),
+      onDidCreate:  (cb) => this.fileOperations.onDid('create', cb),
+      onDidMove:    (cb) => this.fileOperations.onDid('move', cb),
+      onDidDelete:  (cb) => this.fileOperations.onDid('delete', cb),
+
+      revealPath: (targetPath, { focus } = {}) => {
+        return this.getTreeViewInstance().revealPath(targetPath, { focus })
+      }
     }
   }
 
   getTreeViewInstance (state = {}) {
     if (this.treeView == null) {
-      this.treeView = new TreeView(state)
+      this.fileOperations ??= new FileOperations()
+      this.treeView = new TreeView(state, this.fileOperations)
       this.treeView.onDidDestroy(() => { this.treeView = null })
     }
     return this.treeView
   }
+
 }
