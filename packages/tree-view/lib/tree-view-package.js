@@ -7,7 +7,7 @@ const FileOperations = require('./file-operations')
 module.exports =
 class TreeViewPackage {
   activate () {
-    this.fileOperations = new FileOperations()
+    this.fileOperations ??= new FileOperations()
     this.disposables = new CompositeDisposable()
     this.disposables.add(atom.commands.add('atom-workspace', {
       'tree-view:show': () => this.getTreeViewInstance().show(),
@@ -45,6 +45,7 @@ class TreeViewPackage {
     if (this.treeView) this.treeView.destroy()
     this.treeView = null
     this.fileOperations.dispose()
+    this.fileOperations = null
   }
 
   consumeElementIcons (service) {
@@ -81,6 +82,7 @@ class TreeViewPackage {
 
   getTreeViewInstance (state = {}) {
     if (this.treeView == null) {
+      this.fileOperations ??= new FileOperations()
       this.treeView = new TreeView(state, this.fileOperations)
       this.treeView.onDidDestroy(() => { this.treeView = null })
     }

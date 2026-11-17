@@ -32,7 +32,7 @@ function toggleConfig(keyPath) {
 let nextId = 1;
 
 class TreeView {
-  constructor(state, fileOperations = new FileOperations()) {
+  constructor(state, fileOperations) {
     this.fileOperations = fileOperations;
     this.onDragLeave = this.onDragLeave.bind(this);
     this.onDragEnter = this.onDragEnter.bind(this);
