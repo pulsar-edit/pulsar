@@ -2780,6 +2780,133 @@ describe('WASMTreeSitterLanguageMode', () => {
     });
   });
 
+  describe('HighlightIterator::seek(start, end)', () => {
+    // `end` was historically a buffer row; as of `text-buffer` 16 it's a
+    // buffer position. We support both.
+    const JS_QUERY = scm`
+      ["let"] @keyword
+      (identifier) @variable
+      (string) @string
+    `;
+
+    let languageMode;
+    beforeEach(async () => {
+      buffer.setText(dedent`
+        let a = 'x';
+        let b = 'y';
+        let c = 'z';
+      `);
+      languageMode = await prepareTSLanguageMode(buffer, { jsQuery: JS_QUERY });
+    });
+
+    describe('when `end` is a row number', () => {
+      it('reports boundaries through the end of that row and no further', () => {
+        let { boundaries } = collectBoundaries(languageMode, new Point(0, 0), 1);
+        expect(boundaries.some(b => b.position.row === 1)).toBe(true);
+        expect(boundaries.some(b => b.position.isEqual([1, 11]))).toBe(true);
+        expect(boundaries.every(b => b.position.row <= 1)).toBe(true);
+      });
+
+      it('treats row 0 as a row, not as an omitted argument', () => {
+        let { boundaries } = collectBoundaries(languageMode, new Point(0, 0), 0);
+        expect(boundaries.length).toBeGreaterThan(0);
+        expect(boundaries.every(b => b.position.row === 0)).toBe(true);
+      });
+    });
+
+    describe('when `end` is omitted', () => {
+      it('reports boundaries through the end of the buffer', () => {
+        let throughLastRow = collectBoundaries(languageMode, new Point(0, 0), 2);
+        expect(throughLastRow.boundaries.some(b => b.position.row === 2)).toBe(true);
+        expect(collectBoundaries(languageMode, new Point(0, 0))).toEqual(throughLastRow);
+        expect(collectBoundaries(languageMode, new Point(0, 0), null)).toEqual(throughLastRow);
+      });
+    });
+
+    describe('when `end` is a point', () => {
+      it('behaves identically to a row number when the point is at the end of that row', () => {
+        for (let start of [new Point(0, 0), new Point(1, 4)]) {
+          for (let row = start.row; row <= 2; row++) {
+            let end = new Point(row, buffer.lineLengthForRow(row));
+            expect(collectBoundaries(languageMode, start, end))
+              .toEqual(collectBoundaries(languageMode, start, row));
+          }
+        }
+      });
+
+      it('reports boundaries up to and including the point, and none after', () => {
+        let start = new Point(0, 0);
+        // The end of the `a` identifier.
+        let end = new Point(0, 5);
+        let result = collectBoundaries(languageMode, start, end);
+
+        expect(result.boundaries.every(b => b.position.isLessThanOrEqual(end))).toBe(true);
+        expect(
+          result.boundaries.some(b => b.position.isEqual(end) && b.close.includes('variable'))
+        ).toBe(true);
+        expect(result).toEqual(
+          boundariesThrough(collectBoundaries(languageMode, start, 0), end)
+        );
+      });
+
+      it('accepts a point-like object', () => {
+        expect(collectBoundaries(languageMode, new Point(0, 0), { row: 0, column: 5 }))
+          .toEqual(collectBoundaries(languageMode, new Point(0, 0), new Point(0, 5)));
+      });
+
+      it('respects the point when deciding which injections contribute boundaries', async () => {
+        buffer.setText('let r = /ab+c/;');
+        languageMode = await prepareTSLanguageMode(buffer, {
+          jsQuery: scm` (regex) @regex-outer `,
+          regexQuery: scm` (pattern) @string.regexp `
+        });
+        // Wait for injections.
+        await wait(100);
+        expect(languageMode.getAllInjectionLayers().length).toBe(1);
+
+        let start = new Point(0, 0);
+        let full = collectBoundaries(languageMode, start, 0);
+        let regexOpen = full.boundaries.find(b => b.open.includes('string.regexp'));
+        // The pattern `ab+c` starts after `let r = /`.
+        expect(regexOpen.position).toEqual(new Point(0, 9));
+
+        // A point before the injection begins: nothing from the injection.
+        let before = collectBoundaries(languageMode, start, new Point(0, 5));
+        expect(
+          before.boundaries.some(b => [...b.open, ...b.close].includes('string.regexp'))
+        ).toBe(false);
+        expect(before).toEqual(boundariesThrough(full, new Point(0, 5)));
+
+        // A point inside the injection: it opens its scope, but doesn't close
+        // it, and reports nothing past the point.
+        let inside = collectBoundaries(languageMode, start, new Point(0, 11));
+        expect(inside.boundaries.some(b => b.open.includes('string.regexp'))).toBe(true);
+        expect(inside.boundaries.some(b => b.close.includes('string.regexp'))).toBe(false);
+        expect(inside).toEqual(boundariesThrough(full, new Point(0, 11)));
+      });
+    });
+
+    it('highlights lines of any length', async () => {
+      // There used to be a 10,000-character limit beyond which no
+      // highlighting would be applied to a line.
+      let prefix = `let a = '${'x'.repeat(20000)}'; let `;
+      buffer.setText(`${prefix}b = 1;`);
+      await languageMode.atTransactionEnd();
+
+      let column = prefix.length;
+      expect(
+        editor.scopeDescriptorForBufferPosition([0, column]).getScopesArray()
+      ).toContain('variable');
+
+      let { boundaries } = collectBoundaries(
+        languageMode,
+        new Point(0, column),
+        new Point(0, column + 1)
+      );
+      expect(boundaries.some(b => b.open.includes('variable'))).toBe(true);
+    });
+  });
+
   describe('.scopeDescriptorForPosition', () => {
     it('returns a scope descriptor representing the given position in the syntax tree', async () => {
       const grammar = new WASMTreeSitterGrammar(atom.grammars, jsGrammarPath, jsConfig);
@@ -3040,7 +3167,10 @@ describe('WASMTreeSitterLanguageMode', () => {
 
       try {
         const rootIterator = rootLayer.buildHighlightIterator();
-        const [hasBoundaries, openScopes] = rootIterator.seek(new Point(0, 15), 0);
+        const [hasBoundaries, openScopes] = rootIterator.seek(
+          new Point(0, 15),
+          buffer.clipPosition(new Point(0, Infinity))
+        );
         expect(hasBoundaries).toBe(false);
         expect(openScopes.size).toBe(0);
 
@@ -4868,6 +4998,39 @@ async function nextHighlightingUpdate(languageMode) {
 //     });
 //   });
 // }
+
+// Seeks a fresh highlight iterator from `start` to `end`, then walks it to
+// exhaustion. Returns the already-open scopes and every boundary reported,
+// with scope IDs translated to scope names.
+function collectBoundaries(languageMode, start, end) {
+  const iterator = languageMode.buildHighlightIterator();
+  const names = (ids) => ids.map(id => languageMode.scopeNameForScopeId(id));
+  const openScopes = names(iterator.seek(start, end) || []);
+  const boundaries = [];
+
+  for (let i = 0; i < 10000; i++) {
+    let position = Point.fromObject(iterator.getPosition());
+    if (position.isEqual(Point.INFINITY)) break;
+    boundaries.push({
+      position,
+      close: names(iterator.getCloseScopeIds()),
+      open: names(iterator.getOpenScopeIds())
+    });
+    iterator.moveToSuccessor();
+  }
+
+  return { openScopes, boundaries };
+}
+
+// The portion of a `collectBoundaries` result at or before `end`.
+function boundariesThrough(result, end) {
+  return {
+    openScopes: result.openScopes,
+    boundaries: result.boundaries.filter(
+      b => b.position.isLessThanOrEqual(end)
+    )
+  };
+}
 
 function getDisplayText(editor) {
   return editor.displayLayer.getText();
