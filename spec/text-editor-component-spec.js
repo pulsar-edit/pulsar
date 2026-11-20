@@ -6257,6 +6257,322 @@ describe('TextEditorComponent', () => {
     });
   });
 
+  describe('large documents (render origin)', () => {
+    // Shrink the chunk size so that an ordinary fixture spans many chunks. It
+    // must stay larger than the editor's height (see `getRenderHeight`).
+    const CHUNK = 2 ** 9;
+    let originalChunkSize;
+
+    beforeEach(() => {
+      if (NEEDS_ALTERNATIVE_SCHEDULER) useAlternativeScheduler();
+      originalChunkSize = TextEditorComponent.RENDER_ORIGIN_CHUNK_SIZE;
+      TextEditorComponent.RENDER_ORIGIN_CHUNK_SIZE = CHUNK;
+    });
+
+    afterEach(() => {
+      TextEditorComponent.RENDER_ORIGIN_CHUNK_SIZE = originalChunkSize;
+      if (NEEDS_ALTERNATIVE_SCHEDULER) restoreDefaultScheduler();
+    });
+
+    function buildTallComponent() {
+      return buildComponent({ text: 'abc\n'.repeat(1000), height: 100 });
+    }
+
+    // The invariant the render origin must preserve: a row's position in
+    // client space depends only on its document-space position and the scroll
+    // position, never on the origin.
+    function expectRowsAtCorrectClientPositions(component) {
+      const containerTop = component.refs.scrollContainer.getBoundingClientRect()
+        .top;
+      const scrollTop = component.getScrollTop();
+      for (
+        let row = component.getRenderedStartRow();
+        row < component.getRenderedEndRow();
+        row++
+      ) {
+        const expectedTop =
+          component.pixelPositionAfterBlocksForRow(row) - scrollTop;
+        expect(clientTopForLine(component, row) - containerTop).toBeNear(
+          expectedTop
+        );
+        expect(
+          lineNumberNodeForScreenRow(component, row).getBoundingClientRect()
+            .top - containerTop
+        ).toBeNear(expectedTop);
+      }
+    }
+
+    it('renders lines and line numbers at their correct positions past the render origin', async () => {
+      const { component } = buildTallComponent();
+      expect(component.getScrollHeight()).toBeGreaterThan(10 * CHUNK);
+
+      await setScrollTop(component, CHUNK - 50);
+      expect(component.getRenderOrigin()).toBe(0);
+      expectRowsAtCorrectClientPositions(component);
+
+      await setScrollTop(component, CHUNK * 3 + 17);
+      expect(component.getRenderOrigin()).toBe(CHUNK * 3);
+      expect(component.renderedOrigin).toBe(CHUNK * 3);
+      expectRowsAtCorrectClientPositions(component);
+    });
+
+    it('repositions line numbers when a small scroll crosses a chunk boundary', async () => {
+      // A scroll this small usually leaves the rendered tiles unchanged, so
+      // the line number gutter must notice the origin change on its own.
+      const { component } = buildTallComponent();
+      await setScrollTop(component, CHUNK - 1);
+      expect(component.getRenderOrigin()).toBe(0);
+
+      await setScrollTop(component, CHUNK + 1);
+      expect(component.getRenderOrigin()).toBe(CHUNK);
+      expectRowsAtCorrectClientPositions(component);
+    });
+
+    it('renders cursors and the hidden input at their correct positions past the render origin', async () => {
+      const { component, element, editor } = buildTallComponent();
+      await setScrollTop(component, CHUNK * 3 + 17);
+      const row = component.getFirstVisibleRow() + 2;
+      editor.setCursorScreenPosition([row, 2], { autoscroll: false });
+      await component.getNextUpdatePromise();
+
+      verifyCursorPosition(component, element.querySelector('.cursor'), row, 2);
+      const { hiddenInput } = component.refs.cursorsAndInput.refs;
+      expect(hiddenInput.getBoundingClientRect().top).toBeNear(
+        clientTopForLine(component, row)
+      );
+    });
+
+    it('renders multi-line highlights at their correct positions past the render origin', async () => {
+      const { component, element, editor } = buildTallComponent();
+      await setScrollTop(component, CHUNK * 3 + 17);
+      const row = component.getFirstVisibleRow() + 1;
+      const marker = editor.markScreenRange([[row, 1], [row + 2, 2]]);
+      editor.decorateMarker(marker, { type: 'highlight', class: 'a' });
+      await component.getNextUpdatePromise();
+
+      // Start, middle, and end regions.
+      const rects = Array.from(
+        element.querySelectorAll('.highlight.a .region.a')
+      )
+        .map(region => region.getBoundingClientRect())
+        .sort((a, b) => a.top - b.top);
+      expect(rects.length).toBe(3);
+      expect(rects[0].top).toBeNear(clientTopForLine(component, row));
+      expect(rects[1].top).toBeNear(clientTopForLine(component, row + 1));
+      expect(rects[1].height).toBeNear(component.getLineHeight());
+      expect(rects[2].top).toBeNear(clientTopForLine(component, row + 2));
+    });
+
+    it('renders custom gutter decorations at their correct positions past the render origin', async () => {
+      const { component, editor } = buildTallComponent();
+      const gutter = editor.addGutter({ name: 'a' });
+      await setScrollTop(component, CHUNK * 3 + 17);
+      const row = component.getFirstVisibleRow() + 1;
+      const marker = editor.markScreenRange([[row, 0], [row + 1, 0]]);
+      editor.decorateMarker(marker, {
+        type: 'gutter',
+        gutterName: 'a',
+        item: document.createElement('div')
+      });
+      await component.getNextUpdatePromise();
+
+      const decorationNode = gutter.getElement().firstChild.children[0];
+      const rect = decorationNode.getBoundingClientRect();
+      expect(rect.top).toBeNear(clientTopForLine(component, row));
+      expect(rect.height).toBeNear(2 * component.getLineHeight());
+    });
+
+    it('renders overlay decorations at their correct positions past the render origin', async () => {
+      const { component, editor } = buildTallComponent();
+      await setScrollTop(component, CHUNK * 3 + 17);
+      const row = component.getFirstVisibleRow() + 1;
+      const marker = editor.markScreenPosition([row, 1]);
+      const item = document.createElement('div');
+      item.style.width = '10px';
+      item.style.height = '10px';
+      editor.decorateMarker(marker, {
+        type: 'overlay',
+        item,
+        avoidOverflow: false
+      });
+      await component.getNextUpdatePromise();
+
+      expect(item.parentElement.getBoundingClientRect().top).toBeNear(
+        clientTopForLine(component, row + 1)
+      );
+    });
+
+    it('maps mouse events to the correct screen position past the render origin', async () => {
+      const { component, editor } = buildTallComponent();
+      await setScrollTop(component, CHUNK * 3 + 17);
+      const row = component.getFirstVisibleRow() + 2;
+
+      component.didMouseDownOnContent({
+        detail: 1,
+        button: 0,
+        clientX: clientLeftForCharacter(component, row, 2),
+        clientY:
+          clientTopForLine(component, row) + component.getLineHeight() / 2
+      });
+      expect(editor.getCursorScreenPosition()).toEqual([row, 2]);
+    });
+
+    it('maps mouse events against the origin the DOM was rendered with, even if the scroll position has since changed', async () => {
+      const { component } = buildTallComponent();
+      const lineHeight = component.getLineHeight();
+      await setScrollTop(component, 2 * CHUNK - 10);
+      expect(component.getRenderOrigin()).toBe(CHUNK);
+      const row = component.getFirstVisibleRow() + 1;
+      const clientX = clientLeftForCharacter(component, row, 0);
+      const clientY = clientTopForLine(component, row) + lineHeight / 2;
+
+      // Cross a chunk boundary without re-rendering, as a wheel event would.
+      component.setScrollTop(2 * CHUNK + 10);
+      expect(component.getRenderOrigin()).toBe(2 * CHUNK);
+      expect(component.renderedOrigin).toBe(CHUNK);
+
+      const { top } = component.pixelPositionForMouseEvent({
+        clientX,
+        clientY
+      });
+      expect(top).toBeNear(
+        component.pixelPositionAfterBlocksForRow(row) + lineHeight / 2
+      );
+
+      component.scheduleUpdate();
+      await component.getNextUpdatePromise();
+    });
+
+    it('round-trips between screen and pixel positions past the render origin', async () => {
+      const { component } = buildTallComponent();
+      const lineHeight = component.getLineHeight();
+      await setScrollTop(component, CHUNK * 3 + 17);
+      const row = component.getFirstVisibleRow() + 2;
+
+      // Pixel positions are in document space, unaffected by the origin.
+      const pixelPosition = component.pixelPositionForScreenPosition({
+        row,
+        column: 2
+      });
+      expect(pixelPosition.top).toBe(
+        component.pixelPositionAfterBlocksForRow(row)
+      );
+
+      // If the hit-testing point were wrong, the fallback strategy would still
+      // return the right answer, so check the point itself as well.
+      spyOn(document, 'caretRangeFromPoint').and.callThrough();
+      expect(
+        component.screenPositionForPixelPosition({
+          top: pixelPosition.top + lineHeight / 2,
+          left: pixelPosition.left
+        })
+      ).toEqual([row, 2]);
+      const [, clientY] = document.caretRangeFromPoint.calls.first().args;
+      expect(clientY).toBeNear(
+        clientTopForLine(component, row) + lineHeight / 2
+      );
+    });
+
+    it('caps the heights of content elements', async () => {
+      const { component } = buildTallComponent();
+      await setScrollTop(component, CHUNK * 3 + 17);
+      const limit = 2 * CHUNK;
+      expect(component.getScrollHeight()).toBeGreaterThan(limit);
+
+      const { content, lineTiles, gutterContainer } = component.refs;
+      expect(parseFloat(content.style.height)).toBeLessThanOrEqual(limit);
+      expect(parseFloat(lineTiles.style.height)).toBeLessThanOrEqual(limit);
+      expect(
+        parseFloat(gutterContainer.refs.lineNumberGutter.element.style.height)
+      ).toBeLessThanOrEqual(limit);
+    });
+
+    it('does not cap the heights of content elements in auto-height editors', () => {
+      // Auto-height editors render all of their content at once, so capping
+      // would clip everything past `2 * CHUNK`.
+      const { component } = buildComponent({
+        text: 'abc\n'.repeat(1000),
+        autoHeight: true
+      });
+      const scrollHeight = component.getScrollHeight();
+      expect(scrollHeight).toBeGreaterThan(2 * CHUNK);
+
+      const { content, lineTiles, gutterContainer } = component.refs;
+      expect(parseFloat(content.style.height)).toBeNear(scrollHeight);
+      expect(parseFloat(lineTiles.style.height)).toBeNear(scrollHeight);
+      expect(
+        parseFloat(gutterContainer.refs.lineNumberGutter.element.style.height)
+      ).toBeNear(scrollHeight);
+    });
+  });
+
+  describe('dummy scrollbar scaling', () => {
+    const MAX_CONTENT_SIZE = 1000;
+    let DummyScrollbarComponent, originalMaxContentSize;
+
+    afterEach(() => {
+      if (DummyScrollbarComponent) {
+        DummyScrollbarComponent.MAX_CONTENT_SIZE = originalMaxContentSize;
+        DummyScrollbarComponent = null;
+      }
+    });
+
+    async function buildScaledComponent() {
+      const result = buildComponent({
+        text: 'abc\n'.repeat(1000),
+        height: 100
+      });
+      // `DummyScrollbarComponent` isn't exported.
+      DummyScrollbarComponent =
+        result.component.refs.verticalScrollbar.constructor;
+      originalMaxContentSize = DummyScrollbarComponent.MAX_CONTENT_SIZE;
+      DummyScrollbarComponent.MAX_CONTENT_SIZE = MAX_CONTENT_SIZE;
+      result.component.scheduleUpdate();
+      await result.component.getNextUpdatePromise();
+      return result;
+    }
+
+    it('caps the size of the scrollbar content', async () => {
+      const { component } = await buildScaledComponent();
+      const scrollbar = component.refs.verticalScrollbar;
+      expect(component.getScrollHeight()).toBeGreaterThan(MAX_CONTENT_SIZE);
+      expect(scrollbar.element.scrollHeight).toBeNear(MAX_CONTENT_SIZE);
+      expect(scrollbar.getScale()).toBeGreaterThan(1);
+    });
+
+    it('maps the ends of the native scroll range to the ends of the editor scroll range', async () => {
+      const { component } = await buildScaledComponent();
+      const { element } = component.refs.verticalScrollbar;
+
+      element.scrollTop = element.scrollHeight - element.clientHeight;
+      await component.getNextUpdatePromise();
+      expect(component.getScrollTop()).toBeNear(component.getMaxScrollTop());
+
+      element.scrollTop = 0;
+      await component.getNextUpdatePromise();
+      expect(component.getScrollTop()).toBe(0);
+    });
+
+    it('does not quantize the scroll position when its own position update echoes back as a scroll event', async () => {
+      const { component } = await buildScaledComponent();
+      const scrollbar = component.refs.verticalScrollbar;
+
+      // Pick a position that falls between native pixels, so that reading the
+      // native position back and scaling it would not reproduce it.
+      const target = Math.floor(scrollbar.getScale() * 20.25);
+      const didScroll = new Promise(resolve =>
+        scrollbar.element.addEventListener('scroll', resolve, { once: true })
+      );
+      await setScrollTop(component, target);
+      expect(component.getScrollTop()).toBe(target);
+
+      // The editor's own scroll listener was registered first, so it has run
+      // by the time this resolves.
+      await didScroll;
+      expect(component.getScrollTop()).toBe(target);
+    });
+  });
+
   describe('model methods that delegate to the component / element', () => {
     it('delegates setHeight and getHeight to the component', async () => {
       const { component, editor } = buildComponent({
