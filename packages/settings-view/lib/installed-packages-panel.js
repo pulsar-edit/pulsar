@@ -142,10 +142,12 @@ export default class InstalledPackagesPanel extends CollapsibleSectionPanel {
   }
 
   filterPackages (packages) {
-    packages.dev = packages.dev.filter(({theme}) => !theme)
-    packages.user = packages.user.filter(({theme}) => !theme)
-    packages.core = packages.core.filter(({theme}) => !theme)
-    packages.git = (packages.git || []).filter(({theme}) => !theme)
+    packages.dev = packages.dev.filter((pack) => !(pack.theme || pack.themes))
+    packages.user = packages.user.filter((pack) => !(pack.theme || pack.themes))
+    packages.core = packages.core.filter((pack) => !(pack.theme || pack.themes))
+    packages.git = (packages.git || []).filter((pack) =>
+      !(pack.theme || pack.themes)
+    )
 
     for (let packageType of ['dev', 'core', 'user', 'git']) {
       for (let pack of packages[packageType]) {
