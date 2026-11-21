@@ -7,7 +7,12 @@ const path = require('path')
 const {GitRepository} = require('atom')
 const {Minimatch} = require('minimatch')
 const childProcess = require('child_process')
-const { rgPath } = require('vscode-ripgrep')
+
+// `@vscode/ripgrep` is ESM-only and can't be `require`d, so resolve its
+// platform-specific binary package directly (mirroring its `index.js`).
+const rgPath = require.resolve(
+  `@vscode/ripgrep-${process.platform}-${process.arch}/bin/${process.platform === 'win32' ? 'rg.exe' : 'rg'}`
+)
 
 const PathsChunkSize = 100
 

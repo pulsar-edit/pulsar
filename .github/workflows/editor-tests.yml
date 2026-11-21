@@ -43,26 +43,7 @@ jobs:
       run: python3 -m pip install setuptools --break-system-packages
 
     - name: Install Dependencies
-      if: runner.os != 'Windows'
       run: yarn install --ignore-engines || yarn install --ignore-engines
-
-    - name: Install Dependencies (Windows)
-      if: runner.os == 'Windows'
-      shell: pwsh
-      # `vscode-ripgrep`'s postinstall unzips its download by shelling out to
-      # Windows PowerShell 5.1 (`powershell Expand-Archive`). Because this step
-      # runs under PowerShell 7, the child process inherits a `PSModulePath`
-      # that includes PowerShell 7's module directory, so 5.1 loads PS7's
-      # `Microsoft.PowerShell.Archive` module, which calls a .NET Core-only
-      # overload of `ExtractToDirectory` and fails. Remove that directory from
-      # `PSModulePath` so 5.1 falls back to its own modules.
-      #
-      # This started with the `windows-2022` runner image 20261112.x. It can
-      # go away once `fuzzy-finder` moves to `@vscode/ripgrep`, which ships
-      # prebuilt binaries instead of downloading them.
-      run: |
-        $env:PSModulePath = ($env:PSModulePath -split ';' | Where-Object { $_ -notlike "$PSHOME*" }) -join ';'
-        yarn install --ignore-engines || yarn install --ignore-engines
 
     - name: Build Dependencies
       run: yarn build

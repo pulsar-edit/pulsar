@@ -1,0 +1,160 @@
+Add a notice to each modified file stating that it was changed, and when.
+
+GPL-2.0 section 2(a) asks that modified files carry such notices.
+
+diff -ru a/c.c b/c.c
+--- a/c.c	2026-11-15 16:04:03
++++ b/c.c	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 01-ctags-attr-unused.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: c.c 689 2008-12-13 21:17:36Z elliotth $
+ *
+ *   Copyright (c) 1996-2003, Darren Hiebert
+diff -ru a/eiffel.c b/eiffel.c
+--- a/eiffel.c	2026-11-15 16:04:03
++++ b/eiffel.c	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 01-ctags-attr-unused.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: eiffel.c 706 2009-06-28 23:09:30Z dhiebert $
+ *
+ *   Copyright (c) 1998-2002, Darren Hiebert
+diff -ru a/general.h b/general.h
+--- a/general.h	2026-11-15 16:04:03
++++ b/general.h	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 01-ctags-attr-unused.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: general.h 508 2007-05-03 03:20:59Z dhiebert $
+ *
+ *   Copyright (c) 1998-2003, Darren Hiebert
+diff -ru a/lregex.c b/lregex.c
+--- a/lregex.c	2026-11-15 16:04:03
++++ b/lregex.c	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 01-ctags-attr-unused.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: lregex.c 576 2007-06-30 04:16:23Z elliotth $
+ *
+ *   Copyright (c) 2000-2003, Darren Hiebert
+diff -ru a/lua.c b/lua.c
+--- a/lua.c	2026-11-15 16:04:03
++++ b/lua.c	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 01-ctags-attr-unused.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: lua.c 443 2006-05-30 04:37:13Z darren $
+ *
+ *   Copyright (c) 2000-2001, Max Ischenko <mfi@ukr.net>.
+diff -ru a/main.c b/main.c
+--- a/main.c	2026-11-15 16:04:03
++++ b/main.c	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 01-ctags-attr-unused.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: main.c 536 2007-06-02 06:09:00Z elliotth $
+ *
+ *   Copyright (c) 1996-2003, Darren Hiebert
+diff -ru a/options.c b/options.c
+--- a/options.c	2026-11-15 16:04:03
++++ b/options.c	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 01-ctags-attr-unused.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: options.c 576 2007-06-30 04:16:23Z elliotth $
+ *
+ *   Copyright (c) 1996-2003, Darren Hiebert
+diff -ru a/parse.c b/parse.c
+--- a/parse.c	2026-11-15 16:04:03
++++ b/parse.c	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 01-ctags-attr-unused.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: parse.c 597 2007-07-31 05:35:30Z dhiebert $
+ *
+ *   Copyright (c) 1996-2003, Darren Hiebert
+diff -ru a/python.c b/python.c
+--- a/python.c	2026-11-15 16:04:03
++++ b/python.c	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 01-ctags-attr-unused.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: python.c 720 2009-07-07 03:55:23Z dhiebert $
+ *
+ *   Copyright (c) 2000-2003, Darren Hiebert
+diff -ru a/read.c b/read.c
+--- a/read.c	2026-11-15 16:04:03
++++ b/read.c	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 02-non-const-file.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: read.c 708 2009-07-04 05:29:02Z dhiebert $
+ *
+ *   Copyright (c) 1996-2002, Darren Hiebert
+diff -ru a/read.h b/read.h
+--- a/read.h	2026-11-15 16:04:03
++++ b/read.h	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 02-non-const-file.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: read.h 659 2008-04-20 23:27:48Z elliotth $
+ *
+ *   Copyright (c) 1998-2002, Darren Hiebert
+diff -ru a/routines.c b/routines.c
+--- a/routines.c	2026-11-15 16:04:03
++++ b/routines.c	2026-11-15 16:04:03
+@@ -1,4 +1,9 @@
+ /*
++*   Modified for Pulsar on 2026-11-15. See 01-ctags-attr-unused.patch, 03-r782-memmove.patch
++*   in packages/symbol-provider-ctags/vendor/ctags/patches/ of
++*   https://github.com/pulsar-edit/pulsar for the changes.
++*/
++/*
+ *   $Id: routines.c 536 2007-06-02 06:09:00Z elliotth $
+ *
+ *   Copyright (c) 2002-2003, Darren Hiebert

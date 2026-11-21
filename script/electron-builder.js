@@ -170,6 +170,7 @@ let options = {
     "!**/{Makefile}",
     "!**/build/{binding.Makefile,config.gypi,gyp-mac-tool,Makefile}",
     "!**/build/Release/{obj.target,obj,.deps}",
+    "!**/node_modules/symbol-provider-ctags/vendor/ctags/**", // ctags source; only build/Release/ctags is needed at runtime
 
     // Test Exclusions
     "!**/pegjs/examples",

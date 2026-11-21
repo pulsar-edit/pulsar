@@ -1,0 +1,43 @@
+Don't declare the global `File` as `const` outside of read.c.
+
+read.c writes to `File` (including the current line number), but every other
+translation unit sees it as `extern const`, so an optimizing compiler may
+reuse stale values. Symptom: off-by-one line numbers from the JavaScript
+parser. From Homebrew's Patches/ctags/5.8.patch (read.c/read.h hunks).
+
+diff -ru a/read.c b/read.c
+--- a/read.c	2026-11-15 15:29:53
++++ b/read.c	2026-11-15 15:29:53
+@@ -18,7 +18,6 @@
+ #include <string.h>
+ #include <ctype.h>
+ 
+-#define FILE_WRITE
+ #include "read.h"
+ #include "debug.h"
+ #include "entry.h"
+diff -ru a/read.h b/read.h
+--- a/read.h	2026-11-15 15:29:53
++++ b/read.h	2026-11-15 15:29:53
+@@ -11,12 +11,6 @@
+ #ifndef _READ_H
+ #define _READ_H
+ 
+-#if defined(FILE_WRITE) || defined(VAXC)
+-# define CONST_FILE
+-#else
+-# define CONST_FILE const
+-#endif
+-
+ /*
+ *   INCLUDE FILES
+ */
+@@ -95,7 +89,7 @@
+ /*
+ *   GLOBAL VARIABLES
+ */
+-extern CONST_FILE inputFile File;
++extern inputFile File;
+ 
+ /*
+ *   FUNCTION PROTOTYPES

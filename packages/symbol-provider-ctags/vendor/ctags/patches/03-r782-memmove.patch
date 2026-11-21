@@ -1,0 +1,24 @@
+Don't use strcpy on overlapping buffers when canonicalizing paths.
+
+Upstream SVN r782 (never released): https://sourceforge.net/p/ctags/code/782/
+Fixes https://sourceforge.net/p/ctags/bugs/312/ ; carried by Homebrew.
+
+diff -ru a/routines.c b/routines.c
+--- a/routines.c	2026-11-15 15:29:53
++++ b/routines.c	2026-11-15 15:29:53
+@@ -757,13 +757,13 @@
+ 				else if (cp [0] != PATH_SEPARATOR)
+ 					cp = slashp;
+ #endif
+-				strcpy (cp, slashp + 3);
++				memmove (cp, slashp + 3, strlen (slashp + 3) + 1);
+ 				slashp = cp;
+ 				continue;
+ 			}
+ 			else if (slashp [2] == PATH_SEPARATOR  ||  slashp [2] == '\0')
+ 			{
+-				strcpy (slashp, slashp + 2);
++				memmove (slashp, slashp + 2, strlen (slashp + 2) + 1);
+ 				continue;
+ 			}
+ 		}
