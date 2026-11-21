@@ -20,11 +20,52 @@ const MOUSE_DRAG_AUTOSCROLL_MARGIN = 40;
 const CURSOR_BLINK_RESUME_DELAY = 300;
 const CURSOR_BLINK_PERIOD = 800;
 
+// DOCUMENT SPACE vs. RENDER SPACE vs. CLIENT SPACE
+//
+// DOCUMENT SPACE is the editor's absolute vertical pixel grid: row tops as
+// computed by `lineTopIndex`, `scrollTop`, and the public pixel-position APIs.
+// It has no upper bound.
+//
+// Chromium can't faithfully render arbitrarily large coordinates. Content
+// positioned more than 2^24px from its containing element's origin stops
+// painting (cause unconfirmed; possibly float32 precision), and element sizes
+// max out at around 2^25px (the range of Blink's `LayoutUnit`).
+//
+// So nothing we write to the DOM uses document space directly. Instead we
+// pick a render origin: the largest multiple of `RENDER_ORIGIN_CHUNK_SIZE`
+// that does not exceed `scrollTop`.
+//
+// RENDER SPACE is document space minus that origin. Every vertical position
+// and size we write to the DOM is in render space, so those values stay below
+// `2 * RENDER_ORIGIN_CHUNK_SIZE`.
+//
+// Converting between DOM rects (client space) and document space must use
+// `renderedOrigin` (the origin the DOM was last rendered with) because
+// scrolling can change `scrollTop` before the next render.
+//
+// CLIENT SPACE is the browser's viewport coordinate system — what
+// `clientY`, `getBoundingClientRect()`, and `caretRangeFromPoint()` use. A
+// rendered element's client position reflects the render-space value we
+// wrote, plus the transforms and layout of its ancestors.
+//
+
 function scaleMouseDragAutoscrollDelta(delta) {
   return Math.pow(delta / 3, 3) / 280;
 }
 
 module.exports = class TextEditorComponent {
+  // Vertical positions written to the DOM are measured from a moving origin
+  // rather than from the top of the document. This keeps them far below
+  // 2^24px, past which Chromium stops painting content. (See #1677.)
+  //
+  // This must be a power of two because it guarantees `round(x) - origin ===
+  // round(x - origin)` at any common device pixel ratio. Hence the
+  // physical-pixel rounding helpers can be applied before or after the
+  // subtraction with the same result.
+  //
+  // A static property rather than a constant so that specs can lower it.
+  static RENDER_ORIGIN_CHUNK_SIZE = 2 ** 20;
+
   static setScheduler(scheduler) {
     etch.setScheduler(scheduler);
   }
@@ -134,6 +175,7 @@ module.exports = class TextEditorComponent {
     this.pendingAutoscroll = null;
     this.scrollTopPending = false;
     this.scrollLeftPending = false;
+    this.renderedOrigin = 0;
     this.scrollTop = 0;
     this.scrollLeft = 0;
     this.previousScrollWidth = 0;
@@ -552,8 +594,8 @@ module.exports = class TextEditorComponent {
         rootComponent: this,
         hasInitialMeasurements: this.hasInitialMeasurements,
         measuredContent: this.measuredContent,
-        scrollTop: this.getScrollTop(),
-        scrollHeight: this.getScrollHeight(),
+        scrollTop: this.getRenderScrollTop(),
+        scrollHeight: this.getRenderHeight(),
         lineNumberGutterWidth: this.getLineNumberGutterWidth(),
         lineHeight: this.getLineHeight(),
         renderedStartRow: this.getRenderedStartRow(),
@@ -603,12 +645,13 @@ module.exports = class TextEditorComponent {
       backgroundColor: 'inherit'
     };
     if (this.hasInitialMeasurements) {
+      this.renderedOrigin = this.getRenderOrigin();
       style.width = ceilToPhysicalPixelBoundary(this.getScrollWidth()) + 'px';
-      style.height = ceilToPhysicalPixelBoundary(this.getScrollHeight()) + 'px';
+      style.height = ceilToPhysicalPixelBoundary(this.getRenderHeight()) + 'px';
       style.willChange = 'transform';
       style.transform = `translate(${-roundToPhysicalPixelBoundary(
         this.getScrollLeft()
-      )}px, ${-roundToPhysicalPixelBoundary(this.getScrollTop())}px)`;
+      )}px, ${-roundToPhysicalPixelBoundary(this.getRenderScrollTop())}px)`;
     }
 
     return $.div(
@@ -628,7 +671,7 @@ module.exports = class TextEditorComponent {
       hasInitialMeasurements: this.hasInitialMeasurements,
       highlightDecorations: this.decorationsToRender.highlights.slice(),
       width: this.getScrollWidth(),
-      height: this.getScrollHeight(),
+      height: this.getRenderHeight(),
       lineHeight: this.getLineHeight()
     });
   }
@@ -664,7 +707,7 @@ module.exports = class TextEditorComponent {
             measuredContent: this.measuredContent,
             height: tileHeight,
             width: tileWidth,
-            top: this.pixelPositionBeforeBlocksForRow(tileStartRow),
+            top: this.renderTopBeforeBlocksForRow(tileStartRow),
             lineHeight: this.getLineHeight(),
             renderedStartRow: startRow,
             tileStartRow,
@@ -706,7 +749,7 @@ module.exports = class TextEditorComponent {
       });
 
       style.width = this.getScrollWidth() + 'px';
-      style.height = this.getScrollHeight() + 'px';
+      style.height = this.getRenderHeight() + 'px';
     }
 
     children.push(this.renderPlaceholderText());
@@ -734,7 +777,7 @@ module.exports = class TextEditorComponent {
       didCompositionEnd: this.didCompositionEnd,
       measuredContent: this.measuredContent,
       lineHeight: this.getLineHeight(),
-      scrollHeight: this.getScrollHeight(),
+      scrollHeight: this.getRenderHeight(),
       scrollWidth: this.getScrollWidth(),
       decorationsToRender: this.decorationsToRender,
       cursorsBlinkedOff: this.cursorsBlinkedOff,
@@ -1300,9 +1343,9 @@ module.exports = class TextEditorComponent {
         decorations
       );
     }
-    const top = this.pixelPositionAfterBlocksForRow(screenRange.start.row);
+    const top = this.renderTopAfterBlocksForRow(screenRange.start.row);
     const height =
-      this.pixelPositionBeforeBlocksForRow(screenRange.end.row + 1) - top;
+      this.renderTopBeforeBlocksForRow(screenRange.end.row + 1) - top;
 
     decorations.push({
       className:
@@ -1535,7 +1578,7 @@ module.exports = class TextEditorComponent {
         );
       }
 
-      highlight.startPixelTop = this.pixelPositionAfterBlocksForRow(start.row);
+      highlight.startPixelTop = this.renderTopAfterBlocksForRow(start.row);
       // We use these `ClientRect`s for their X-axis coordinates;
       // `startPixelTop` above tells us where to start the highlight on the
       // Y-axis.
@@ -1543,7 +1586,7 @@ module.exports = class TextEditorComponent {
         r => rectRelativeToOrigin(r, originRect)
       );
       highlight.endPixelTop =
-        this.pixelPositionAfterBlocksForRow(end.row) + this.getLineHeight();
+        this.renderTopAfterBlocksForRow(end.row) + this.getLineHeight();
       highlight.endRects = endClientRects ?
         [...endClientRects].map(
           r => rectRelativeToOrigin(r, originRect)
@@ -1560,7 +1603,7 @@ module.exports = class TextEditorComponent {
       const { screenPosition, className, style } = cursor;
       const { row, column } = screenPosition;
 
-      const pixelTop = this.pixelPositionAfterBlocksForRow(row);
+      const pixelTop = this.renderTopAfterBlocksForRow(row);
       const pixelLeft = this.pixelLeftForRowAndColumn(row, column);
       let pixelWidth;
       if (cursor.columnWidth === 0) {
@@ -1588,9 +1631,11 @@ module.exports = class TextEditorComponent {
 
     const { element, screenPosition, avoidOverflow } = decoration;
     const { row, column } = screenPosition;
+    // Use render space here because we're combining a value with a `DOMRect`.
+    // The rest of the function operates in client space.
     let wrapperTop =
       contentClientRect.top +
-      this.pixelPositionAfterBlocksForRow(row) +
+      (this.pixelPositionAfterBlocksForRow(row) - this.renderedOrigin) +
       this.getLineHeight();
     let wrapperLeft =
       contentClientRect.left + this.pixelLeftForRowAndColumn(row, column);
@@ -1828,12 +1873,12 @@ module.exports = class TextEditorComponent {
     let scrollLeftChanged = false;
     if (!this.scrollTopPending) {
       scrollTopChanged = this.setScrollTop(
-        this.refs.verticalScrollbar?.element.scrollTop ?? 0
+        this.refs.verticalScrollbar?.getScrollPosition() ?? 0
       );
     }
     if (!this.scrollLeftPending) {
       scrollLeftChanged = this.setScrollLeft(
-        this.refs.horizontalScrollbar?.element.scrollLeft ?? 0
+        this.refs.horizontalScrollbar?.getScrollPosition() ?? 0
       );
     }
     if (scrollTopChanged || scrollLeftChanged) this.updateSync();
@@ -2304,7 +2349,7 @@ module.exports = class TextEditorComponent {
     );
     const linesRect = this.refs.lineTiles.getBoundingClientRect();
     return {
-      top: clientY - linesRect.top,
+      top: clientY - linesRect.top + this.renderedOrigin,
       left: clientX - linesRect.left
     };
   }
@@ -2771,6 +2816,18 @@ module.exports = class TextEditorComponent {
     return nextRowTop - currentRowBottom;
   }
 
+  // Like `pixelPositionBeforeBlocksForRow`, but in render space. Use this
+  // instead for anything written to the DOM.
+  renderTopBeforeBlocksForRow(row) {
+    return this.pixelPositionBeforeBlocksForRow(row) - this.getRenderOrigin();
+  }
+
+  // Like `pixelPositionAfterBlocksForRow`, but in render space. Use this
+  // instead for anything written to the DOM.
+  renderTopAfterBlocksForRow(row) {
+    return this.pixelPositionAfterBlocksForRow(row) - this.getRenderOrigin();
+  }
+
   pixelPositionBeforeBlocksForRow(row) {
     return this.lineTopIndex.pixelPositionBeforeBlocksForRow(row);
   }
@@ -2812,7 +2869,9 @@ module.exports = class TextEditorComponent {
 
     let linesClientRect = this.refs.lineTiles.getBoundingClientRect();
     let targetClientLeft = linesClientRect.left + Math.max(0, left);
-    let targetClientTop = linesClientRect.top + Math.max(0, top);
+    // Waiting until now to reference `renderedOrigin` ensures we don't cache
+    // a possibly stale value (since we may have done `updateSync` above).
+    let targetClientTop = linesClientRect.top + Math.max(0, top) - this.renderedOrigin;
 
     // STRATEGY 1:
     //
@@ -3461,6 +3520,35 @@ module.exports = class TextEditorComponent {
     return this.scrollTop;
   }
 
+  // The absolute vertical position that corresponds to `0` in render space.
+  // Always `0` until the editor is scrolled down more than
+  // `RENDER_ORIGIN_CHUNK_SIZE` pixels (implying the user is editing a buffer
+  // at least that tall).
+  getRenderOrigin() {
+    const chunkSize = TextEditorComponent.RENDER_ORIGIN_CHUNK_SIZE;
+    return Math.floor(this.getScrollTop() / chunkSize) * chunkSize;
+  }
+
+  // Like `getScrollTop`, but relative to the render origin. Use this instead
+  // of `getScrollTop` for anything written to the DOM.
+  getRenderScrollTop() {
+    return this.getScrollTop() - this.getRenderOrigin();
+  }
+
+  // The height of the elements that hold rendered content, in render space.
+  // These need only extend far enough below the render origin to cover the
+  // viewport and overscan. Capping them keeps us under Blink's 2^25px limit
+  // for layout sizes.
+  getRenderHeight() {
+    // Auto-height editors never scroll internally, so their origin is always
+    // 0 and their "viewport" is their entire content; capping would clip it.
+    if (this.props.model.getAutoHeight()) return this.getScrollHeight();
+    return Math.min(
+      this.getScrollHeight() - this.getRenderOrigin(),
+      2 * TextEditorComponent.RENDER_ORIGIN_CHUNK_SIZE
+    );
+  }
+
   setScrollTop(scrollTop) {
     if (Number.isNaN(scrollTop) || scrollTop == null) return false;
 
@@ -3671,6 +3759,8 @@ module.exports = class TextEditorComponent {
 };
 
 class DummyScrollbarComponent {
+  static MAX_CONTENT_SIZE = 2 ** 24;
+
   constructor(props) {
     this.props = props;
     etch.initialize(this);
@@ -3688,11 +3778,47 @@ class DummyScrollbarComponent {
   }
 
   flushScrollPosition() {
+    const scale = this.getScale();
     if (this.props.orientation === 'horizontal') {
-      this.element.scrollLeft = this.props.scrollLeft;
+      this.element.scrollLeft = (this.props.scrollLeft ?? 0) / scale;
+      this.lastFlushedPosition = this.element.scrollLeft;
     } else {
-      this.element.scrollTop = this.props.scrollTop;
+      this.element.scrollTop = (this.props.scrollTop ?? 0) / scale;
+      this.lastFlushedPosition = this.element.scrollTop;
     }
+  }
+
+  // Editor pixels per native scrollbar pixel. Exactly 1 unless the content is
+  // larger than `DummyScrollbarComponent.MAX_CONTENT_SIZE`.
+  getScale() {
+    const horizontal = this.props.orientation === 'horizontal';
+    const contentSize =
+      (horizontal ? this.props.scrollWidth : this.props.scrollHeight) || 0;
+    if (contentSize <= DummyScrollbarComponent.MAX_CONTENT_SIZE) return 1;
+    const clientSize = horizontal
+      ? this.element.clientWidth
+      : this.element.clientHeight;
+    // Map scroll *ranges*, not content sizes, so that the end of the native
+    // range lands exactly on the end of the editor's range.
+    return (
+      (contentSize - clientSize) /
+      (DummyScrollbarComponent.MAX_CONTENT_SIZE - clientSize)
+    );
+  }
+
+  // The scroll position in editor (document-space) pixels.
+  getScrollPosition() {
+    const horizontal = this.props.orientation === 'horizontal';
+    const nativePosition = horizontal
+      ? this.element.scrollLeft
+      : this.element.scrollTop;
+    // If the native position hasn't moved since we last set it, this scroll
+    // event is the echo of our own `flushScrollPosition`. Return the exact
+    // position we were given rather than one quantized by the scale.
+    if (nativePosition === this.lastFlushedPosition) {
+      return (horizontal ? this.props.scrollLeft : this.props.scrollTop) ?? 0;
+    }
+    return nativePosition * this.getScale();
   }
 
   render() {
@@ -3726,7 +3852,7 @@ class DummyScrollbarComponent {
       outerStyle.overflowX = forceScrollbarVisible ? 'scroll' : 'auto';
       outerStyle.cursor = 'default';
       innerStyle.height = '15px';
-      innerStyle.width = (scrollWidth || 0) + 'px';
+      innerStyle.width = Math.min(scrollWidth || 0, DummyScrollbarComponent.MAX_CONTENT_SIZE) + 'px';
     } else {
       let bottom = horizontalScrollbarHeight || 0;
       outerStyle.right = 0;
@@ -3737,7 +3863,7 @@ class DummyScrollbarComponent {
       outerStyle.overflowY = forceScrollbarVisible ? 'scroll' : 'auto';
       outerStyle.cursor = 'default';
       innerStyle.width = '15px';
-      innerStyle.height = (scrollHeight || 0) + 'px';
+      innerStyle.height = Math.min(scrollHeight || 0, DummyScrollbarComponent.MAX_CONTENT_SIZE) + 'px';
     }
 
     return $.div(
@@ -3908,6 +4034,7 @@ class GutterContainerComponent {
         keys: keys,
         bufferRows: bufferRows,
         screenRows: screenRows,
+        renderOrigin: rootComponent.getRenderOrigin(),
         softWrappedFlags: softWrappedFlags,
         foldableFlags: foldableFlags,
         decorations: decorationsToRender.lineNumbers.get(gutter.name) || [],
@@ -4034,6 +4161,8 @@ class LineNumberGutterComponent {
           });
         }
 
+        // No need for these to be in render space, since we compute them just
+        // to determine the tile height.
         const tileTop = rootComponent.pixelPositionBeforeBlocksForRow(
           tileStartRow
         );
@@ -4052,7 +4181,7 @@ class LineNumberGutterComponent {
               top: 0,
               height: tileHeight + 'px',
               width: tileWidth,
-              transform: `translateY(${tileTop}px)`
+              transform: `translateY(${tileTop - this.props.renderOrigin}px)`
             }
           },
           ...tileChildren
@@ -4104,6 +4233,7 @@ class LineNumberGutterComponent {
     if (oldProps.maxDigits !== newProps.maxDigits) return true;
     if (oldProps.labelFn !== newProps.labelFn) return true;
     if (oldProps.className !== newProps.className) return true;
+    if (oldProps.renderOrigin !== newProps.renderOrigin) return true;
     if (newProps.didMeasureVisibleBlockDecoration) return true;
     if (!arraysEqual(oldProps.keys, newProps.keys)) return true;
     if (!arraysEqual(oldProps.bufferRows, newProps.bufferRows)) return true;
