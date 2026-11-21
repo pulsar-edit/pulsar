@@ -176,7 +176,7 @@ module.exports = {
     ).join('\n');
 
     atom.notifications.addInfo(
-      'Symbols View Redux providers',
+      'Symbols View providers',
       {
         description: message,
         dismissable: true,
