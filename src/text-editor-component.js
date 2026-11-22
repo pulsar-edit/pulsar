@@ -4892,7 +4892,11 @@ class LineComponent {
       )
     ) {
       this.props.textDecorations = newProps.textDecorations;
-      this.element.firstChild.remove();
+      // Remove all children, not just the root span: `appendContents` can
+      // also append nodes directly to the line element (the placeholder on
+      // empty lines, the zero-width node after fold markers). Leaving them
+      // behind shifts later content and breaks measurements.
+      this.element.replaceChildren();
       this.appendContents();
     }
   }
