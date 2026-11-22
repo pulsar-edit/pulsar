@@ -45,4 +45,37 @@ describe('Helpers', () => {
       expect(helpers.getFullExtension(path.join('path', 'to', '.gitconfig'))).toBe('')
     })
   })
+
+  describe('withoutDescendants', () => {
+    const root = path.resolve(path.sep, 'project')
+    const a = path.join(root, 'a')
+    const ab = path.join(root, 'ab')
+    const aChild = path.join(a, 'child')
+    const aGrandchild = path.join(aChild, 'grandchild')
+    const b = path.join(root, 'b')
+
+    it('removes paths inside another path in the list, at any depth', () => {
+      expect(helpers.withoutDescendants([a, aChild, aGrandchild, b])).toEqual([a, b])
+    })
+
+    it('removes a descendant even when it comes before its ancestor', () => {
+      expect(helpers.withoutDescendants([aGrandchild, b, a])).toEqual([b, a])
+    })
+
+    it('keeps siblings whose names share a prefix', () => {
+      expect(helpers.withoutDescendants([a, ab])).toEqual([a, ab])
+    })
+
+    it('removes exact duplicates, keeping the first', () => {
+      expect(helpers.withoutDescendants([b, a, b])).toEqual([b, a])
+    })
+
+    it('treats an ancestor with a trailing separator as an ancestor', () => {
+      expect(helpers.withoutDescendants([a + path.sep, aChild])).toEqual([a + path.sep])
+    })
+
+    it('returns an empty list for an empty list', () => {
+      expect(helpers.withoutDescendants([])).toEqual([])
+    })
+  })
 })

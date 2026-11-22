@@ -5,7 +5,7 @@ const { repoForPath } = require("./helpers");
 
 module.exports =
 class CopyDialog extends Dialog {
-  constructor(initialPath, {onCopy}) {
+  constructor(initialPath, {fileOperations, onCopy}) {
     super({
       prompt: 'Enter the new path for the duplicate.',
       initialPath: atom.project.relativize(initialPath),
@@ -15,9 +15,12 @@ class CopyDialog extends Dialog {
 
     this.initialPath = initialPath;
     this.onCopy = onCopy;
+    this.fileOperations = fileOperations;
   }
 
-  onConfirm(newPath) {
+  async onConfirm(newPath) {
+    if (this.busy) return;
+
     newPath = newPath.replace(/\s+$/, ''); // Remove trailing whitespace
     if (!path.isAbsolute(newPath)) {
       const [rootPath] = Array.from(atom.project.relativizePath(this.initialPath));
@@ -37,29 +40,51 @@ class CopyDialog extends Dialog {
 
     let activeEditor = atom.workspace.getActiveTextEditor();
     if (activeEditor?.getPath() !== this.initialPath) { activeEditor = null; }
+
+    let action = {
+      kind: fs.isDirectorySync(this.initialPath) ? 'folder' : 'file',
+      newPath
+    };
+
+    let error;
+    let copied;
+    this.setBusy(true);
     try {
-      let repo;
-      if (fs.isDirectorySync(this.initialPath)) {
-        fs.copySync(this.initialPath, newPath);
-        this.onCopy?.({initialPath: this.initialPath, newPath});
-      } else {
-        fs.copy(this.initialPath, newPath, () => {
-          this.onCopy?.({initialPath: this.initialPath, newPath});
-          return atom.workspace.open(newPath, {
-            activatePane: true,
-            initialLine: activeEditor?.getLastCursor().getBufferRow(),
-            initialColumn: activeEditor?.getLastCursor().getBufferColumn()
+      [copied] = await this.fileOperations.run('create', [action], async ([action]) => {
+        try {
+          if (fs.existsSync(newPath)) {
+            throw new Error(`'${newPath}' already exists`);
           }
-          );
-        });
-      }
-      if (repo = repoForPath(newPath)) {
-        repo.getPathStatus(this.initialPath);
-        repo.getPathStatus(newPath);
-      }
-      return this.close();
-    } catch (error) {
+          if (action.kind === 'folder') {
+            fs.copySync(this.initialPath, newPath);
+          } else {
+            fs.copyFileSync(this.initialPath, newPath);
+          }
+          let repo = repoForPath(newPath);
+          repo?.getPathStatus(this.initialPath);
+          repo?.getPathStatus(newPath);
+          return [action];
+        } catch (e) {
+          error = e;
+          return [];
+        }
+      });
+    } finally {
+      this.setBusy(false);
+    }
+
+    if (!copied) {
       return this.showError(`${error.message}.`);
     }
+
+    this.onCopy?.({ initialPath: this.initialPath, newPath });
+    if (action.kind === 'file') {
+      atom.workspace.open(newPath, {
+        activatePane: true,
+        initialLine: activeEditor?.getLastCursor().getBufferRow(),
+        initialColumn: activeEditor?.getLastCursor().getBufferColumn()
+      });
+    }
+    return this.close();
   }
 }

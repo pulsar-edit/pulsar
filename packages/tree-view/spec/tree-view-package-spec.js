@@ -9,7 +9,7 @@ const remote = require('@electron/remote');
 const Directory = require('../lib/directory');
 const eventHelpers = require("./event-helpers");
 const { setDebug } = require('../lib/helpers');
-const { conditionPromise, timeoutPromise: wait } = require('./async-spec-helpers');
+const { conditionPromise, timeoutPromise: wait, fileOperationsSettled } = require('./async-spec-helpers');
 
 let isCaseSensitive = null;
 const isFilesystemCaseSensitive = function () {
@@ -370,6 +370,195 @@ describe("TreeView", function () {
       const entryCountAfterRecreatingView = treeView2.element.getElementsByClassName('entry').length;
       expect(entryCountAfterRecreatingView).toBe(entryCountBeforeRecreatingView);
     })
+  });
+
+  describe("::revealPath", () => {
+    let deepFilePath;
+
+    beforeEach(() => {
+      atom.workspace.getLeftDock().hide();
+      spyOn(treeView, 'focus');
+      deepFilePath = path.join(path1, 'dir1', 'sub-dir1', 'sub-file1');
+      // Start from a fully collapsed tree, so that revealing has work to do.
+      treeView.selectEntry(root1);
+      treeView.collapseDirectory(true);
+    });
+
+    it("expands collapsed ancestors, selects and scrolls to the entry, shows the tree view, and resolves to true", async () => {
+      spyOn(treeView, 'scrollToEntry').andCallThrough();
+
+      const result = await treeView.revealPath(deepFilePath);
+
+      expect(result).toBe(true);
+      expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
+      expect(root1.classList.contains('expanded')).toBe(true);
+      expect(treeView.entryForPath(path.join(path1, 'dir1')).classList.contains('expanded')).toBe(true);
+      expect(treeView.entryForPath(path.join(path1, 'dir1', 'sub-dir1')).classList.contains('expanded')).toBe(true);
+      expect(treeView.selectedEntry().getPath()).toBe(deepFilePath);
+      expect(treeView.scrollToEntry).toHaveBeenCalledWith(treeView.selectedEntry());
+    });
+
+    it("selects a folder without expanding it", async () => {
+      const dirPath = path.join(path1, 'dir1');
+
+      expect(await treeView.revealPath(dirPath)).toBe(true);
+
+      const entry = treeView.selectedEntry();
+      expect(entry.getPath()).toBe(dirPath);
+      expect(entry.classList.contains('expanded')).toBe(false);
+    });
+
+    it("selects a project root", async () => {
+      expect(await treeView.revealPath(path2)).toBe(true);
+      expect(treeView.selectedEntry()).toBe(root2);
+    });
+
+    it("accepts a path that isn't normalized", async () => {
+      const unnormalized = path.join(path1, 'dir1', 'sub-dir1', '..', 'sub-dir1', 'sub-file1');
+      expect(await treeView.revealPath(unnormalized)).toBe(true);
+      expect(treeView.selectedEntry().getPath()).toBe(deepFilePath);
+    });
+
+    it("resolves to false for a path outside the project, without showing the tree view", async () => {
+      const outsidePath = temp.mkdirSync('outside-project');
+
+      expect(await treeView.revealPath(outsidePath)).toBe(false);
+
+      expect(atom.workspace.getLeftDock().isVisible()).toBe(false);
+      expect(treeView.selectedEntry()).toBe(root1);
+    });
+
+    it("resolves to false for a path that doesn't exist, leaving the selection alone", async () => {
+      const missingPath = path.join(path1, 'dir1', 'no-such-file');
+
+      expect(await treeView.revealPath(missingPath)).toBe(false);
+
+      expect(treeView.selectedEntry()).toBe(root1);
+    });
+
+    it("resolves to false for a path hidden by ignore settings", async () => {
+      atom.config.set('tree-view.hideIgnoredNames', true);
+      atom.config.set('core.ignoredNames', ['tree-view.js']);
+      const hiddenPath = path.join(path1, 'tree-view.js');
+      await conditionPromise(
+        () => !treeView.entryForPath(hiddenPath)?.isPathEqual(hiddenPath),
+        'ignored entry to disappear'
+      );
+
+      expect(await treeView.revealPath(hiddenPath)).toBe(false);
+      expect(treeView.selectedEntry()?.getPath()).not.toBe(hiddenPath);
+    });
+
+    describe("when squashDirectoryNames is enabled", () => {
+      // `gamma` holds only `delta`, which holds only `epsilon`, so all three
+      // share one entry whose path is that of `epsilon`.
+      let squashRoot, gammaPath, deltaPath, epsilonPath, thetaPath;
+
+      beforeEach(async () => {
+        squashRoot = fs.absolute(temp.mkdirSync('tree-view-squash'));
+        gammaPath = path.join(squashRoot, 'gamma');
+        deltaPath = path.join(gammaPath, 'delta');
+        epsilonPath = path.join(deltaPath, 'epsilon');
+        thetaPath = path.join(epsilonPath, 'theta.txt');
+        fs.makeTreeSync(epsilonPath);
+        fs.writeFileSync(thetaPath, 'theta');
+        fs.writeFileSync(path.join(squashRoot, 'zeta.txt'), 'zeta');
+
+        atom.config.set('tree-view.squashDirectoryNames', true);
+        atom.project.setPaths([squashRoot]);
+        await conditionPromise(
+          () => treeView.roots[0]?.getPath() === squashRoot,
+          'tree view to show the new root'
+        );
+        treeView.selectEntry(treeView.roots[0]);
+        treeView.collapseDirectory(true);
+      });
+
+      it("reveals a file inside a squashed chain", async () => {
+        expect(await treeView.revealPath(thetaPath)).toBe(true);
+        expect(treeView.selectedEntry().getPath()).toBe(thetaPath);
+        expect(treeView.entryForPath(epsilonPath).classList.contains('expanded')).toBe(true);
+      });
+
+      it("reveals the active file inside a squashed chain", async () => {
+        await atom.workspace.open(thetaPath);
+        await treeView.revealActiveFile({ show: true });
+        expect(treeView.selectedEntry().getPath()).toBe(thetaPath);
+      });
+
+      it("selects the chain's entry for the deepest folder in it", async () => {
+        expect(await treeView.revealPath(epsilonPath)).toBe(true);
+        expect(treeView.selectedEntry().getPath()).toBe(epsilonPath);
+      });
+
+      it("selects the chain's entry for a folder squashed into it", async () => {
+        for (const folderPath of [gammaPath, deltaPath]) {
+          treeView.selectEntry(treeView.roots[0]);
+          expect(await treeView.revealPath(folderPath)).toBe(true);
+          expect(treeView.selectedEntry().getPath()).toBe(epsilonPath);
+        }
+      });
+
+      it("resolves to false for a missing path whose parent is squashed", async () => {
+        expect(await treeView.revealPath(path.join(gammaPath, 'no-such-file'))).toBe(false);
+        expect(treeView.selectedEntry()).toBe(treeView.roots[0]);
+      });
+    });
+
+    describe("focus", () => {
+      it("follows the tree-view.focusOnReveal setting by default", async () => {
+        atom.config.set('tree-view.focusOnReveal', true);
+        await treeView.revealPath(deepFilePath);
+        expect(treeView.focus).toHaveBeenCalled();
+
+        treeView.focus.reset();
+        atom.config.set('tree-view.focusOnReveal', false);
+        await treeView.revealPath(path.join(path1, 'dir2', 'file2'));
+        expect(treeView.focus).not.toHaveBeenCalled();
+      });
+
+      it("can be overridden in either direction", async () => {
+        atom.config.set('tree-view.focusOnReveal', true);
+        await treeView.revealPath(deepFilePath, { focus: false });
+        expect(treeView.focus).not.toHaveBeenCalled();
+
+        atom.config.set('tree-view.focusOnReveal', false);
+        await treeView.revealPath(deepFilePath, { focus: true });
+        expect(treeView.focus).toHaveBeenCalled();
+      });
+    });
+
+    describe("when `show` is false", () => {
+      it("reveals the entry without showing the tree view", async () => {
+        expect(await treeView.revealPath(deepFilePath, { show: false, focus: false })).toBe(true);
+        expect(atom.workspace.getLeftDock().isVisible()).toBe(false);
+        expect(treeView.selectedEntry().getPath()).toBe(deepFilePath);
+      });
+    });
+
+    describe("through the service", () => {
+      let service;
+
+      beforeEach(() => {
+        service = atom.packages.getActivePackage('tree-view').mainModule.provideTreeView();
+      });
+
+      it("reveals the path", async () => {
+        expect(await service.revealPath(deepFilePath)).toBe(true);
+        expect(treeView.selectedEntry().getPath()).toBe(deepFilePath);
+      });
+
+      it("always shows the tree view, ignoring any `show` option", async () => {
+        expect(await service.revealPath(deepFilePath, { show: false })).toBe(true);
+        expect(atom.workspace.getLeftDock().isVisible()).toBe(true);
+      });
+
+      it("honors the `focus` option", async () => {
+        atom.config.set('tree-view.focusOnReveal', true);
+        await service.revealPath(deepFilePath, { focus: false });
+        expect(treeView.focus).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe("when tree-view:reveal-active-file is triggered", function () {
@@ -1686,6 +1875,7 @@ describe("TreeView", function () {
           spyOn(moveDialog, 'showError').andCallThrough();
           let newRelativePath = `bar${path.sep}foo.txt`;
           moveDialog.onConfirm(newRelativePath);
+          await fileOperationsSettled(treeView);
           expect(fs.existsSync(path.resolve(fixturesPath, newRelativePath)))
           expect(moveDialog.onMove).toHaveBeenCalled();
           expect(moveDialog.showError).not.toHaveBeenCalled();
@@ -1735,6 +1925,608 @@ describe("TreeView", function () {
       atom.commands.dispatch(treeView.element, "tree-view:remove-project-folder");
       expect(atom.project.getPaths()).toHaveLength(2);
     }));
+  });
+
+  describe("the tree-view service (1.1.0): file operations", () => {
+    let service, serviceSubscription, subscriptions, events;
+    let rootPath, srcPath, aPath, bPath, nestedPath, cPath, libPath, otherPath, otherBPath;
+
+    // Records each notification, along with whether each action's paths
+    // existed at the moment it arrived.
+    const record = (phase, type) => (actions) => {
+      events.push({
+        phase,
+        type,
+        actions,
+        existed: actions.map((action) => ({
+          oldPath: action.oldPath ? fs.existsSync(action.oldPath) : null,
+          newPath: action.newPath ? fs.existsSync(action.newPath) : null
+        }))
+      });
+    };
+    const wills = () => events.filter((event) => event.phase === 'will');
+    const dids = () => events.filter((event) => event.phase === 'did');
+
+    const entryFor = (entryPath) => {
+      const entry = treeView.entryForPath(entryPath);
+      expect(entry?.isPathEqual(entryPath)).toBe(true);
+      return entry;
+    };
+    const modalItem = () => atom.workspace.getModalPanels()[0]?.getItem();
+    const confirmTrash = () => spyOn(atom, 'confirm').andCallFake((_options, callback) => callback(0));
+
+    beforeEach(async () => {
+      rootPath = fs.realpathSync(temp.mkdirSync('file-operations-root'));
+      srcPath = path.join(rootPath, 'src');
+      aPath = path.join(srcPath, 'a.js');
+      bPath = path.join(srcPath, 'b.js');
+      nestedPath = path.join(srcPath, 'nested');
+      cPath = path.join(nestedPath, 'c.js');
+      libPath = path.join(rootPath, 'lib');
+      otherPath = path.join(rootPath, 'other');
+      otherBPath = path.join(otherPath, 'b.js');
+
+      fs.makeTreeSync(nestedPath);
+      fs.makeTreeSync(libPath);
+      fs.makeTreeSync(otherPath);
+      fs.writeFileSync(aPath, 'a');
+      fs.writeFileSync(bPath, 'b');
+      fs.writeFileSync(cPath, 'c');
+      fs.writeFileSync(otherBPath, 'other b');
+
+      atom.project.setPaths([rootPath]);
+      jasmine.attachToDOM(workspaceElement);
+      await treeView.roots[0].expand();
+      for (const dirPath of [srcPath, nestedPath, libPath, otherPath]) {
+        await entryFor(dirPath).expand();
+      }
+
+      events = [];
+      subscriptions = [];
+      serviceSubscription = atom.packages.serviceHub.consume('tree-view', '^1.1.0', (s) => { service = s; });
+      expect(service).toBeDefined();
+      for (const type of ['Create', 'Move', 'Delete']) {
+        subscriptions.push(
+          service[`onWill${type}`](record('will', type.toLowerCase())),
+          service[`onDid${type}`](record('did', type.toLowerCase()))
+        );
+      }
+
+      window.localStorage.removeItem('tree-view:copyPath');
+      window.localStorage.removeItem('tree-view:cutPath');
+    });
+
+    afterEach(() => {
+      for (const subscription of subscriptions) subscription.dispose();
+      serviceSubscription.dispose();
+      service = null;
+      window.localStorage.removeItem('tree-view:copyPath');
+      window.localStorage.removeItem('tree-view:cutPath');
+    });
+
+    it("exposes every 1.1.0 method", () => {
+      for (const name of ['selectedPaths', 'entryForPath', 'revealPath',
+        'onWillCreate', 'onWillMove', 'onWillDelete',
+        'onDidCreate', 'onDidMove', 'onDidDelete']) {
+        expect(typeof service[name]).toBe('function');
+      }
+    });
+
+    describe("creating", () => {
+      it("reports a new file before and after it exists", async () => {
+        treeView.selectEntry(entryFor(libPath));
+        treeView.add(true);
+        const newPath = path.join(libPath, 'new.js');
+        modalItem().miniEditor.setText(newPath);
+        atom.commands.dispatch(modalItem().element, 'core:confirm');
+        await fileOperationsSettled(treeView);
+
+        expect(wills().length).toBe(1);
+        expect(wills()[0].type).toBe('create');
+        expect(wills()[0].actions).toEqual([{ kind: 'file', newPath }]);
+        expect(wills()[0].existed[0].newPath).toBe(false);
+        expect(dids().length).toBe(1);
+        expect(dids()[0].actions).toEqual([{ kind: 'file', newPath }]);
+        expect(dids()[0].existed[0].newPath).toBe(true);
+      });
+
+      it("reports only the leaf of a nested new folder", async () => {
+        treeView.selectEntry(entryFor(libPath));
+        treeView.add(false);
+        const newPath = path.join(libPath, 'x', 'y');
+        modalItem().miniEditor.setText(newPath);
+        atom.commands.dispatch(modalItem().element, 'core:confirm');
+        await fileOperationsSettled(treeView);
+
+        expect(fs.isDirectorySync(newPath)).toBe(true);
+        expect(wills().length).toBe(1);
+        expect(wills()[0].actions).toEqual([{ kind: 'folder', newPath }]);
+      });
+
+      it("doesn't notify anyone when validation fails", async () => {
+        treeView.selectEntry(entryFor(libPath));
+        treeView.add(true);
+        const dialog = modalItem();
+        dialog.miniEditor.setText(aPath);
+        atom.commands.dispatch(dialog.element, 'core:confirm');
+        await fileOperationsSettled(treeView);
+
+        expect(events.length).toBe(0);
+        expect(atom.workspace.getModalPanels().length).toBe(1);
+        dialog.close();
+      });
+
+      it("keeps the dialog open, ignoring further input, while consumers react", async () => {
+        let release;
+        subscriptions.push(service.onWillCreate((_actions, handle) => {
+          handle.waitUntil(() => new Promise((resolve) => { release = resolve; }));
+        }));
+
+        treeView.selectEntry(entryFor(libPath));
+        treeView.add(true);
+        const dialog = modalItem();
+        const newPath = path.join(libPath, 'slow.js');
+        dialog.miniEditor.setText(newPath);
+        atom.commands.dispatch(dialog.element, 'core:confirm');
+        await conditionPromise(() => release, 'consumer to start waiting');
+
+        expect(dialog.busy).toBe(true);
+        atom.commands.dispatch(dialog.element, 'core:confirm');
+        atom.commands.dispatch(dialog.element, 'core:cancel');
+        dialog.miniEditor.element.dispatchEvent(new FocusEvent('blur'));
+        expect(atom.workspace.getModalPanels().length).toBe(1);
+
+        release();
+        await fileOperationsSettled(treeView);
+
+        expect(wills().length).toBe(1);
+        expect(fs.existsSync(newPath)).toBe(true);
+        expect(atom.workspace.getModalPanels().length).toBe(0);
+      });
+
+      // `onConfirm` handles failures of the filesystem work itself. These
+      // cover a failure anywhere else, which would otherwise leave a dialog
+      // that ignores every attempt to dismiss it.
+      describe("when the operation fails unexpectedly", () => {
+        const openers = {
+          add: () => {
+            treeView.selectEntry(entryFor(libPath));
+            treeView.add(true);
+            return path.join(libPath, 'new.js');
+          },
+          copy: () => {
+            treeView.selectEntry(entryFor(aPath));
+            treeView.copySelectedEntry();
+            return path.join(libPath, 'a-copy.js');
+          },
+          move: () => {
+            treeView.selectEntry(entryFor(aPath));
+            treeView.moveSelectedEntry();
+            return path.join(libPath, 'a.js');
+          }
+        };
+
+        for (const [name, open] of Object.entries(openers)) {
+          it(`leaves the ${name} dialog dismissable`, async () => {
+            const error = new Error('unexpected');
+            spyOn(treeView.fileOperations, 'run').andCallFake(() => Promise.reject(error));
+            treeView.focus();
+            const newPath = open();
+            const dialog = modalItem();
+
+            let rejection;
+            try {
+              await dialog.onConfirm(newPath);
+            } catch (e) {
+              rejection = e;
+            }
+
+            expect(treeView.fileOperations.run).toHaveBeenCalled();
+            expect(rejection).toBe(error);
+            expect(dialog.busy).toBe(false);
+            expect(dialog.element.classList.contains('busy')).toBe(false);
+            atom.commands.dispatch(dialog.element, 'core:cancel');
+            expect(atom.workspace.getModalPanels().length).toBe(0);
+          });
+        }
+      });
+    });
+
+    describe("copying", () => {
+      it("reports a duplicate made with the copy dialog as a creation of the target", async () => {
+        const copied = jasmine.createSpy('onEntryCopied');
+        treeView.onEntryCopied(copied);
+        treeView.selectEntry(entryFor(aPath));
+        treeView.focus();
+        treeView.copySelectedEntry();
+        const newPath = path.join(libPath, 'a-copy.js');
+        modalItem().miniEditor.setText(newPath);
+        atom.commands.dispatch(modalItem().element, 'core:confirm');
+        await fileOperationsSettled(treeView);
+
+        expect(wills().length).toBe(1);
+        expect(wills()[0].type).toBe('create');
+        expect(wills()[0].actions).toEqual([{ kind: 'file', newPath }]);
+        expect(dids()[0].actions).toEqual([{ kind: 'file', newPath }]);
+        expect(fs.readFileSync(newPath, 'utf8')).toBe('a');
+        // This event used to be lost; see `TreeView::copySelectedEntry`.
+        expect(copied).toHaveBeenCalledWith({ initialPath: aPath, newPath });
+      });
+
+      it("shows a failed copy in the dialog, without reporting it as done", async () => {
+        treeView.selectEntry(entryFor(aPath));
+        treeView.focus();
+        treeView.copySelectedEntry();
+        const dialog = modalItem();
+        // A file can't be a parent directory.
+        dialog.miniEditor.setText(path.join(bPath, 'impossible.js'));
+        atom.commands.dispatch(dialog.element, 'core:confirm');
+        await fileOperationsSettled(treeView);
+
+        expect(dids().length).toBe(0);
+        expect(dialog.errorMessage.textContent).toBeTruthy();
+        expect(atom.workspace.getModalPanels().length).toBe(1);
+        dialog.close();
+      });
+
+      it("reports a multi-item paste as one batch, giving same-named items distinct names", async () => {
+        window.localStorage['tree-view:copyPath'] = JSON.stringify([bPath, otherBPath]);
+        treeView.selectEntry(entryFor(libPath));
+        treeView.pasteEntries();
+        await fileOperationsSettled(treeView);
+
+        expect(wills().length).toBe(1);
+        expect(wills()[0].actions).toEqual([
+          { kind: 'file', newPath: path.join(libPath, 'b.js') },
+          { kind: 'file', newPath: path.join(libPath, 'b0.js') }
+        ]);
+        expect(fs.readFileSync(path.join(libPath, 'b.js'), 'utf8')).toBe('b');
+        expect(fs.readFileSync(path.join(libPath, 'b0.js'), 'utf8')).toBe('other b');
+      });
+
+      it("plans each of two quick pastes against what the earlier one did", async () => {
+        window.localStorage['tree-view:copyPath'] = JSON.stringify([bPath]);
+        treeView.selectEntry(entryFor(libPath));
+        treeView.pasteEntries();
+        treeView.pasteEntries();
+        await fileOperationsSettled(treeView);
+
+        expect(wills().map((event) => event.actions[0].newPath)).toEqual([
+          path.join(libPath, 'b.js'),
+          path.join(libPath, 'b0.js')
+        ]);
+        expect(dids().length).toBe(2);
+      });
+
+      it("drops items whose ancestor is also being copied", async () => {
+        await treeView.copyEntries([srcPath, aPath], libPath);
+
+        expect(wills().length).toBe(1);
+        expect(wills()[0].actions).toEqual([{ kind: 'folder', newPath: path.join(libPath, 'src') }]);
+        expect(fs.existsSync(path.join(libPath, 'src', 'a.js'))).toBe(true);
+        expect(fs.existsSync(path.join(libPath, 'a.js'))).toBe(false);
+      });
+    });
+
+    describe("renaming", () => {
+      it("reports the move before and after it happens", async () => {
+        treeView.selectEntry(entryFor(aPath));
+        treeView.focus();
+        const dialog = treeView.moveSelectedEntry();
+        const newPath = path.join(srcPath, 'renamed.js');
+        dialog.miniEditor.setText(newPath);
+        atom.commands.dispatch(dialog.element, 'core:confirm');
+        await fileOperationsSettled(treeView);
+
+        expect(wills().length).toBe(1);
+        expect(wills()[0].actions).toEqual([{ kind: 'file', oldPath: aPath, newPath }]);
+        expect(wills()[0].existed[0]).toEqual({ oldPath: true, newPath: false });
+        expect(dids()[0].existed[0]).toEqual({ oldPath: false, newPath: true });
+      });
+
+      it("shows an error in the dialog when the file vanished after the dialog opened", async () => {
+        treeView.selectEntry(entryFor(aPath));
+        treeView.focus();
+        const dialog = treeView.moveSelectedEntry();
+        fs.removeSync(aPath);
+        dialog.miniEditor.setText(path.join(srcPath, 'renamed.js'));
+
+        await dialog.onConfirm(dialog.miniEditor.getText());
+
+        expect(wills().length).toBe(0);
+        expect(dialog.errorMessage.textContent).toBeTruthy();
+        expect(dialog.busy).toBe(false);
+        expect(atom.workspace.getModalPanels().length).toBe(1);
+        dialog.close();
+      });
+
+      it("moves an open editor along with the file, even when a consumer edits it first", async () => {
+        const editor = await atom.workspace.open(aPath);
+        subscriptions.push(service.onWillMove((_actions, handle) => {
+          handle.waitUntil(async () => {
+            editor.getBuffer().append('\n// edited by a consumer');
+            await editor.save();
+          });
+        }));
+
+        treeView.selectEntry(entryFor(aPath));
+        treeView.focus();
+        const dialog = treeView.moveSelectedEntry();
+        const newPath = path.join(srcPath, 'renamed.js');
+        dialog.miniEditor.setText(newPath);
+        atom.commands.dispatch(dialog.element, 'core:confirm');
+        await fileOperationsSettled(treeView);
+
+        expect(editor.getPath()).toBe(newPath);
+        expect(fs.readFileSync(newPath, 'utf8')).toContain('// edited by a consumer');
+      });
+    });
+
+    describe("moving", () => {
+      it("settles conflicts with the user before notifying, then reports the batch once", async () => {
+        fs.writeFileSync(path.join(libPath, 'a.js'), 'existing');
+        spyOn(atom, 'confirm').andReturn(0); // Replace
+        let promptsBeforeWill;
+        subscriptions.push(service.onWillMove(() => { promptsBeforeWill = atom.confirm.callCount; }));
+
+        await treeView.moveEntries([aPath, bPath], libPath);
+        await fileOperationsSettled(treeView);
+
+        expect(promptsBeforeWill).toBe(1);
+        expect(wills().length).toBe(1);
+        expect(wills()[0].actions).toEqual([
+          { kind: 'file', oldPath: aPath, newPath: path.join(libPath, 'a.js') },
+          { kind: 'file', oldPath: bPath, newPath: path.join(libPath, 'b.js') }
+        ]);
+        expect(fs.readFileSync(path.join(libPath, 'a.js'), 'utf8')).toBe('a');
+      });
+
+      it("notifies no one when the user cancels", async () => {
+        fs.writeFileSync(path.join(libPath, 'a.js'), 'existing');
+        spyOn(atom, 'confirm').andReturn(2); // Cancel
+
+        await treeView.moveEntries([bPath, aPath], libPath);
+        await fileOperationsSettled(treeView);
+
+        expect(events.length).toBe(0);
+        expect(fs.existsSync(aPath)).toBe(true);
+        expect(fs.existsSync(bPath)).toBe(true);
+      });
+
+      it("reports a folder merge as the moves of its contents, then removes the emptied folder", async () => {
+        const targetSrcPath = path.join(libPath, 'src');
+        fs.makeTreeSync(targetSrcPath);
+        fs.writeFileSync(path.join(targetSrcPath, 'a.js'), 'existing');
+        spyOn(atom, 'confirm').andReturn(0); // Replace
+
+        await treeView.moveEntries([srcPath], libPath);
+        await fileOperationsSettled(treeView);
+
+        const actions = wills()[0].actions.slice().sort((x, y) => x.oldPath.localeCompare(y.oldPath));
+        expect(actions).toEqual([
+          { kind: 'file', oldPath: aPath, newPath: path.join(targetSrcPath, 'a.js') },
+          { kind: 'file', oldPath: bPath, newPath: path.join(targetSrcPath, 'b.js') },
+          { kind: 'folder', oldPath: nestedPath, newPath: path.join(targetSrcPath, 'nested') }
+        ]);
+        expect(fs.existsSync(srcPath)).toBe(false);
+        expect(fs.existsSync(path.join(targetSrcPath, 'nested', 'c.js'))).toBe(true);
+      });
+
+      it("leaves a merged folder in place when the user skips part of it", async () => {
+        const targetSrcPath = path.join(libPath, 'src');
+        fs.makeTreeSync(targetSrcPath);
+        fs.writeFileSync(path.join(targetSrcPath, 'a.js'), 'existing');
+        spyOn(atom, 'confirm').andReturn(1); // Skip
+
+        await treeView.moveEntries([srcPath], libPath);
+        await fileOperationsSettled(treeView);
+
+        const movedFrom = wills()[0].actions.map((action) => action.oldPath).sort();
+        expect(movedFrom).toEqual([bPath, nestedPath]);
+        expect(fs.existsSync(aPath)).toBe(true);
+        expect(fs.readFileSync(path.join(targetSrcPath, 'a.js'), 'utf8')).toBe('existing');
+      });
+
+      it("does nothing when an item is dropped on its own parent", async () => {
+        await treeView.moveEntries([aPath], srcPath);
+        await fileOperationsSettled(treeView);
+        expect(events.length).toBe(0);
+        expect(fs.existsSync(aPath)).toBe(true);
+      });
+
+      it("skips a folder being moved into itself without abandoning the rest of the batch", async () => {
+        atom.notifications.clear();
+
+        await treeView.moveEntries([srcPath, otherPath], nestedPath);
+        await fileOperationsSettled(treeView);
+
+        expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot move a folder into itself');
+        expect(wills().length).toBe(1);
+        expect(wills()[0].actions).toEqual([
+          { kind: 'folder', oldPath: otherPath, newPath: path.join(nestedPath, 'other') }
+        ]);
+      });
+
+      it("leaves a move that fails after the wait out of the onDidMove report", async () => {
+        // The consumer pulls a source out from under the batch.
+        subscriptions.push(service.onWillMove(() => fs.removeSync(aPath)));
+
+        await treeView.moveEntries([aPath, bPath], libPath);
+        await fileOperationsSettled(treeView);
+
+        expect(wills()[0].actions).toEqual([
+          { kind: 'file', oldPath: aPath, newPath: path.join(libPath, 'a.js') },
+          { kind: 'file', oldPath: bPath, newPath: path.join(libPath, 'b.js') }
+        ]);
+        expect(dids().length).toBe(1);
+        expect(dids()[0].actions).toEqual([
+          { kind: 'file', oldPath: bPath, newPath: path.join(libPath, 'b.js') }
+        ]);
+      });
+    });
+
+    describe("deleting", () => {
+      it("leaves a failed deletion out of the onDidDelete report", async () => {
+        const trashItem = atom.trashItem.bind(atom);
+        spyOn(atom, 'trashItem').andCallFake((itemPath) => {
+          return itemPath === aPath ? Promise.reject(new Error('cannot trash')) : trashItem(itemPath);
+        });
+        treeView.selectEntry(entryFor(aPath));
+        treeView.selectMultipleEntries(entryFor(bPath));
+        treeView.focus();
+        confirmTrash();
+
+        atom.commands.dispatch(treeView.element, 'tree-view:remove');
+        await fileOperationsSettled(treeView);
+
+        expect(wills()[0].actions).toEqual([
+          { kind: 'file', oldPath: aPath },
+          { kind: 'file', oldPath: bPath }
+        ]);
+        expect(dids().length).toBe(1);
+        expect(dids()[0].actions).toEqual([{ kind: 'file', oldPath: bPath }]);
+        expect(fs.existsSync(aPath)).toBe(true);
+      });
+
+      it("reports one batch, dropping items whose ancestor is also being deleted", async () => {
+        treeView.selectEntry(entryFor(srcPath));
+        treeView.selectMultipleEntries(entryFor(aPath));
+        treeView.focus();
+        confirmTrash();
+
+        atom.commands.dispatch(treeView.element, 'tree-view:remove');
+        await fileOperationsSettled(treeView);
+
+        expect(wills().length).toBe(1);
+        expect(wills()[0].actions).toEqual([{ kind: 'folder', oldPath: srcPath }]);
+        expect(wills()[0].existed[0].oldPath).toBe(true);
+        expect(dids()[0].actions).toEqual([{ kind: 'folder', oldPath: srcPath }]);
+        expect(dids()[0].existed[0].oldPath).toBe(false);
+      });
+
+      it("reports a symlink to a folder as a file, since only the link is deleted", async () => {
+        const linkPath = path.join(rootPath, 'link-to-other');
+        fs.symlinkSync(otherPath, linkPath, 'junction');
+        await conditionPromise(
+          () => treeView.entryForPath(linkPath)?.isPathEqual(linkPath),
+          'symlink to appear in the tree'
+        );
+
+        treeView.selectEntry(entryFor(linkPath));
+        treeView.focus();
+        confirmTrash();
+        atom.commands.dispatch(treeView.element, 'tree-view:remove');
+        await fileOperationsSettled(treeView);
+
+        expect(wills()[0].actions).toEqual([{ kind: 'file', oldPath: linkPath }]);
+        expect(fs.existsSync(otherBPath)).toBe(true);
+      });
+
+      describe("open editors", () => {
+        it("closes an unmodified editor for the deleted file", async () => {
+          const editor = await atom.workspace.open(aPath);
+          treeView.selectEntry(entryFor(aPath));
+          treeView.focus();
+          confirmTrash();
+
+          atom.commands.dispatch(treeView.element, 'tree-view:remove');
+          await fileOperationsSettled(treeView);
+
+          expect(editor.isDestroyed()).toBe(true);
+        });
+
+        it("keeps an editor that a consumer modified while tree-view waited", async () => {
+          const editor = await atom.workspace.open(aPath);
+          subscriptions.push(service.onWillDelete((_actions, handle) => {
+            handle.waitUntil(async () => { editor.insertText('unsaved change'); });
+          }));
+          treeView.selectEntry(entryFor(aPath));
+          treeView.focus();
+          confirmTrash();
+
+          atom.commands.dispatch(treeView.element, 'tree-view:remove');
+          await fileOperationsSettled(treeView);
+
+          expect(fs.existsSync(aPath)).toBe(false);
+          expect(editor.isDestroyed()).toBe(false);
+          expect(editor.isModified()).toBe(true);
+        });
+      });
+    });
+
+    describe("when a consumer is too slow", () => {
+      it("performs the operation anyway once the budget runs out, aborting the signal", async () => {
+        atom.config.set('tree-view.fileOperationTimeout', 100);
+        let signal;
+        subscriptions.push(service.onWillDelete((_actions, handle) => {
+          signal = handle.signal;
+          handle.waitUntil(() => new Promise(() => {})); // Never settles.
+        }));
+        treeView.selectEntry(entryFor(bPath));
+        treeView.focus();
+        confirmTrash();
+
+        atom.commands.dispatch(treeView.element, 'tree-view:remove');
+        await fileOperationsSettled(treeView);
+
+        expect(signal.aborted).toBe(true);
+        expect(fs.existsSync(bPath)).toBe(false);
+        expect(dids().length).toBe(1);
+      });
+    });
+
+    describe("when a consumer throws", () => {
+      let hook;
+
+      beforeEach(() => {
+        // In production, Pulsar sends exceptions from event handlers to
+        // `reportError` through this hook. Spec mode leaves it out, so install
+        // it here to test what users will see.
+        hook = atom.installEventHandlerExceptionHandler();
+        spyOn(window, 'reportError');
+      });
+
+      afterEach(() => hook.dispose());
+
+      it("reports the error, still notifies the other consumers, and performs the operation", async () => {
+        const willError = new Error('will failure');
+        const didError = new Error('did failure');
+        const laterWill = jasmine.createSpy('laterWill');
+        const laterDid = jasmine.createSpy('laterDid');
+        // Registered after the recorders, and before the later spies.
+        subscriptions.push(
+          service.onWillDelete(() => { throw willError; }),
+          service.onDidDelete(() => { throw didError; }),
+          service.onWillDelete(laterWill),
+          service.onDidDelete(laterDid)
+        );
+        treeView.selectEntry(entryFor(bPath));
+        treeView.focus();
+        confirmTrash();
+
+        atom.commands.dispatch(treeView.element, 'tree-view:remove');
+        await fileOperationsSettled(treeView);
+
+        expect(window.reportError).toHaveBeenCalledWith(willError);
+        expect(window.reportError).toHaveBeenCalledWith(didError);
+        expect(laterWill).toHaveBeenCalled();
+        expect(laterDid).toHaveBeenCalled();
+        expect(fs.existsSync(bPath)).toBe(false);
+      });
+    });
+
+    describe("when the package is deactivated", () => {
+      it("stops notifying consumers", async () => {
+        const { fileOperations } = treeView;
+        spyOn(fileOperations, 'dispose').andCallThrough();
+
+        await atom.packages.deactivatePackage('tree-view');
+        await fileOperations.run('delete', [{ kind: 'file', oldPath: aPath }], async (actions) => actions);
+
+        expect(fileOperations.dispose).toHaveBeenCalled();
+        expect(events).toEqual([]);
+      });
+    });
   });
 
   describe("file modification", function () {
@@ -1857,19 +2649,20 @@ describe("TreeView", function () {
       });
 
       describe("when attempting to paste a directory into itself", () => {
-        it("shows a warning notification and does not paste", function () {
+        it("shows a warning notification and does not paste", async function () {
           // /dir-1/ -> /dir-1/
           LocalStorage["tree-view:copyPath"] = JSON.stringify([dirPath]);
           const newPath = path.join(dirPath, path.basename(dirPath));
           dirView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
           expect(() => atom.commands.dispatch(treeView.element, "tree-view:paste")).not.toThrow();
+          await fileOperationsSettled(treeView);
           expect(fs.existsSync(newPath)).toBe(false);
           expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot copy a folder into itself');
         })}
       );
 
       describe("when attempting to paste a directory into a nested child directory", () => {
-        it("shows a warning notification and does not paste", function () {
+        it("shows a warning notification and does not paste", async function () {
           const nestedPath = path.join(dirPath, 'nested');
           fs.makeTreeSync(nestedPath);
 
@@ -1880,25 +2673,27 @@ describe("TreeView", function () {
           const nestedView = dirView.querySelector('.directory');
           nestedView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
           expect(() => atom.commands.dispatch(treeView.element, "tree-view:paste")).not.toThrow();
+          await fileOperationsSettled(treeView);
           expect(fs.existsSync(newPath)).toBe(false);
           expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot copy a folder into itself');
         });
       });
 
       describe("when attempting to paste a directory into a sibling directory that starts with the same letter", () => {
-        it("allows the paste to occur", function () {
+        it("allows the paste to occur", async function () {
           // /dir-1/ -> /dir-2/
           LocalStorage["tree-view:copyPath"] = JSON.stringify([dirPath]);
           const newPath = path.join(dirPath2, path.basename(dirPath));
           dirView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
           expect(() => atom.commands.dispatch(treeView.element, "tree-view:paste")).not.toThrow();
+          await fileOperationsSettled(treeView);
           expect(fs.existsSync(newPath)).toBe(true);
           expect(atom.notifications.getNotifications()[0]).toBeUndefined();
         });
       });
 
       describe("when attempting to paste a directory into a symlink of itself", () => {
-        it("shows a warning notification and does not paste", function () {
+        it("shows a warning notification and does not paste", async function () {
           fs.symlinkSync(dirPath, path.join(rootDirPath, 'symdir'), 'junction');
 
           // /dir-1/ -> symlink of /dir-1/
@@ -1907,13 +2702,14 @@ describe("TreeView", function () {
           const symlinkView = root1.querySelector('.directory');
           symlinkView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
           expect(() => atom.commands.dispatch(treeView.element, "tree-view:paste")).not.toThrow();
+          await fileOperationsSettled(treeView);
           expect(fs.existsSync(newPath)).toBe(false);
           expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Cannot copy a folder into itself');
         });
       });
 
       describe("when attempting to paste a symlink into its target directory", () => {
-        it("allows the paste to occur", function () {
+        it("allows the paste to occur", async function () {
           const symlinkedPath = path.join(rootDirPath, 'symdir');
           fs.symlinkSync(dirPath, symlinkedPath, 'junction');
 
@@ -1922,13 +2718,14 @@ describe("TreeView", function () {
           const newPath = path.join(dirPath, path.basename(symlinkedPath));
           dirView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
           expect(() => atom.commands.dispatch(treeView.element, "tree-view:paste")).not.toThrow();
+          await fileOperationsSettled(treeView);
           expect(fs.existsSync(newPath)).toBe(true);
           expect(atom.notifications.getNotifications()[0]).toBeUndefined();
         });
       });
 
       describe("when pasting entries which don't exist anymore", () => {
-        it("skips the entry which doesn't exist", function () {
+        it("skips the entry which doesn't exist", async function () {
           const filePathDoesntExist1 = path.join(dirPath2, "test-file-doesnt-exist1.txt");
           const filePathDoesntExist2 = path.join(dirPath2, "test-file-doesnt-exist2.txt");
 
@@ -1936,6 +2733,7 @@ describe("TreeView", function () {
 
           fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
           atom.commands.dispatch(treeView.element, "tree-view:paste");
+          await fileOperationsSettled(treeView);
 
           expect(fs.existsSync(path.join(dirPath, path.basename(filePath2)))).toBeTruthy();
           expect(fs.existsSync(path.join(dirPath, path.basename(filePath3)))).toBeTruthy();
@@ -1950,32 +2748,36 @@ describe("TreeView", function () {
         describe("when a file is selected", function () {
           beforeEach(() => LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath]));
 
-          it("creates a copy of the original file in the selected file's parent directory", function () {
+          it("creates a copy of the original file in the selected file's parent directory", async function () {
             fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             const newPath = path.join(dirPath2, path.basename(filePath));
             expect(fs.existsSync(newPath)).toBeTruthy();
             expect(fs.existsSync(filePath)).toBeTruthy();
           });
 
-          it("emits an event", function () {
+          it("emits an event", async function () {
             const callback = jasmine.createSpy("onEntryCopied");
             treeView.onEntryCopied(callback);
             fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             const newPath = path.join(dirPath2, path.basename(filePath));
             expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
           });
 
           describe("when the target already exists", () => {
-            it("appends a number to the destination name", function () {
+            it("appends a number to the destination name", async function () {
               LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath]);
 
               fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
 
               expect(fs.existsSync(path.join(path.dirname(filePath), "test-file0.txt"))).toBeTruthy();
               expect(fs.existsSync(path.join(path.dirname(filePath), "test-file1.txt"))).toBeTruthy();
@@ -1986,7 +2788,7 @@ describe("TreeView", function () {
 
         describe("when a file containing two or more periods has been copied", () => {
           describe("when a file is selected", function () {
-            it("creates a copy of the original file in the selected file's parent directory", function () {
+            it("creates a copy of the original file in the selected file's parent directory", async function () {
               const dotFilePath = path.join(dirPath, "test.file.txt");
               fs.writeFileSync(dotFilePath, "doesn't matter .");
               LocalStorage['tree-view:copyPath'] = JSON.stringify([dotFilePath]);
@@ -1995,19 +2797,22 @@ describe("TreeView", function () {
 
               fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
               expect(fs.existsSync(path.join(dirPath, path.basename(dotFilePath)))).toBeTruthy();
               expect(fs.existsSync(dotFilePath)).toBeTruthy();
             });
 
             describe("when the target already exists", () => {
-              it("appends a number to the destination name", function () {
+              it("appends a number to the destination name", async function () {
                 const dotFilePath = path.join(dirPath, "test.file.txt");
                 fs.writeFileSync(dotFilePath, "doesn't matter .");
                 LocalStorage['tree-view:copyPath'] = JSON.stringify([dotFilePath]);
 
                 fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
                 atom.commands.dispatch(treeView.element, "tree-view:paste");
+                await fileOperationsSettled(treeView);
                 atom.commands.dispatch(treeView.element, "tree-view:paste");
+                await fileOperationsSettled(treeView);
 
                 expect(fs.existsSync(path.join(dirPath, 'test0.file.txt'))).toBeTruthy();
                 expect(fs.existsSync(path.join(dirPath, 'test1.file.txt'))).toBeTruthy();
@@ -2018,23 +2823,26 @@ describe("TreeView", function () {
         });
 
         describe("when a directory is selected", function () {
-          it("creates a copy of the original file in the selected directory", function () {
+          it("creates a copy of the original file in the selected directory", async function () {
             LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath]);
 
             dirView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             expect(fs.existsSync(path.join(dirPath2, path.basename(filePath)))).toBeTruthy();
             expect(fs.existsSync(filePath)).toBeTruthy();
           });
 
           describe("when the target already exists", () => {
-            it("appends a number to the destination file name", function () {
+            it("appends a number to the destination file name", async function () {
               LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath]);
 
               dirView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
 
               expect(fs.existsSync(path.join(path.dirname(filePath), "test-file0.txt"))).toBeTruthy();
               expect(fs.existsSync(path.join(path.dirname(filePath), "test-file1.txt"))).toBeTruthy();
@@ -2053,20 +2861,21 @@ describe("TreeView", function () {
             return atom.project.setPaths([rootDirPath]);
           }); // Force test.dir to show up
 
-          it("creates a copy of the original file in the selected directory", function () {
+          it("creates a copy of the original file in the selected directory", async function () {
             LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath]);
 
             const directories = treeView.roots[0].entries.querySelectorAll('.directory');
             const dotDirView = directories[directories.length - 1];
             dotDirView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             expect(fs.existsSync(path.join(dotDirPath, path.basename(filePath)))).toBeTruthy();
             expect(fs.existsSync(filePath)).toBeTruthy();
           });
 
           describe("when the target already exists", () => {
-            it("appends a number to the destination file name", function () {
+            it("appends a number to the destination file name", async function () {
               const dotFilePath = path.join(dotDirPath, "test.file.txt");
               fs.writeFileSync(dotFilePath, "doesn't matter .");
               LocalStorage['tree-view:copyPath'] = JSON.stringify([dotFilePath]);
@@ -2075,7 +2884,9 @@ describe("TreeView", function () {
               const dotDirView = directories[directories.length - 1];
               dotDirView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
 
               expect(fs.existsSync(path.join(dotDirPath, "test0.file.txt"))).toBeTruthy();
               expect(fs.existsSync(path.join(dotDirPath, "test1.file.txt"))).toBeTruthy();
@@ -2085,16 +2896,17 @@ describe("TreeView", function () {
         });
 
         describe("when pasting into a different root directory", () => {
-          it("creates the file", function () {
+          it("creates the file", async function () {
             LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath4]);
             dirView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
             expect(fs.existsSync(path.join(dirPath2, path.basename(filePath4)))).toBeTruthy();
           });
         });
 
         describe("when pasting a file with an asterisk char '*' in to different directory", () => {
-          it("should successfully move the file", function () {
+          it("should successfully move the file", async function () {
             // Files cannot contain asterisks on Windows
             if (process.platform === "win32") { return; }
 
@@ -2103,6 +2915,7 @@ describe("TreeView", function () {
             LocalStorage['tree-view:copyPath'] = JSON.stringify([asteriskFilePath]);
             dirView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
             expect(fs.existsSync(path.join(dirPath2, path.basename(asteriskFilePath)))).toBeTruthy();
           });
         });
@@ -2116,11 +2929,12 @@ describe("TreeView", function () {
 
       describe("when multiple files have been copied", () => {
         describe("when a file is selected", function () {
-          it("copies the selected files to the parent directory of the selected file", function () {
+          it("copies the selected files to the parent directory of the selected file", async function () {
             LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath2, filePath3]);
 
             fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             expect(fs.existsSync(path.join(dirPath, path.basename(filePath2)))).toBeTruthy();
             expect(fs.existsSync(path.join(dirPath, path.basename(filePath3)))).toBeTruthy();
@@ -2129,7 +2943,7 @@ describe("TreeView", function () {
           });
 
           describe('when the target destination file exists', () => {
-            it('appends a number to the duplicate destination target names', function () {
+            it('appends a number to the duplicate destination target names', async function () {
               LocalStorage['tree-view:copyPath'] = JSON.stringify([filePath2, filePath3]);
 
               filePath4 = path.join(dirPath, "test-file2.txt");
@@ -2139,6 +2953,7 @@ describe("TreeView", function () {
 
               fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
 
               expect(fs.existsSync(path.join(dirPath, "test-file20.txt"))).toBeTruthy();
               expect(fs.existsSync(path.join(dirPath, "test-file30.txt"))).toBeTruthy();
@@ -2151,28 +2966,30 @@ describe("TreeView", function () {
         beforeEach(() => LocalStorage['tree-view:cutPath'] = JSON.stringify([filePath]));
 
         describe("when a file is selected", function () {
-          it("creates a copy of the original file in the selected file's parent directory and removes the original", function () {
+          it("creates a copy of the original file in the selected file's parent directory and removes the original", async function () {
             fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             const newPath = path.join(dirPath2, path.basename(filePath));
             expect(fs.existsSync(newPath)).toBeTruthy();
             expect(fs.existsSync(filePath)).toBeFalsy();
           });
 
-          it("emits an event", function () {
+          it("emits an event", async function () {
             const callback = jasmine.createSpy("onEntryMoved");
             treeView.onEntryMoved(callback);
 
             fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             const newPath = path.join(dirPath2, path.basename(filePath));
             expect(callback).toHaveBeenCalledWith({initialPath: filePath, newPath});
           });
 
           describe('when the target destination file exists', function () {
-            it("prompts to replace the file", function () {
+            it("prompts to replace the file", async function () {
               spyOn(atom, 'confirm');
 
               const callback = jasmine.createSpy("onEntryMoved");
@@ -2183,6 +3000,7 @@ describe("TreeView", function () {
 
               fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
 
               expect(atom.confirm).toHaveBeenCalled();
             });
@@ -2207,7 +3025,7 @@ describe("TreeView", function () {
             });
 
             describe("when selecting the skip option", () => {
-              it("does not replace the existing file", function () {
+              it("does not replace the existing file", async function () {
                 spyOn(atom, 'confirm').andReturn(1);
 
                 const callback = jasmine.createSpy("onEntryMoved");
@@ -2218,14 +3036,16 @@ describe("TreeView", function () {
 
                 fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
                 atom.commands.dispatch(treeView.element, "tree-view:paste");
+                await fileOperationsSettled(treeView);
 
+                expect(atom.confirm).toHaveBeenCalled();
                 expect(fs.existsSync(filePath)).toBe(true);
                 expect(callback).not.toHaveBeenCalled();
               });
             });
 
             describe("when cancelling the dialog", () => {
-              it("does not replace the existing file", function () {
+              it("does not replace the existing file", async function () {
                 spyOn(atom, 'confirm').andReturn(2);
 
                 const callback = jasmine.createSpy("onEntryMoved");
@@ -2236,7 +3056,9 @@ describe("TreeView", function () {
 
                 fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
                 atom.commands.dispatch(treeView.element, "tree-view:paste");
+                await fileOperationsSettled(treeView);
 
+                expect(atom.confirm).toHaveBeenCalled();
                 expect(fs.existsSync(filePath)).toBe(true);
                 expect(callback).not.toHaveBeenCalled();
               });
@@ -2248,41 +3070,42 @@ describe("TreeView", function () {
               await waitForWorkspaceOpenEventPromise(() => atom.workspace.open(filePath));
             });
 
-            it('has its path updated', function () {
+            it('has its path updated', async function () {
               fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
 
               const newPath = path.join(dirPath2, path.basename(filePath));
               expect(atom.workspace.getActiveTextEditor().getPath()).toBe(newPath);
             });
 
-            it('does not update paths for similarly-named editors', function () {
+            it('does not update paths for similarly-named editors', async function () {
               filePath2 = path.join(dirPath, 'test-file.txt2');
               fs.writeFileSync(filePath2, 'copy');
 
-              waitForWorkspaceOpenEvent(() => atom.workspace.open(filePath2));
+              await waitForWorkspaceOpenEventPromise(() => atom.workspace.open(filePath2));
 
-              return runs(function () {
-                fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-                atom.commands.dispatch(treeView.element, "tree-view:paste");
+              fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+              atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
 
-                const newPath = path.join(dirPath2, path.basename(filePath));
-                const editors = atom.workspace.getTextEditors();
-                expect(editors[0].getPath()).toBe(newPath);
-                expect(editors[1].getPath()).toBe(filePath2);
-              });
+              const newPath = path.join(dirPath2, path.basename(filePath));
+              const editors = atom.workspace.getTextEditors();
+              expect(editors[0].getPath()).toBe(newPath);
+              expect(editors[1].getPath()).toBe(filePath2);
             });
           });
         });
 
         describe("when a directory is selected", () => {
-          it("creates a copy of the original file in the selected directory and removes the original", function () {
+          it("creates a copy of the original file in the selected directory and removes the original", async function () {
             LocalStorage['tree-view:cutPath'] = JSON.stringify([filePath]);
 
             const callback = jasmine.createSpy("onEntryMoved");
             treeView.onEntryMoved(callback);
             dirView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             const newPath = path.join(dirPath2, path.basename(filePath));
             expect(fs.existsSync(newPath)).toBeTruthy();
@@ -2296,9 +3119,10 @@ describe("TreeView", function () {
         describe("when a file is selected", function () {
           beforeEach(() => LocalStorage['tree-view:cutPath'] = JSON.stringify([filePath2, filePath3]));
 
-          it("moves the selected files to the parent directory of the selected file", function () {
+          it("moves the selected files to the parent directory of the selected file", async function () {
             fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             const newPath2 = path.join(dirPath, path.basename(filePath2));
             const newPath3 = path.join(dirPath, path.basename(filePath3));
@@ -2308,11 +3132,12 @@ describe("TreeView", function () {
             expect(fs.existsSync(filePath3)).toBeFalsy();
           });
 
-          it("emits events", function () {
+          it("emits events", async function () {
             const callback = jasmine.createSpy("onEntryMoved");
             treeView.onEntryMoved(callback);
             fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             const newPath2 = path.join(dirPath, path.basename(filePath2));
             const newPath3 = path.join(dirPath, path.basename(filePath3));
@@ -2335,7 +3160,7 @@ describe("TreeView", function () {
               return LocalStorage['tree-view:cutPath'] = JSON.stringify([filePath5, filePath2, filePath3]);
             });
 
-            it("prompts for each file as long as cancel is not chosen", function () {
+            it("prompts for each file as long as cancel is not chosen", async function () {
               let calls = 0;
               const getButton = function () {
                 calls++;
@@ -2353,6 +3178,7 @@ describe("TreeView", function () {
 
               fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
 
               expect(atom.confirm.calls.length).toBe(3);
 
@@ -2361,7 +3187,10 @@ describe("TreeView", function () {
               expect(fs.existsSync(filePath3)).toBe(false);
             });
 
-            it("immediately cancels any pending file moves when cancel is chosen", function () {
+            // Conflicts are resolved before anything moves, so cancelling
+            // abandons the whole batch — including moves the user already
+            // confirmed with "Replace."
+            it("moves nothing when cancel is chosen", async function () {
               let calls = 0;
               const getButton = function () {
                 calls++;
@@ -2374,13 +3203,18 @@ describe("TreeView", function () {
               };
 
               spyOn(atom, 'confirm').andCallFake(() => getButton());
+              const willMove = jasmine.createSpy('onWillMoveEntry');
+              treeView.onWillMoveEntry(willMove);
 
               fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
               atom.commands.dispatch(treeView.element, "tree-view:paste");
+              await fileOperationsSettled(treeView);
 
               expect(atom.confirm.calls.length).toBe(2);
+              expect(willMove).not.toHaveBeenCalled();
 
-              expect(fs.existsSync(filePath5)).toBe(false);
+              expect(fs.existsSync(filePath5)).toBe(true);
+              expect(fs.readFileSync(path.join(dirPath, 'test-file.txt'), 'utf8')).not.toBe("doesn't matter 5");
               expect(fs.existsSync(filePath2)).toBe(true);
               expect(fs.existsSync(filePath3)).toBe(true);
             });
@@ -2388,11 +3222,12 @@ describe("TreeView", function () {
         });
 
         describe("when a directory is selected", () => {
-          it("creates a copy of the original file in the selected directory and removes the original", function () {
+          it("creates a copy of the original file in the selected directory and removes the original", async function () {
             LocalStorage['tree-view:cutPath'] = JSON.stringify([filePath]);
 
             dirView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
             atom.commands.dispatch(treeView.element, "tree-view:paste");
+            await fileOperationsSettled(treeView);
 
             expect(fs.existsSync(path.join(dirPath2, path.basename(filePath)))).toBeTruthy();
             expect(fs.existsSync(filePath)).toBeFalsy();
@@ -2414,6 +3249,7 @@ describe("TreeView", function () {
           fileView2.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
           atom.notifications.clear();
           atom.commands.dispatch(treeView.element, "tree-view:paste");
+          await fileOperationsSettled(treeView);
 
           expect(atom.notifications.getNotifications()[0].getMessage()).toContain('Failed to copy entry');
           expect(atom.notifications.getNotifications()[0].getDetail()).toContain('ENOENT: no such file or directory');
@@ -2668,10 +3504,11 @@ describe("TreeView", function () {
           expect(addDialog.miniEditor.element).toHaveFocus();
         });
 
-        describe(`when the path without a trailing '${path.sep}' is changed and confirmed`, () => describe("when no directory exists at the given path", () => it("adds a directory and closes the dialog", function () {
+        describe(`when the path without a trailing '${path.sep}' is changed and confirmed`, () => describe("when no directory exists at the given path", () => it("adds a directory and closes the dialog", async function () {
           const newPath = path.join(dirPath, 'new', 'dir');
           addDialog.miniEditor.insertText(`new${path.sep}dir`);
           atom.commands.dispatch(addDialog.element, 'core:confirm');
+          await fileOperationsSettled(treeView);
           expect(fs.isDirectorySync(newPath)).toBeTruthy();
           expect(atom.workspace.getModalPanels().length).toBe(0);
           expect(atom.workspace.getCenter().getActivePaneItem().getPath()).not.toBe(newPath);
@@ -2683,10 +3520,11 @@ describe("TreeView", function () {
 
         describe(`when the path with a trailing '${path.sep}' is changed and confirmed`, function () {
           describe("when no directory exists at the given path", function () {
-            it("adds a directory, closes the dialog, and emits an event", function () {
+            it("adds a directory, closes the dialog, and emits an event", async function () {
               const newPath = path.join(dirPath, 'new', 'dir');
               addDialog.miniEditor.insertText(`new${path.sep}dir${path.sep}`);
               atom.commands.dispatch(addDialog.element, 'core:confirm');
+              await fileOperationsSettled(treeView);
               expect(fs.isDirectorySync(newPath)).toBeTruthy();
               expect(atom.workspace.getModalPanels().length).toBe(0);
               expect(atom.workspace.getCenter().getActivePaneItem().getPath()).not.toBe(newPath);
@@ -2696,7 +3534,7 @@ describe("TreeView", function () {
               expect(callback).toHaveBeenCalledWith({path: newPath + path.sep});
             });
 
-            it("selects the created directory and does not change the expansion state of existing directories", function () {
+            it("selects the created directory and does not change the expansion state of existing directories", async function () {
               const expandedPath = path.join(dirPath, 'expanded-dir');
               fs.makeTreeSync(expandedPath);
               treeView.entryForPath(dirPath).expand();
@@ -2707,6 +3545,7 @@ describe("TreeView", function () {
               const newPath = path.join(dirPath, "new2") + path.sep;
               addDialog.miniEditor.insertText(`new2${path.sep}`);
               atom.commands.dispatch(addDialog.element, 'core:confirm');
+              await fileOperationsSettled(treeView);
               expect(fs.isDirectorySync(newPath)).toBeTruthy();
               expect(atom.workspace.getModalPanels().length).toBe(0);
               expect(atom.workspace.getCenter().getActivePaneItem().getPath()).not.toBe(newPath);
@@ -2717,7 +3556,7 @@ describe("TreeView", function () {
               expect(callback).toHaveBeenCalledWith({path: newPath});
             });
 
-            describe("when the project has no path", () => it("adds a directory and closes the dialog", function () {
+            describe("when the project has no path", () => it("adds a directory and closes the dialog", async function () {
               addDialog.close();
               atom.project.setPaths([]);
               atom.commands.dispatch(atom.views.getView(atom.workspace), "tree-view:add-folder");
@@ -2728,6 +3567,7 @@ describe("TreeView", function () {
               const newPath = temp.path();
               addDialog.miniEditor.insertText(newPath);
               atom.commands.dispatch(addDialog.element, 'core:confirm');
+              await fileOperationsSettled(treeView);
               expect(fs.isDirectorySync(newPath)).toBeTruthy();
               expect(atom.workspace.getModalPanels().length).toBe(0);
               expect(callback).toHaveBeenCalledWith({path: newPath});
@@ -2788,6 +3628,7 @@ describe("TreeView", function () {
               await wait(50);
 
               atom.commands.dispatch(moveDialog.element, 'core:confirm');
+              await fileOperationsSettled(treeView);
 
               expect(fs.existsSync(newPath)).toBeTruthy();
               expect(fs.existsSync(filePath)).toBeFalsy();
@@ -2845,31 +3686,31 @@ describe("TreeView", function () {
           describe('when the file is currently open', function () {
             beforeEach(() => waitForWorkspaceOpenEvent(() => atom.workspace.open(filePath)));
 
-            it('has its path updated', function () {
+            it('has its path updated', async function () {
               const newPath = path.join(rootDirPath, 'renamed-test-file.txt');
               moveDialog.miniEditor.setText(path.basename(newPath));
 
               atom.commands.dispatch(moveDialog.element, 'core:confirm');
+              await fileOperationsSettled(treeView);
 
               expect(atom.workspace.getActiveTextEditor().getPath()).toBe(newPath);
             });
 
-            it('does not update paths for similarly-named editors', function () {
+            it('does not update paths for similarly-named editors', async function () {
               filePath2 = path.join(dirPath, 'test-file.txt2');
               fs.writeFileSync(filePath2, 'copy');
 
-              waitForWorkspaceOpenEvent(() => atom.workspace.open(filePath2));
+              await waitForWorkspaceOpenEventPromise(() => atom.workspace.open(filePath2));
 
-              return runs(function () {
-                const newPath = path.join(rootDirPath, 'renamed-test-file.txt');
-                moveDialog.miniEditor.setText(path.basename(newPath));
+              const newPath = path.join(rootDirPath, 'renamed-test-file.txt');
+              moveDialog.miniEditor.setText(path.basename(newPath));
 
-                atom.commands.dispatch(moveDialog.element, 'core:confirm');
+              atom.commands.dispatch(moveDialog.element, 'core:confirm');
+              await fileOperationsSettled(treeView);
 
-                const editors = atom.workspace.getTextEditors();
-                expect(editors[0].getPath()).toBe(newPath);
-                expect(editors[1].getPath()).toBe(filePath2);
-              });
+              const editors = atom.workspace.getTextEditors();
+              expect(editors[0].getPath()).toBe(newPath);
+              expect(editors[1].getPath()).toBe(filePath2);
             });
           });
         });
@@ -2963,7 +3804,7 @@ describe("TreeView", function () {
         });
 
         describe("when the path is changed and confirmed", function () {
-          it("updates text editor paths accordingly", function () {
+          it("updates text editor paths accordingly", async function () {
             const editor = atom.workspace.getCenter().getActiveTextEditor();
             expect(editor.getPath()).toBe(filePath);
 
@@ -2971,23 +3812,23 @@ describe("TreeView", function () {
             moveDialog.miniEditor.setText(newPath);
 
             atom.commands.dispatch(moveDialog.element, 'core:confirm');
+            await fileOperationsSettled(treeView);
             expect(atom.workspace.getActivePaneItem()).toBe(editor);
             expect(editor.getPath()).toBe(filePath.replace('test-dir', 'renamed-dir'));
           });
 
-          it('does not update paths for editors with similar paths', function () {
-            waitForWorkspaceOpenEvent(() => atom.workspace.open(filePath2));
+          it('does not update paths for editors with similar paths', async function () {
+            await waitForWorkspaceOpenEventPromise(() => atom.workspace.open(filePath2));
 
-            return runs(function () {
-              const newPath = path.join(rootDirPath, 'renamed-dir');
-              moveDialog.miniEditor.setText(newPath);
+            const newPath = path.join(rootDirPath, 'renamed-dir');
+            moveDialog.miniEditor.setText(newPath);
 
-              atom.commands.dispatch(moveDialog.element, 'core:confirm');
+            atom.commands.dispatch(moveDialog.element, 'core:confirm');
+            await fileOperationsSettled(treeView);
 
-              const editors = atom.workspace.getTextEditors();
-              expect(editors[0].getPath()).toBe(filePath.replace('test-dir', 'renamed-dir'));
-              expect(editors[1].getPath()).toBe(filePath2);
-            });
+            const editors = atom.workspace.getTextEditors();
+            expect(editors[0].getPath()).toBe(filePath.replace('test-dir', 'renamed-dir'));
+            expect(editors[1].getPath()).toBe(filePath2);
           });
         });
       });
@@ -3419,14 +4260,10 @@ describe("TreeView", function () {
           spyOn(atom, 'confirm').andCallFake((_, callback) =>callback(0));
 
           atom.commands.dispatch(treeView.element, 'tree-view:remove');
+          await fileOperationsSettled(treeView);
 
-          waitsFor('directory to be deleted', () =>
-            callback.mostRecentCall?.args?.[0].pathToDelete === dirPath2
-          );
-
-          runs(() => {
-            expect(root1).toHaveClass('selected');
-          });
+          expect(callback.mostRecentCall?.args?.[0].pathToDelete).toBe(dirPath2);
+          expect(root1).toHaveClass('selected');
         });
       });
 
@@ -3522,6 +4359,7 @@ describe("TreeView", function () {
           spyOn(atom, 'confirm').andCallFake((_, callback) => callback(0));
 
           atom.commands.dispatch(treeView.element, 'tree-view:remove');
+          await fileOperationsSettled(treeView);
 
           await conditionPromise(() => callback.callCount === 1);
           expect(dirView2).toHaveClass('selected');
@@ -3529,27 +4367,25 @@ describe("TreeView", function () {
       });
 
       describe("when multiple files and folders are deleted", function () {
-        it("does not error when the selected entries form a parent/child relationship", function () {
-          // If dir1 and dir1/file1 are both selected for deletion,
-          // and dir1 is deleted first, do not error when attempting to delete dir1/file1
+        it("does not error when the selected entries form a parent/child relationship", async () => {
+          // If dir1 and dir1/file1 are both selected for deletion, deleting
+          // dir1 covers dir1/file1; nothing should complain about the child.
           atom.notifications.clear();
 
-          spyOn(fs, 'existsSync').andCallThrough();
-
           fileView.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-          dirView.dispatchEvent(new MouseEvent('mousedown', {bubbles: true, metaKey: true}));
+          dirView.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, metaKey: true }));
           treeView.focus();
 
           spyOn(atom, 'confirm').andCallFake((_, callback) => callback(0));
 
           atom.commands.dispatch(treeView.element, 'tree-view:remove');
+          await fileOperationsSettled(treeView);
 
-          waitsFor('dir1/file1 to attempt to be deleted', () => fs.existsSync.mostRecentCall.args[0] === filePath);
-
-          return runs(() => expect(atom.notifications.getNotifications().length).toBe(0));
+          expect(fs.existsSync(dirPath)).toBe(false);
+          expect(atom.notifications.getNotifications().length).toBe(0);
         });
 
-        it("focuses the first selected entry's parent folder", function () {
+        it("focuses the first selected entry's parent folder", async function () {
           jasmine.attachToDOM(workspaceElement);
 
           const callback = jasmine.createSpy('onEntryDeleted');
@@ -3562,10 +4398,10 @@ describe("TreeView", function () {
           spyOn(atom, 'confirm').andCallFake((_, callback) => callback(0));
 
           atom.commands.dispatch(treeView.element, 'tree-view:remove');
+          await fileOperationsSettled(treeView);
 
-          waitsFor('all selected entries to be deleted', () => callback.callCount === 2);
-
-          return runs(() => expect(root1).toHaveClass('selected'));
+          expect(callback.callCount).toBe(2);
+          expect(root1).toHaveClass('selected');
         });
       });
 
@@ -4940,6 +5776,7 @@ describe("TreeView", function () {
           eventHelpers.buildInternalDragEvents([thetaDir], alphaDir.querySelector('.header'), alphaDir, treeView);
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
+        await fileOperationsSettled(treeView);
         expect(alphaDir.children.length).toBe(2);
 
         const editors = atom.workspace.getTextEditors();
@@ -5039,12 +5876,12 @@ describe("TreeView", function () {
         const [dragStartEvent, _dragEnterEvent, dropEvent] =
         eventHelpers.buildInternalDragEvents(dragged, alphaDir.querySelector('.header'), alphaDir, treeView);
 
-        spyOn(treeView, 'moveEntry');
+        spyOn(treeView, 'moveEntries');
 
         treeView.onDragStart(dragStartEvent);
         treeView.onDrop(dropEvent);
         await wait(500);
-        expect(treeView.moveEntry).not.toHaveBeenCalled();
+        expect(treeView.moveEntries).not.toHaveBeenCalled();
       })
     });
 
@@ -5065,14 +5902,15 @@ describe("TreeView", function () {
           const [dragStartEvent, _dragEnterEvent, dropEvent] =
           eventHelpers.buildInternalDragEvents(dragged, alphaDir.querySelector('.header'), alphaDir, treeView, true);
 
-          spyOn(treeView, 'copyEntry').andCallThrough();
+          spyOn(treeView, 'copyEntries').andCallThrough();
 
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
+          await fileOperationsSettled(treeView);
           await conditionPromise(() => {
             return fs.existsSync(path.join(alphaDirPath, 'beta.txt'));
           }, 'wait for file to exist');
-          expect(treeView.copyEntry).toHaveBeenCalled();
+          expect(treeView.copyEntries).toHaveBeenCalled();
 
           await conditionPromise(() => {
             let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
@@ -5163,9 +6001,11 @@ describe("TreeView", function () {
     });
 
     describe("when dragging a file and directory from the OS onto a DirectoryView's header", () => {
-      it("should move the file and directory to the hovered directory", async () => {
+      it("should move the directory, along with the file inside it, to the hovered directory", async () => {
         jasmine.useRealClock();
-        // Dragging delta.txt and gammaDir from OS file explorer onto alphaDir
+        // Dragging delta.txt and gammaDir from OS file explorer onto alphaDir.
+        // delta.txt lives inside gammaDir, so moving gammaDir covers it; it
+        // should arrive inside gammaDir, not be pulled out beside it.
         const alphaDir = findDirectoryContainingText(treeView.roots[0], 'alpha');
         await alphaDir.expand();
 
@@ -5174,14 +6014,19 @@ describe("TreeView", function () {
         const dropEvent = eventHelpers.buildExternalDropEvent([deltaFilePath, gammaDirPath], alphaDir);
 
         treeView.onDrop(dropEvent);
-        await conditionPromise(() => alphaDir.children.length === 2);
+        await fileOperationsSettled(treeView);
+
+        const movedGammaDirPath = path.join(alphaDirPath, path.basename(gammaDirPath));
+        expect(fs.isDirectorySync(movedGammaDirPath)).toBe(true);
+        expect(fs.existsSync(path.join(movedGammaDirPath, path.basename(deltaFilePath)))).toBe(true);
+        expect(fs.existsSync(path.join(alphaDirPath, path.basename(deltaFilePath)))).toBe(false);
 
         await conditionPromise(() => {
           let alphaEntries = findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry');
           return alphaEntries.length > alphaDirContents;
         }, "directory view contents to refresh");
 
-        expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 2)
+        expect(findDirectoryContainingText(treeView.roots[0], 'alpha').querySelectorAll('.entry').length).toBe(alphaDirContents + 1)
       });
     });
 
@@ -5264,19 +6109,23 @@ describe("TreeView", function () {
         });
 
         describe("when selecting the skip option", () => {
-          it("does not replace the existing file", function () {
+          it("does not replace the existing file", async function () {
             spyOn(atom, 'confirm').andReturn(1);
             treeView.onDragStart(dragStartEvent);
             treeView.onDrop(dropEvent);
+            await fileOperationsSettled(treeView);
+            expect(atom.confirm).toHaveBeenCalled();
             expect(fs.readFileSync(deltaAlphaFilePath, 'utf8')).toBe('old');
           });
         });
 
         describe("when cancelling the dialog", () => {
-          it("does not replace the existing file", function () {
+          it("does not replace the existing file", async function () {
             spyOn(atom, 'confirm').andReturn(2);
             treeView.onDragStart(dragStartEvent);
             treeView.onDrop(dropEvent);
+            await fileOperationsSettled(treeView);
+            expect(atom.confirm).toHaveBeenCalled();
             expect(fs.readFileSync(deltaAlphaFilePath, 'utf8')).toBe('old');
           });
         });
@@ -5308,7 +6157,7 @@ describe("TreeView", function () {
           return dropEvent = eventHelpers.buildExternalDropEvent([aGammaFilePath, bGammaFilePath, cGammaFilePath], alphaDir);
         });
 
-        it("prompts for each file as long as cancel is not chosen", function () {
+        it("prompts for each file as long as cancel is not chosen", async function () {
           let calls = 0;
           const getButton = function () {
             calls++;
@@ -5324,6 +6173,7 @@ describe("TreeView", function () {
 
           spyOn(atom, 'confirm').andCallFake(() => getButton());
           treeView.onDrop(dropEvent);
+          await fileOperationsSettled(treeView);
           expect(atom.confirm.calls.length).toBe(3);
 
           expect(fs.readFileSync(aAlphaFilePath, 'utf8')).toBe('new');
@@ -5331,7 +6181,10 @@ describe("TreeView", function () {
           expect(fs.readFileSync(cAlphaFilePath, 'utf8')).toBe('new');
         });
 
-        it("immediately cancels any pending file moves when cancel is chosen", function () {
+        // Conflicts are resolved before anything moves, so cancelling
+        // abandons the whole batch — including a.txt, which the user had
+        // already chosen to replace.
+        it("moves nothing when cancel is chosen", async function () {
           let calls = 0;
           const getButton = function () {
             calls++;
@@ -5345,11 +6198,15 @@ describe("TreeView", function () {
 
           spyOn(atom, 'confirm').andCallFake(() => getButton());
           treeView.onDrop(dropEvent);
+          await fileOperationsSettled(treeView);
           expect(atom.confirm.calls.length).toBe(2);
 
-          expect(fs.readFileSync(aAlphaFilePath, 'utf8')).toBe('new');
+          expect(fs.readFileSync(aAlphaFilePath, 'utf8')).toBe('old');
           expect(fs.readFileSync(bAlphaFilePath, 'utf8')).toBe('old');
           expect(fs.readFileSync(cAlphaFilePath, 'utf8')).toBe('old');
+          expect(fs.existsSync(aGammaFilePath)).toBe(true);
+          expect(fs.existsSync(bGammaFilePath)).toBe(true);
+          expect(fs.existsSync(cGammaFilePath)).toBe(true);
         });
       });
 
@@ -5409,10 +6266,11 @@ describe("TreeView", function () {
             eventHelpers.buildInternalDragEvents([newAlphaDir], treeView.roots[0].querySelector('.header'), treeView.roots[0], treeView);
         });
 
-        it("recursively walks the directory structure and prompts to replace each conflicting file", function () {
+        it("recursively walks the directory structure and prompts to replace each conflicting file", async function () {
           spyOn(atom, 'confirm').andReturn(1);
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
+          await fileOperationsSettled(treeView);
           expect(atom.confirm.calls.length).toBe(4);
           expect(atom.confirm.calls[0].args[0].message).toContain('a.txt');
           expect(atom.confirm.calls[1].args[0].message).toContain('b.txt');
@@ -5420,7 +6278,7 @@ describe("TreeView", function () {
           expect(atom.confirm.calls[3].args[0].message).toContain('nested.txt');
         });
 
-        it("removes the containing folder only if it is empty after all entries have finished moving", function () {
+        it("removes the containing folder only if it is empty after all entries have finished moving", async function () {
           let calls = 0;
           const getButton = function () {
             calls++;
@@ -5439,11 +6297,15 @@ describe("TreeView", function () {
           spyOn(atom, 'confirm').andCallFake(() => getButton());
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
+          await fileOperationsSettled(treeView);
           expect(fs.existsSync(newAlphaDirPath)).toBe(true);
           expect(fs.existsSync(newNestedDirPath)).toBe(false);
         });
 
-        it("immediately cancels any pending file moves when cancel is chosen", function () {
+        // Conflicts are resolved before anything moves, so cancelling
+        // abandons the whole merge — including a.txt, which the user had
+        // already chosen to replace.
+        it("moves nothing when cancel is chosen", async function () {
           let calls = 0;
           const getButton = function () {
             calls++;
@@ -5457,22 +6319,26 @@ describe("TreeView", function () {
 
           spyOn(atom, 'confirm').andCallFake(() => getButton());
           spyOn(fs, 'renameSync').andCallThrough();
+          spyOn(fs, 'moveSync').andCallThrough();
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
+          await fileOperationsSettled(treeView);
           expect(atom.confirm.calls.length).toBe(2);
-          expect(fs.renameSync.calls.length).toBe(1);
-          expect(fs.existsSync(newAFilePath)).toBe(false);
-          expect(fs.readFileSync(oldAFilePath, 'utf8')).toBe('new');
+          expect(fs.renameSync).not.toHaveBeenCalled();
+          expect(fs.moveSync).not.toHaveBeenCalled();
+          expect(fs.existsSync(newAFilePath)).toBe(true);
+          expect(fs.readFileSync(oldAFilePath, 'utf8')).toBe('old');
           expect(fs.existsSync(newBFilePath)).toBe(true);
-          expect(fs.existsSync(onlyNewDirPath)).toBe(true); // true since this comes after b.txt
+          expect(fs.existsSync(onlyNewDirPath)).toBe(true);
           expect(fs.existsSync(newNestedFilePath)).toBe(true);
         });
 
-        it("moves everything as expected", function () {
+        it("moves everything as expected", async function () {
           spyOn(atom, 'confirm').andReturn(0);
           spyOn(fs, 'renameSync').andCallThrough();
           treeView.onDragStart(dragStartEvent);
           treeView.onDrop(dropEvent);
+          await fileOperationsSettled(treeView);
           expect(fs.renameSync.calls.length).toBe(4); // new/ is handled internally by fs-plus
           expect(fs.existsSync(newAFilePath)).toBe(false);
           expect(fs.readFileSync(oldAFilePath, 'utf8')).toBe('new');
@@ -5516,9 +6382,9 @@ describe("TreeView", function () {
         treeView.onDragLeave(dragEnterEvent);
         expect(alphaDir).not.toHaveClass('selected');
 
-        spyOn(treeView, 'moveEntry');
+        spyOn(treeView, 'moveEntries');
         treeView.onDrop(dropEvent);
-        expect(treeView.moveEntry).not.toHaveBeenCalled();
+        expect(treeView.moveEntries).not.toHaveBeenCalled();
       })
     });
   });
@@ -6015,6 +6881,16 @@ describe("Service provider", function () {
   it("provides the `entryForPath` method which should return the Tree View entry for a given path", function () {
     const root = atom.project.getPaths()[0];
     expect(treeViewService.entryForPath(root)).toEqual(treeView.roots[0]);
+  });
+
+  it("still provides version 1.0.0 to consumers that ask for it", () => {
+    let provided;
+    const subscription = atom.packages.serviceHub.consume('tree-view', '1.0.0', (service) => {
+      provided = service;
+    });
+    expect(typeof provided?.selectedPaths).toBe('function');
+    expect(typeof provided?.entryForPath).toBe('function');
+    subscription.dispose();
   });
 });
 

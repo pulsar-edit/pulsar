@@ -50,6 +50,26 @@ export async function conditionPromise (condition, description = 'anonymous cond
   }
 }
 
+// Wait for a tree view's queued file operations to finish, along with
+// whatever awaited them (dialogs closing, deletion's notifications and
+// reselection, etc.).
+//
+// File operations always go async (they're queued, and consumers may delay
+// them), but the commands that trigger them don't return promises; this is
+// what a spec can wait on instead.
+export async function fileOperationsSettled (treeView) {
+  let queue
+  do {
+    queue = treeView.fileOperations.queue
+    await queue
+    // A macrotask, so that every continuation of the operation's promise has
+    // run by the time we return. `setImmediate` rather than `setTimeout`,
+    // because the spec helper fakes `setTimeout` unless a spec opts into the
+    // real clock.
+    await new Promise((resolve) => setImmediate(resolve))
+  } while (queue !== treeView.fileOperations.queue)
+}
+
 export function timeoutPromise (timeout) {
   return new Promise(function (resolve) {
     global.setTimeout(resolve, timeout)
