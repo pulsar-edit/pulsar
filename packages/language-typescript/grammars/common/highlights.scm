@@ -363,7 +363,7 @@
 (type_parameters ">" @punctuation.definition.parameters.end.bracket.angle._LANG_
   (#set! capture.final))
 
-"=>" @storage.type.arrow._LANG_
+"=>" @punctuation.function.arrow._LANG_
 
 ; TODO: If I allow scopes like `storage.type.string.ts`, I will make a lot of
 ; text look like strings by accident. This really needs to be fixed in syntax
