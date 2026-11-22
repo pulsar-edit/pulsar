@@ -4241,6 +4241,25 @@ describe('TextEditorComponent', () => {
       );
     });
 
+    it('does not leave stale nodes behind on empty lines when text decorations change', async () => {
+      const { component, editor } = buildComponent({ text: 'abc\n\ndef\n' });
+      const marker = editor.markBufferRange([[0, 1], [2, 1]]);
+      const decoration = editor.decorateMarker(marker, {
+        type: 'text',
+        class: 'a'
+      });
+      await component.getNextUpdatePromise();
+      decoration.setProperties({ type: 'text', class: 'b' });
+      await component.getNextUpdatePromise();
+
+      // An empty line renders as an empty root span plus a placeholder space.
+      const lineNode = lineNodeForScreenRow(component, 1);
+      expect(lineNode.childNodes.length).toBe(2);
+      expect(
+        component.pixelPositionForScreenPosition({ row: 1, column: 0 }).left
+      ).toBe(0);
+    });
+
     it('does not create empty spans when a text decoration contains a row but another text decoration starts or ends at the beginning of it', async () => {
       const { component, element, editor } = buildComponent();
       const markerLayer = editor.addMarkerLayer();
