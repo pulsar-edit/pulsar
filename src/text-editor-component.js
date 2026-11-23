@@ -2851,7 +2851,7 @@ module.exports = class TextEditorComponent {
       }
     }
 
-    // SECOND STRATEGY:
+    // STRATEGY 2:
     //
     // We need this if the point on screen isn't visible. This can happen if a
     // package calls `screenPositionForPixelPosition` programmatically for a
@@ -2898,184 +2898,35 @@ module.exports = class TextEditorComponent {
       }
 
       let containingTextNodeIndex = textNodes.indexOf(containingTextNode);
-      let characterIndex = 0;
+      let textNodeStartColumn = 0;
+      for (let i = 0; i < containingTextNodeIndex; i++) {
+        textNodeStartColumn += textNodes[i].length;
+      }
 
-      // The space we will search will be either a full text node or some
-      // subset of it. We will ensure that this range of the text node has
-      // exactly one text direction.
-      let containingTextNodeBounds;
-      let containingText;
-
+      let characterIndex;
       if (clientRectsForTextNode(containingTextNode).length === 1) {
-        // The whole text node is a single-directional fragment. Great!
-        containingText = containingTextNode.textContent;
-        containingTextNodeBounds = [0, containingText.length - 1];
-      } else {
-        // There are multiple `DOMRect`s used to draw this text range. Since
-        // this is a single screen line, it won't be because of text wrapping;
-        // hence it's almost certainly because we're drawing text in two
-        // different directions.
-        //
-        // Let's divide this text node up along the likely boundaries of RTL
-        // text divisions.
-        let { textContent } = containingTextNode;
-
-        // Detect unbroken strings of RTL text. These will help us divide the
-        // string into fragments, each of which will be considered
-        // individually. We use a pattern designed to detect Arabic, Hebrew,
-        // and Persian characters in their standard unicode ranges.
-
-        // This pattern describes any number of RTL characters separated only
-        // by strings.
-        let textMatches = Array.from(
-          textContent.matchAll(
-            /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+(?:\s+[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]+)*/g
-          )
-        );
-
-        // These matches identify the RTL sections. Using them, we'll divide
-        // the entire line up into fragments, each of which is unidrectional.
-        let fragments = [];
-        let lastMatchIndex = textMatches.length - 1;
-
-        for (let [i, match] of Array.from(textMatches).entries()) {
-          let { index } = match;
-          let matchLength = match[0].length;
-          if (fragments.length === 0 && index > 0) {
-            // The first match doesn't start the line, so add a fragment to
-            // represent everything until the first match.
-            fragments.push([0, index]);
-          }
-          let [_, lastFragmentEnd] = fragments[fragments.length - 1];
-          if (lastFragmentEnd < index) {
-            // A gap exists between the last fragment we added and this match,
-            // so add another fragment to represent the gap.
-            fragments.push([lastFragmentEnd, index]);
-          }
-          // Add a fragment for this match.
-          fragments.push([index, index + matchLength]);
-
-          if (i === lastMatchIndex && (index + matchLength) < (textContent.length - 1)) {
-            // This is the last match, but there's text on the line after this
-            // match, so we'll add one final fragment to represent that text.
-            fragments.push([index + matchLength, textContent.length - 1]);
-          }
-        }
-
-        for (let [index, endIndex] of fragments) {
-          let fragmentText = textContent.substring(index, endIndex);
-          let rects = Array.from(
-            clientRectsForRange(containingTextNode, index, endIndex)
-          );
-          if (rects.some(
-            r => targetClientLeft >= r.left && targetClientLeft <= r.right
-          )) {
-            containingTextNodeBounds = [index, endIndex];
-            containingText = fragmentText;
-            break;
-          }
-        }
-
-        let clientRects = clientRectsForTextNode(
+        // The whole text node is drawn as one unidirectional run. Great!
+        const { textContent } = containingTextNode;
+        characterIndex = characterIndexInUnidirectionalRun(
           containingTextNode,
-          containingTextNodeBounds[0],
-          containingTextNodeBounds[1]
+          0,
+          textContent.length,
+          targetClientLeft,
+          hasRtlText(textContent)
         );
-        if (clientRects.length > 1) {
-          // We've still got a bidirectional fragment somehow. Split the whole
-          // thing into individual words. This is a more aggressive way to
-          // ensure unidirectionality within a text.
-          let words = containingText.split(/\b/);
-          let index = containingTextNodeBounds[0];
-          let found = false;
-          let targetClientRects;
-          for (let word of words) {
-            let boundaries = [index, index + word.length];
-            let clientRects = clientRectsForTextNode(
-              containingTextNode,
-              boundaries[0],
-              boundaries[1]
-            );
-            if (clientRects.some(
-              r => targetClientLeft >= r.left && targetClientLeft <= r.right
-            )) {
-              found = true;
-              targetClientRects = clientRects;
-              containingTextNodeBounds = boundaries;
-              containingText = containingText.substring(...boundaries);
-              break;
-            }
-          }
-          // At this point, if we can't find one — or if we can't isolate it to
-          // a single contiguous `DOMRect` — then we should give up.
-          if (!found | targetClientRects.length > 1) {
-            console.error(`Error: could not find a valid cursor position for coordinates: (${left}, ${top}) within the editor.`);
-            // Declare defeat and fall back to the 0th column.
-            return Point(row, 0);
-          }
-        }
+      } else {
+        // There are multiple `DOMRect`s used to draw this text node. Since
+        // this is a single screen line, it won't be because of text wrapping;
+        // hence it's almost certainly because the node contains text in more
+        // than one direction.
+        characterIndex = characterIndexInBidirectionalTextNode(
+          containingTextNode,
+          screenLine.lineText,
+          targetClientLeft
+        );
       }
 
-      if (!containingTextNodeBounds) {
-        console.error(`Error: could not find a valid cursor position for coordinates: (${left}, ${top}) within the editor.`);
-        // Declare defeat and fall back to the 0th column.
-        return Point(row, 0);
-      }
-
-      let mode = hasRtlText(containingText) ? 'rtl' : 'ltr';
-
-      characterIndex = -1;
-      {
-        let low = containingTextNodeBounds[0];
-        let high = containingTextNodeBounds[1];
-        while (low <= high) {
-          let charIndex = low + ((high - low) >> 1);
-          const nextCharIndex = isPairedCharacter(
-            containingTextNode.textContent,
-            charIndex
-          ) ? charIndex + 2 : charIndex + 1;
-
-          const rangeRect = clientRectForRange(
-            containingTextNode,
-            charIndex,
-            nextCharIndex
-          );
-
-          if (
-            (mode === 'ltr' && targetClientLeft < rangeRect.left) ||
-            (mode === 'rtl' && targetClientLeft > rangeRect.right)
-          ) {
-            high = charIndex - 1;
-            characterIndex = Math.max(0, charIndex - 1);
-          } else if (
-            (mode === 'ltr' && targetClientLeft > rangeRect.right) ||
-            (mode === 'rtl' && targetClientLeft < rangeRect.left)
-          ) {
-            low = nextCharIndex;
-            characterIndex = Math.min(
-              containingTextNode.textContent.length,
-              nextCharIndex
-            );
-          } else {
-            let mid = (rangeRect.left + rangeRect.right) / 2;
-            if (
-              (mode === 'ltr' && targetClientLeft <= mid) ||
-              (mode === 'rtl' && targetClientLeft >= mid)
-            ) {
-              characterIndex = charIndex;
-            } else {
-              characterIndex = nextCharIndex;
-            }
-            break;
-          }
-        }
-        let textNodeStartColumn = 0;
-        for (let i = 0; i < containingTextNodeIndex; i++) {
-          textNodeStartColumn += textNodes[i].length;
-        }
-        const column = textNodeStartColumn + characterIndex;
-        return Point(row, column);
-      }
+      return Point(row, textNodeStartColumn + characterIndex);
     }
   }
 
@@ -5376,18 +5227,149 @@ class OverlayComponent {
 }
 
 let rangeForMeasurement;
+
+// Explicit bidi embeddings, overrides, and isolates (LRE, RLE, PDF, LRO, RLO,
+// LRI, RLI, FSI, PDI). These can force even strongly-LTR characters to be
+// drawn right-to-left.
+const RE_BIDI_EMBEDDING_OR_OVERRIDE = /[\u202A-\u202E\u2066-\u2069]/;
+
+// A run of printable ASCII that starts and ends with an ASCII letter.
+//
+// Per the Unicode Bidirectional Algorithm, such a run is guaranteed to be
+// drawn left-to-right as one contiguous block, provided that the line has an
+// LTR base direction and contains no explicit embeddings or overrides:
+//
+// * ASCII letters are strongly LTR.
+// * Neutrals (spaces, punctuation, brackets) between two strongly-LTR
+//   characters resolve to LTR (rules N0/N1).
+// * European digits preceded by a strongly-LTR character resolve to LTR
+//   (rule W7).
+const RE_SAFE_LTR_RUN = /[A-Za-z](?:[\x20-\x7E]*[A-Za-z])?/g;
+
+// Divides a text node's contents into segments, each of which is either a
+// run of text known to be drawn LTR (`safe: true`) or a single character
+// whose direction we can't infer from its code point alone (`safe: false`).
+function bidiSegmentsForText(text, lineText) {
+  const segments = [];
+  const pushUnsafeCharacters = (start, end) => {
+    let i = start;
+    while (i < end) {
+      const next = isPairedCharacter(text, i) ? i + 2 : i + 1;
+      segments.push({ start: i, end: Math.min(next, end), safe: false });
+      i = next;
+    }
+  };
+
+  if (RE_BIDI_EMBEDDING_OR_OVERRIDE.test(lineText)) {
+    // All bets are off; consider every character individually.
+    pushUnsafeCharacters(0, text.length);
+    return segments;
+  }
+
+  let lastEnd = 0;
+  for (const match of text.matchAll(RE_SAFE_LTR_RUN)) {
+    pushUnsafeCharacters(lastEnd, match.index);
+    lastEnd = match.index + match[0].length;
+    segments.push({ start: match.index, end: lastEnd, safe: true });
+  }
+  pushUnsafeCharacters(lastEnd, text.length);
+  return segments;
+}
+
+// Given a client X coordinate, returns the index within `textNode` (between
+// `start` and `end`, inclusive) of the character boundary closest to it. The
+// range `[start, end)` must be drawn in a single direction.
+function characterIndexInUnidirectionalRun(textNode, start, end, targetClientLeft, isRtl) {
+  const text = textNode.textContent;
+  let characterIndex = start;
+  let low = start;
+  let high = end - 1;
+  while (low <= high) {
+    const charIndex = low + ((high - low) >> 1);
+    const nextCharIndex = isPairedCharacter(text, charIndex)
+      ? charIndex + 2
+      : charIndex + 1;
+    const rect = clientRectForRange(textNode, charIndex, nextCharIndex);
+
+    const isBefore = isRtl
+      ? targetClientLeft > rect.right
+      : targetClientLeft < rect.left;
+    const isAfter = isRtl
+      ? targetClientLeft < rect.left
+      : targetClientLeft > rect.right;
+
+    if (isBefore) {
+      high = charIndex - 1;
+      characterIndex = Math.max(start, charIndex - 1);
+    } else if (isAfter) {
+      low = nextCharIndex;
+      characterIndex = Math.min(end, nextCharIndex);
+    } else {
+      const mid = (rect.left + rect.right) / 2;
+      const inFirstHalf = isRtl
+        ? targetClientLeft >= mid
+        : targetClientLeft <= mid;
+      characterIndex = inFirstHalf ? charIndex : nextCharIndex;
+      break;
+    }
+  }
+  return Math.min(end, Math.max(start, characterIndex));
+}
+
+// Returns the index of the character boundary within `textNode` whose caret
+// position is closest to the given client X coordinate, for a text node that
+// contains text drawn in more than one direction.
+//
+// At the edge of a run of RTL text, the character boundary that is visually
+// nearest isn't necessarily one of the logical boundaries of the character
+// under the pointer, so we compare caret positions directly. These are the
+// same collapsed-range measurements used to position the cursor, so the
+// result agrees with where the cursor is drawn.
+//
+// To keep this cheap, a run of text that is known to be drawn LTR
+// contributes only its ends plus the result of a binary search; only the
+// characters whose direction is uncertain are measured individually.
+function characterIndexInBidirectionalTextNode(textNode, lineText, targetClientLeft) {
+  const segments = bidiSegmentsForText(textNode.textContent, lineText);
+  const candidates = new Set();
+  for (const segment of segments) {
+    candidates.add(segment.start);
+    candidates.add(segment.end);
+    if (!segment.safe) continue;
+    const rect = clientRectForRange(textNode, segment.start, segment.end);
+    if (targetClientLeft >= rect.left && targetClientLeft <= rect.right) {
+      candidates.add(
+        characterIndexInUnidirectionalRun(
+          textNode,
+          segment.start,
+          segment.end,
+          targetClientLeft,
+          false
+        )
+      );
+    }
+  }
+
+  let best = 0;
+  let bestDistance = Infinity;
+  for (const offset of candidates) {
+    const caretRect = clientRectForRange(textNode, offset, offset);
+    // A collapsed range with no height wasn't laid out; ignore it.
+    if (caretRect.height === 0) continue;
+    const distance = Math.abs(caretRect.left - targetClientLeft);
+    if (distance < bestDistance) {
+      best = offset;
+      bestDistance = distance;
+    }
+  }
+  return best;
+}
+
 function clientRectForRange(textNode, startIndex, endIndex) {
   rangeForMeasurement ??= document.createRange();
   rangeForMeasurement.setStart(textNode, startIndex);
   rangeForMeasurement.setEnd(textNode, endIndex);
   return rangeForMeasurement.getBoundingClientRect();
-}
-
-function clientRectsForRange(textNode, startIndex, endIndex) {
-  rangeForMeasurement ??= document.createRange();
-  rangeForMeasurement.setStart(textNode, startIndex);
-  rangeForMeasurement.setEnd(textNode, endIndex);
-  return rangeForMeasurement.getClientRects();
 }
 
 function clientRectsForTextNode(textNode, startIndex = null, endIndex = null) {
