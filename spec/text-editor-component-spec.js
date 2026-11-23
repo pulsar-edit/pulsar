@@ -6274,6 +6274,61 @@ describe('TextEditorComponent', () => {
         );
       }
     });
+
+    describe('on lines containing bidirectional text', () => {
+      // Sweeps the pointer across every horizontal position on the given row
+      // and asserts that each lookup succeeds and returns a position on that
+      // row.
+      //
+      // `caretRangeFromPoint` is stubbed out so that we exercise the
+      // measurement-based fallback, which is what runs when the point isn't
+      // visible or `caretRangeFromPoint` gives an unusable result.
+      async function expectSweepToSucceed(text) {
+        const { component, editor } = buildComponent({ text });
+        await component.getNextUpdatePromise();
+        if (!jasmine.isSpy(document.caretRangeFromPoint)) {
+          spyOn(document, 'caretRangeFromPoint').and.returnValue(null);
+        }
+        const lineHeight = component.getLineHeight();
+        const charWidth = component.getBaseCharacterWidth();
+        const rowLength = editor.lineLengthForScreenRow(0);
+        const top = lineHeight / 2;
+        const maxLeft = (rowLength + 2) * charWidth;
+
+        let failure = null;
+        for (let left = 0; left <= maxLeft && !failure; left += 1) {
+          try {
+            const { row, column } = component.screenPositionForPixelPosition({
+              top,
+              left
+            });
+            if (row !== 0 || column < 0 || column > rowLength) {
+              failure = `left=${left}: got [${row}, ${column}]`;
+            }
+          } catch (error) {
+            failure = `left=${left}: ${error.message}`;
+          }
+        }
+        expect(failure).toBeNull(`for ${JSON.stringify(text)}`);
+      }
+
+      it('handles a pointer over the last character after an RTL run', async () => {
+        await expectSweepToSucceed('abc אבג def');
+      });
+
+      it('handles a line that starts with an RTL run', async () => {
+        await expectSweepToSucceed('אבג abc');
+      });
+
+      it('handles RTL characters outside of the commonly-detected ranges', async () => {
+        // U+200F RIGHT-TO-LEFT MARK
+        await expectSweepToSucceed('rlm‏mark here');
+        // Arabic Extended-A
+        await expectSweepToSucceed('arabic ࢠࢡ x');
+        // Adlam (outside the BMP)
+        await expectSweepToSucceed('adlam \u{1E900}\u{1E901} x');
+      });
+    });
   });
 
   describe('model methods that delegate to the component / element', () => {
