@@ -4241,6 +4241,25 @@ describe('TextEditorComponent', () => {
       );
     });
 
+    it('does not leave stale nodes behind on empty lines when text decorations change', async () => {
+      const { component, editor } = buildComponent({ text: 'abc\n\ndef\n' });
+      const marker = editor.markBufferRange([[0, 1], [2, 1]]);
+      const decoration = editor.decorateMarker(marker, {
+        type: 'text',
+        class: 'a'
+      });
+      await component.getNextUpdatePromise();
+      decoration.setProperties({ type: 'text', class: 'b' });
+      await component.getNextUpdatePromise();
+
+      // An empty line renders as an empty root span plus a placeholder space.
+      const lineNode = lineNodeForScreenRow(component, 1);
+      expect(lineNode.childNodes.length).toBe(2);
+      expect(
+        component.pixelPositionForScreenPosition({ row: 1, column: 0 }).left
+      ).toBe(0);
+    });
+
     it('does not create empty spans when a text decoration contains a row but another text decoration starts or ends at the beginning of it', async () => {
       const { component, element, editor } = buildComponent();
       const markerLayer = editor.addMarkerLayer();
@@ -6254,6 +6273,61 @@ describe('TextEditorComponent', () => {
           [3, 4]
         );
       }
+    });
+
+    describe('on lines containing bidirectional text', () => {
+      // Sweeps the pointer across every horizontal position on the given row
+      // and asserts that each lookup succeeds and returns a position on that
+      // row.
+      //
+      // `caretRangeFromPoint` is stubbed out so that we exercise the
+      // measurement-based fallback, which is what runs when the point isn't
+      // visible or `caretRangeFromPoint` gives an unusable result.
+      async function expectSweepToSucceed(text) {
+        const { component, editor } = buildComponent({ text });
+        await component.getNextUpdatePromise();
+        if (!jasmine.isSpy(document.caretRangeFromPoint)) {
+          spyOn(document, 'caretRangeFromPoint').and.returnValue(null);
+        }
+        const lineHeight = component.getLineHeight();
+        const charWidth = component.getBaseCharacterWidth();
+        const rowLength = editor.lineLengthForScreenRow(0);
+        const top = lineHeight / 2;
+        const maxLeft = (rowLength + 2) * charWidth;
+
+        let failure = null;
+        for (let left = 0; left <= maxLeft && !failure; left += 1) {
+          try {
+            const { row, column } = component.screenPositionForPixelPosition({
+              top,
+              left
+            });
+            if (row !== 0 || column < 0 || column > rowLength) {
+              failure = `left=${left}: got [${row}, ${column}]`;
+            }
+          } catch (error) {
+            failure = `left=${left}: ${error.message}`;
+          }
+        }
+        expect(failure).toBeNull(`for ${JSON.stringify(text)}`);
+      }
+
+      it('handles a pointer over the last character after an RTL run', async () => {
+        await expectSweepToSucceed('abc אבג def');
+      });
+
+      it('handles a line that starts with an RTL run', async () => {
+        await expectSweepToSucceed('אבג abc');
+      });
+
+      it('handles RTL characters outside of the commonly-detected ranges', async () => {
+        // U+200F RIGHT-TO-LEFT MARK
+        await expectSweepToSucceed('rlm‏mark here');
+        // Arabic Extended-A
+        await expectSweepToSucceed('arabic ࢠࢡ x');
+        // Adlam (outside the BMP)
+        await expectSweepToSucceed('adlam \u{1E900}\u{1E901} x');
+      });
     });
   });
 
