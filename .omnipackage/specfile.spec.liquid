@@ -1,0 +1,58 @@
+Name:       {{ package_name }}
+Version:    {{ version }}
+Release:    1%{?dist}
+Summary:    Pulsar editor
+License:    GPL-3.0-or-later
+URL:        https://pulsar-edit.dev
+Source0:    {{ source_folder_name }}.tar.gz
+#AutoReqProv: no # Avoid libchromiumcontent.so missing dependency
+
+BuildRequires: {{ build_dependencies | join: ' ' }}
+{% if runtime_dependencies.size > 0 %}
+Requires: {{ runtime_dependencies | join: ', ' }}
+{% endif %}
+
+# Disable Fedora's shebang mangling script,
+# which errors out on any file with versionless `python` in its shebang
+# See: https://github.com/atom/atom/issues/21937
+%undefine __brp_mangle_shebangs
+
+%define debug_package %{nil}
+%define _build_id_links none
+
+%description
+{{ description }}
+
+
+%prep
+%setup -q
+
+
+%build
+
+
+%install
+.omnipackage/install.sh %{buildroot} %{name}
+
+
+%files
+/usr/lib/%{name}/
+%attr(4755, root, root) /usr/lib/%{name}/chrome-sandbox
+/usr/bin/%{name}
+/usr/bin/ppm-dev
+/usr/share/applications/%{name}.desktop
+/usr/share/polkit-1/actions/%{name}.policy
+/usr/share/icons/hicolor/16x16/apps/%{name}.png
+/usr/share/icons/hicolor/22x22/apps/%{name}.png
+/usr/share/icons/hicolor/24x24/apps/%{name}.png
+/usr/share/icons/hicolor/32x32/apps/%{name}.png
+/usr/share/icons/hicolor/48x48/apps/%{name}.png
+/usr/share/icons/hicolor/64x64/apps/%{name}.png
+/usr/share/icons/hicolor/128x128/apps/%{name}.png
+/usr/share/icons/hicolor/256x256/apps/%{name}.png
+/usr/share/icons/hicolor/384x384/apps/%{name}.png
+
+
+%changelog
+* Sun Feb 18 2024 Chuck Norris <chuck@norr.is>
+- Chuck Norris does not use revision control software. None of his code has ever needed revision.
