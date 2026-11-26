@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { clipboard } = require('electron');
+const { clipboard } = require('@electron/remote');
 
 // Extended: Represents the clipboard used for copying and pasting in Pulsar.
 //
@@ -52,29 +52,29 @@ module.exports = class Clipboard {
   //
   // * `text` The {String} to store.
   // * `metadata` (optional) The additional info to associate with the text.
-  write(text, metadata) {
+  async write(text, metadata) {
     text = text.replace(/\r?\n/g, process.platform === 'win32' ? '\r\n' : '\n');
 
     this.signatureForMetadata = this.md5(text);
     this.metadata = metadata;
-    clipboard.writeText(text);
+    await clipboard.writeText(text);
   }
 
   // Public: Read the text from the clipboard.
   //
-  // Returns a {String}.
+  // Returns a Promise that resolves to a {String}.
   read() {
     return clipboard.readText();
   }
 
   // Public: Write the given text to the macOS find pasteboard
   writeFindText(text) {
-    clipboard.writeFindText(text);
+    return clipboard.writeFindText(text);
   }
 
   // Public: Read the text from the macOS find pasteboard.
   //
-  // Returns a {String}.
+  // Returns a Promise that resolves to a {String}.
   readFindText() {
     return clipboard.readFindText();
   }
@@ -85,8 +85,8 @@ module.exports = class Clipboard {
   // Returns an {Object} with the following keys:
   // * `text` The {String} clipboard text.
   // * `metadata` The metadata stored by an earlier call to {::write}.
-  readWithMetadata() {
-    const text = this.read();
+  async readWithMetadata() {
+    const text = await this.read();
     if (this.signatureForMetadata === this.md5(text)) {
       return { text, metadata: this.metadata };
     } else {
